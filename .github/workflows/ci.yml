@@ -1,0 +1,35 @@
+# SPDX-License-Identifier: Apache-2.0
+name: simulation-only-checks
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+concurrency:
+  group: simulation-only-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  host-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Confirm host C++ compiler
+        run: g++ --version
+      - name: Run complete offline verification
+        run: python tools/check_all.py
+        env:
+          PYTHONPATH: src
+      - name: Check local wheel build tooling
+        run: python -c "import setuptools; print('setuptools', setuptools.__version__)"
+      - name: Build and smoke-test wheel without network access
+        run: python tools/wheel_smoke.py --require-build-tools

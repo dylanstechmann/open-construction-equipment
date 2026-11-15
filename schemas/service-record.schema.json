@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Controlled service-record envelope",
+  "type": "object",
+  "required": [
+    "recordType",
+    "platform",
+    "record"
+  ],
+  "properties": {
+    "recordType": {
+      "const": "OCE-CTL-01-service-record"
+    },
+    "platform": {
+      "const": "OCE-CTL-01"
+    },
+    "syntheticNotice": {
+      "type": "string"
+    },
+    "record": {
+      "type": "object",
+      "required": [
+        "recordId",
+        "unitId",
+        "recordStatus",
+        "serviceContext",
+        "workEntries",
+        "returnToService"
+      ],
+      "properties": {
+        "recordId": {
+          "type": "string"
+        },
+        "unitId": {
+          "type": "string"
+        },
+        "recordStatus": {
+          "type": "string"
+        },
+        "serviceContext": {
+          "type": "object",
+          "required": [
+            "scheduleId",
+            "operatingHours"
+          ],
+          "properties": {
+            "scheduleId": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "pattern": "^SVC-[0-9]{3}$"
+            },
+            "operatingHours": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0
+            }
+          }
+        },
+        "workEntries": {
+          "type": "array"
+        },
+        "returnToService": {
+          "type": "object",
+          "required": [
+            "allowed"
+          ],
+          "properties": {
+            "allowed": {
+              "const": false
+            }
+          }
+        }
+      }
+    },
+    "templateStatus": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": true,
+  "description": "Documentation/interchange subset. Null fields are missing evidence; internal maintenance tooling uses service-history records, not this controlled unit-record envelope."
+}

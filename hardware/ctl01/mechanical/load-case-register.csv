@@ -1,0 +1,14 @@
+load_case_id,subsystem,scenario,required_inputs,acceptance_basis,analysis_method,status,evidence_reference
+LC-001,Whole machine,Static target attachment load at critical lift geometry,Mass CG track footprint load center attachment inertia slope,Applicable capacity stability structural criteria TBD,Rigid body then multibody structural analysis,TBD,NONE
+LC-002,Whole machine,Forward braking with target load at target speed,Mass distribution deceleration adhesion load geometry,No instability excessive stop structural exceedance TBD,Dynamic analysis then instrumented tests,TBD,NONE
+LC-003,Whole machine,Turning and one-side traction fault on slope,Slope friction fault payload CG steering dynamics,Controlled stop stability and protective response TBD,Fault dynamics simulation and physical validation,TBD,NONE
+LC-004,Chassis lift arms,Hydraulic stall at critical arm position,Pressure limit TBD cylinder geometry target payload tolerance,Strength fatigue deflection limits TBD,Free body FEA and test correlation,TBD,NONE
+LC-005,Quick attach,Off-center attachment with retention misuse,Engagement geometry moment partial engagement,Positive retention strength indication criteria TBD,Interface analysis component test misuse review,TBD,NONE
+LC-006,Bucket lift pivots,Crowd dump endpoint impact,Cylinder force inertia stop geometry duty cycles,Static fatigue bearing pin criteria TBD,Multibody loads fatigue wear analysis,TBD,NONE
+LC-007,Track modules,Obstacle strike and track shock,Speed obstacle soil torque supplier limits,No separation rupture instability criteria TBD,Supplier analysis modeling controlled tests,TBD,NONE
+LC-008,ROPS FOPS zone,Applicable rollover falling object inputs,Current standards mass geometry material seat anchorage,Official test acceptance requirements TBD,Qualified protective structure analysis tests,TBD,NONE
+LC-009,Battery mount,Vibration shock recovery foreseeable impact,Pack mass inertia mount terrain acceleration,Restraint insulation no hazardous release criteria TBD,Load spectrum FEA vibration abuse coordination,TBD,NONE
+LC-010,Chassis,Lifting recovery jack tiedown cases,Mass load angles support geometry transport shocks,No local damage instability criteria TBD,Local FEA proof evaluation marked instructions,TBD,NONE
+LC-011,Mechanical access,Operator service access loading,ISO 2867 applicability users maintenance actions,Geometry strength slip ergonomic criteria TBD,Design review physical mockup test,TBD,NONE
+LC-012,Structure,Combined fatigue spectrum over design life,Duty shock vibration corrosion histories weld categories,Fatigue life inspection residual strength TBD,Cycle counting weld fatigue test correlation,TBD,NONE
+LC-013,Service support,Raised arm removed track support fixtures,Component masses CG support geometry misuse surface,Stability strength positive restraint criteria TBD,Fixture calculations proof inspection,TBD,NONE

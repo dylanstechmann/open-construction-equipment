@@ -1,0 +1,47 @@
+# Generated OpenSCAD output and concept renders
+build/
+builds/
+*.stl
+*.3mf
+*.dxf
+*.png
+*.off
+*.amf
+
+# Software environments and caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Logs, local evidence, and sensitive machine configuration
+*.log
+*.local
+*.secret
+.env
+.env.*
+!.env.example
+secrets/
+/evidence/local/
+
+# Editors and operating systems
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+Thumbs.db
+
+# Host-only firmware outputs (default output is builds/firmware/)
+firmware/ctl01/ctl01_command_gate_tests
+firmware/ctl01/*.o
+
+# Temporary files
+*.tmp
+*.bak

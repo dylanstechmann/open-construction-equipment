@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Supplied OCE-CTL-01 service history",
+  "type": "object",
+  "required": [
+    "recordType",
+    "platform",
+    "asOf",
+    "operatingHours",
+    "useCount",
+    "completedServices",
+    "events"
+  ],
+  "properties": {
+    "recordType": {
+      "const": "OCE-CTL-01-service-history"
+    },
+    "platform": {
+      "const": "OCE-CTL-01"
+    },
+    "syntheticNotice": {
+      "type": "string"
+    },
+    "asOf": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "operatingHours": {
+      "type": "number",
+      "minimum": 0
+    },
+    "useCount": {
+      "type": "number",
+      "minimum": 0
+    },
+    "completedServices": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "serviceId",
+          "completedAt",
+          "operatingHours",
+          "useCount",
+          "sourceRecordId",
+          "recordStatus"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "serviceId": {
+            "type": "string",
+            "pattern": "^SVC-[0-9]{3}$"
+          },
+          "completedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "operatingHours": {
+            "type": "number",
+            "minimum": 0
+          },
+          "useCount": {
+            "type": "number",
+            "minimum": 0
+          },
+          "sourceRecordId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "recordStatus": {
+            "enum": [
+              "SYNTHETIC_NOT_EVIDENCE",
+              "RECORDED_UNREVIEWED",
+              "REVIEWED"
+            ]
+          }
+        }
+      }
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "eventType",
+          "occurredAt",
+          "operatingHours",
+          "useCount"
+        ],
+        "additionalProperties": true,
+        "properties": {
+          "eventType": {
+            "type": "string",
+            "minLength": 1
+          },
+          "occurredAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "operatingHours": {
+            "type": "number",
+            "minimum": 0
+          },
+          "useCount": {
+            "type": "number",
+            "minimum": 0
+          },
+          "synthetic": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,76 @@
+{
+  "spdxLicenseIdentifier": "CC-BY-SA-4.0",
+  "schemaVersion": "1.0.0",
+  "recordType": "OCE-CTL-01-service-record",
+  "templateStatus": "UNRELEASED_TEMPLATE_NOT_EVIDENCE",
+  "platform": "OCE-CTL-01",
+  "purpose": "Controlled future local service record. Null and empty fields are missing evidence, never successful checks.",
+  "fieldRules": {
+    "statusVocabulary": [
+      "inspected",
+      "measured",
+      "reviewed",
+      "released"
+    ],
+    "actualMeasurements": "Every item requires characteristic, value, unit, engineer unit convention, acceptanceSource, instrumentId, calibrationDue, measuredAt, measuredBy and rawEvidenceRef.",
+    "approvals": "Named qualified humans sign actual unit/configuration and limited scope; no AI agent approval is permitted.",
+    "corrections": "Append corrections; do not overwrite original observations or service evidence."
+  },
+  "record": {
+    "recordId": "TBD_LOCAL_CONTROLLED_ID",
+    "unitId": "TBD",
+    "recordStatus": "NOT_STARTED",
+    "configuration": {
+      "hardwareRevision": "TBD",
+      "bomRevision": "TBD",
+      "softwareManifestRevision": null,
+      "attachmentId": null,
+      "attachmentIcdRevision": null
+    },
+    "workAuthorization": {
+      "authorizationId": null,
+      "scope": "TBD",
+      "authorizedBy": null,
+      "authorizedAt": null,
+      "siteProcedureId": "TBD"
+    },
+    "serviceContext": {
+      "scheduleId": null,
+      "intervalStatus": "TBD_OEM_REGULATORY_REVIEW",
+      "reportedSymptoms": [],
+      "observedConditions": "TBD",
+      "operatingHours": null,
+      "operatingHoursUnit": "h",
+      "previousRecordId": null
+    },
+    "personnel": [],
+    "isolation": {
+      "procedureRevision": "PR-002-release-TBD",
+      "required": true,
+      "energySourceRecords": [],
+      "lockTagRecords": [],
+      "zeroEnergyVerified": false,
+      "verifiedBy": null,
+      "verifiedAt": null,
+      "verificationInstrumentIds": []
+    },
+    "workEntries": [],
+    "actualMeasurements": [],
+    "removedAndInstalledParts": [],
+    "softwareChanges": [],
+    "nonconformanceIds": [],
+    "postServiceTests": [],
+    "rawEvidenceReferences": [],
+    "returnToService": {
+      "allowed": false,
+      "scopeLimitation": "NO_RETURN_AUTHORIZED",
+      "unitConfigurationVerified": false,
+      "guardsAndInterlocksRestored": false,
+      "qualifiedReviewer": null,
+      "responsibleEngineer": null,
+      "reviewedAt": null,
+      "signatureReferences": []
+    },
+    "corrections": []
+  }
+}

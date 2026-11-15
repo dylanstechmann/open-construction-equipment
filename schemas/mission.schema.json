@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Synthetic OCE-CTL-01 mission",
+  "type": "object",
+  "required": [
+    "name",
+    "platform",
+    "simulationOnly",
+    "geofence",
+    "obstacles",
+    "start",
+    "goal",
+    "grid_resolution_m",
+    "safety_margin_m",
+    "max_duration_s"
+  ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "platform": {
+      "const": "OCE-CTL-01"
+    },
+    "simulationOnly": {
+      "const": true
+    },
+    "syntheticNotice": {
+      "type": "string"
+    },
+    "geofence": {
+      "type": "array",
+      "minItems": 3,
+      "items": {
+        "type": "array",
+        "prefixItems": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          }
+        ],
+        "items": false,
+        "minItems": 2,
+        "maxItems": 2
+      }
+    },
+    "obstacles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "center",
+          "radius_m"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "center": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "items": false,
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "radius_m": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          }
+        }
+      }
+    },
+    "start": {
+      "type": "object",
+      "required": [
+        "x_m",
+        "y_m",
+        "yaw_rad"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "x_m": {
+          "type": "number"
+        },
+        "y_m": {
+          "type": "number"
+        },
+        "yaw_rad": {
+          "type": "number"
+        }
+      }
+    },
+    "goal": {
+      "type": "object",
+      "required": [
+        "x_m",
+        "y_m",
+        "yaw_rad"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "x_m": {
+          "type": "number"
+        },
+        "y_m": {
+          "type": "number"
+        },
+        "yaw_rad": {
+          "type": "number"
+        }
+      }
+    },
+    "grid_resolution_m": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "safety_margin_m": {
+      "type": "number",
+      "minimum": 0
+    },
+    "max_duration_s": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    }
+  },
+  "additionalProperties": true,
+  "description": "The internal loader additionally rejects non-finite values, degenerate fences, out-of-fence endpoints and unsafe bounds."
+}

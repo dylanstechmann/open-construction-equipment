@@ -1,0 +1,188 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/oce-ctl-01/simulation-config.schema.json",
+  "title": "OCE-CTL-01 simulation-only configuration",
+  "type": "object",
+  "required": [
+    "platform",
+    "simulationOnly",
+    "machine",
+    "limits",
+    "control",
+    "tracker",
+    "battery"
+  ],
+  "properties": {
+    "platform": {
+      "const": "OCE-CTL-01"
+    },
+    "simulationOnly": {
+      "const": true
+    },
+    "machine": {
+      "type": "object",
+      "required": [
+        "width_m",
+        "mass_kg",
+        "footprint_length_m",
+        "footprint_radius_m",
+        "track_gauge_m"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "width_m": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "mass_kg": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "footprint_length_m": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "footprint_radius_m": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "track_gauge_m": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "limits": {
+      "type": "object",
+      "required": [
+        "max_manual_speed_mps",
+        "max_autonomy_speed_mps",
+        "max_acceleration_mps2",
+        "max_deceleration_mps2",
+        "max_yaw_rate_rps",
+        "max_yaw_acceleration_rps2",
+        "max_tilt_deg"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "max_manual_speed_mps": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "max_autonomy_speed_mps": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "max_acceleration_mps2": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "max_deceleration_mps2": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "max_yaw_rate_rps": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "max_yaw_acceleration_rps2": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "max_tilt_deg": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 45
+        }
+      }
+    },
+    "control": {
+      "type": "object",
+      "required": [
+        "period_s",
+        "heartbeat_timeout_s",
+        "localization_timeout_s"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "period_s": {
+          "type": "number",
+          "exclusiveMinimum": 0.001,
+          "maximum": 1
+        },
+        "heartbeat_timeout_s": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "localization_timeout_s": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "tracker": {
+      "type": "object",
+      "required": [
+        "lookahead_m",
+        "goal_tolerance_m",
+        "curvature_slowdown",
+        "minimum_approach_speed_mps"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "lookahead_m": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "goal_tolerance_m": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "curvature_slowdown": {
+          "type": "number",
+          "minimum": 0
+        },
+        "minimum_approach_speed_mps": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "battery": {
+      "type": "object",
+      "required": [
+        "nominal_energy_kwh",
+        "initial_charge_fraction",
+        "auxiliary_power_kw",
+        "drive_power_kw_at_1mps",
+        "turn_power_kw_at_1rps"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "nominal_energy_kwh": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "initial_charge_fraction": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1
+        },
+        "auxiliary_power_kw": {
+          "type": "number",
+          "minimum": 0
+        },
+        "drive_power_kw_at_1mps": {
+          "type": "number",
+          "minimum": 0
+        },
+        "turn_power_kw_at_1rps": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    }
+  },
+  "additionalProperties": true,
+  "description": "Interchange schema only. The dependency-free Python loader adds cross-field checks; no external JSON Schema validator is required."
+}

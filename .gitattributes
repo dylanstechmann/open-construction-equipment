@@ -1,0 +1,7 @@
+* text=auto eol=lf
+*.md text diff=markdown
+*.csv text eol=lf
+*.json text eol=lf
+*.scad text eol=lf
+LICENSE text eol=lf
+LICENSES/* text eol=lf

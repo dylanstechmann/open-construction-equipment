@@ -1,0 +1,263 @@
+{
+  "spdxLicenseIdentifier": "CERN-OHL-S-2.0",
+  "schemaVersion": "1.0.0",
+  "platform": "OCE-CTL-01",
+  "title": "Concept design inputs; never a released specification",
+  "releaseStatus": "concept-only-not-ready-to-build-or-operate",
+  "asOf": "2026-11-15",
+  "unitSystem": "SI where units apply",
+  "statusDefinitions": {
+    "target": "Unvalidated desired value; not measured or released.",
+    "assumption": "Provisional architecture input subject to review.",
+    "TBD": "Unresolved mandatory engineering decision; value must not be inferred."
+  },
+  "prohibitedInferences": [
+    "No dimensional datum or capacity from OpenSCAD.",
+    "No certified performance or compliance from a target.",
+    "No manufacturing from generic BOM categories or TBD values.",
+    "No measurement review or physical approval has been supplied."
+  ],
+  "parameters": [
+    {
+      "id": "DI-MASS-001",
+      "name": "Operating mass",
+      "value": 2200,
+      "unit": "kg",
+      "qualifier": "approximately",
+      "status": "target",
+      "source": "Initial AI-authored concept target; owner review pending",
+      "verificationRequired": "Define operating condition attachments fluids operator then mass calculation and validated weighing"
+    },
+    {
+      "id": "DI-ROC-001",
+      "name": "Rated operating capacity",
+      "value": 500,
+      "unit": "kg",
+      "qualifier": "target maximum",
+      "status": "target",
+      "source": "Initial AI-authored concept target; owner review pending",
+      "verificationRequired": "Applicable definition attachment load center stability structure hydraulics and signed validation"
+    },
+    {
+      "id": "DI-BAT-V001",
+      "name": "Traction battery nominal voltage",
+      "value": 96,
+      "unit": "V",
+      "qualifier": "nominal",
+      "status": "target",
+      "source": "Initial AI-authored concept target; owner review pending",
+      "verificationRequired": "Cell configuration voltage range protection shock arc flash and classification review"
+    },
+    {
+      "id": "DI-BAT-E001",
+      "name": "Traction battery nominal energy",
+      "value": 30,
+      "unit": "kWh",
+      "qualifier": "approximately",
+      "status": "target",
+      "source": "Initial AI-authored concept target; owner review pending",
+      "verificationRequired": "Cell data usable energy duty cycle thermal life and safety validation"
+    },
+    {
+      "id": "DI-BAT-C001",
+      "name": "Battery chemistry",
+      "value": "LFP",
+      "unit": null,
+      "qualifier": "proposed lithium iron phosphate chemistry",
+      "status": "assumption",
+      "source": "Initial AI-authored concept architecture; owner review pending",
+      "verificationRequired": "Specific cells BMS thermal propagation transport charger and end-of-life assessment"
+    },
+    {
+      "id": "DI-TRAC-P001",
+      "name": "Per-side traction motor power",
+      "value": 15,
+      "unit": "kW",
+      "qualifier": "each of two motors",
+      "status": "target",
+      "source": "Initial AI-authored concept target; owner review pending",
+      "verificationRequired": "Continuous peak definition duty cycle gearing thermal braking and fault analysis"
+    },
+    {
+      "id": "DI-HYD-P001",
+      "name": "Hydraulic pump motor power",
+      "value": 10,
+      "unit": "kW",
+      "qualifier": "nominal target drive envelope",
+      "status": "target",
+      "source": "Initial AI-authored concept target; owner review pending",
+      "verificationRequired": "Pressure flow displacement efficiency thermal duty and load-control analysis"
+    },
+    {
+      "id": "DI-ENV-W001",
+      "name": "Machine overall width",
+      "value": 1.5,
+      "unit": "m",
+      "qualifier": "approximate envelope not manufacturing dimension",
+      "status": "target",
+      "source": "Initial AI-authored concept target; owner review pending",
+      "verificationRequired": "Attachment track stance access and transport envelope definition"
+    },
+    {
+      "id": "DI-SPD-001",
+      "name": "Maximum manual travel speed",
+      "value": 6,
+      "unit": "km/h",
+      "qualifier": "target maximum loaded unloaded directional definitions TBD",
+      "status": "target",
+      "source": "Initial AI-authored concept target; owner review pending",
+      "verificationRequired": "Control stability braking steering surface slope and standards validation"
+    },
+    {
+      "id": "DI-DRV-001",
+      "name": "Traction topology",
+      "value": "dual electric traction drives with skid steering",
+      "unit": null,
+      "qualifier": "manual control proposal",
+      "status": "assumption",
+      "source": "Concept architecture",
+      "verificationRequired": "Single-channel failure unintended steering braking and track-load analysis"
+    },
+    {
+      "id": "DI-HYD-001",
+      "name": "Implement topology",
+      "value": "electro-hydraulic lift and tilt",
+      "unit": null,
+      "qualifier": "two-function concept no auxiliary release",
+      "status": "assumption",
+      "source": "Concept architecture",
+      "verificationRequired": "Circuit safe descent load holding hose failure and thermal validation"
+    },
+    {
+      "id": "DI-ATT-001",
+      "name": "Attachment interface",
+      "value": "universal-style quick attach",
+      "unit": null,
+      "qualifier": "style only no compatibility assertion",
+      "status": "assumption",
+      "source": "Concept architecture",
+      "verificationRequired": "Mating geometry retention load envelope and named attachment verification"
+    },
+    {
+      "id": "DI-SAF-001",
+      "name": "Protective controls independence",
+      "value": "independent safety chain outside supervisory autonomy",
+      "unit": null,
+      "qualifier": "architectural proposal",
+      "status": "assumption",
+      "source": "ADR-0002",
+      "verificationRequired": "SRS circuit fault analysis safe states separation and validation"
+    },
+    {
+      "id": "DI-SOF-001",
+      "name": "Autonomy operating boundary",
+      "value": "simulation only",
+      "unit": null,
+      "qualifier": "physical autonomy not authorized",
+      "status": "assumption",
+      "source": "ADR-0002",
+      "verificationRequired": "Future G7 review standards legal ODD and physical safety evidence"
+    },
+    {
+      "id": "DI-STR-001",
+      "name": "Chassis material members joints and welds",
+      "value": null,
+      "unit": null,
+      "qualifier": null,
+      "status": "TBD",
+      "source": "No released calculation",
+      "verificationRequired": "Loads material static fatigue buckling corrosion weld manufacturing and inspection review"
+    },
+    {
+      "id": "DI-STR-002",
+      "name": "Protective structure design",
+      "value": null,
+      "unit": null,
+      "qualifier": "ROPS FOPS applicability unresolved",
+      "status": "TBD",
+      "source": "No released protective structure",
+      "verificationRequired": "Current ISO 3471 ISO 3449 and machine standard applicability and evaluation"
+    },
+    {
+      "id": "DI-HYD-002",
+      "name": "Hydraulic pressure flow relief and test settings",
+      "value": null,
+      "unit": null,
+      "qualifier": null,
+      "status": "TBD",
+      "source": "No released circuit calculation",
+      "verificationRequired": "Sizing duty stability load holding component limits and approved test plan"
+    },
+    {
+      "id": "DI-HYD-003",
+      "name": "Hydraulic fluid cleanliness and hose specifications",
+      "value": null,
+      "unit": null,
+      "qualifier": null,
+      "status": "TBD",
+      "source": "No released component selection",
+      "verificationRequired": "Supplier cleanliness compatibility routing pressure temperature environment and flush validation"
+    },
+    {
+      "id": "DI-FST-001",
+      "name": "Fasteners grades and tightening torques",
+      "value": null,
+      "unit": null,
+      "qualifier": null,
+      "status": "TBD",
+      "source": "No released joint calculation",
+      "verificationRequired": "Preload loads reuse policy lubrication calibrated tools and assembly review"
+    },
+    {
+      "id": "DI-THM-001",
+      "name": "Cooling package and ambient operating envelope",
+      "value": null,
+      "unit": null,
+      "qualifier": null,
+      "status": "TBD",
+      "source": "No released thermal duty cycle",
+      "verificationRequired": "Battery inverter motor hydraulic losses ambient contamination and fault cases"
+    },
+    {
+      "id": "DI-BRK-001",
+      "name": "Service parking emergency and holding brake architecture",
+      "value": null,
+      "unit": null,
+      "qualifier": null,
+      "status": "TBD",
+      "source": "No released braking analysis",
+      "verificationRequired": "Slope payload single-fault power loss regeneration and stop tests"
+    },
+    {
+      "id": "DI-ENV-001",
+      "name": "Ingress corrosion temperature and vibration environment",
+      "value": null,
+      "unit": null,
+      "qualifier": null,
+      "status": "TBD",
+      "source": "No released ODD",
+      "verificationRequired": "Exposure supplier qualification enclosure and system tests"
+    },
+    {
+      "id": "DI-MFG-001",
+      "name": "Manufacturing dimensions tolerances and process parameters",
+      "value": null,
+      "unit": null,
+      "qualifier": null,
+      "status": "TBD",
+      "source": "Not released in conceptual phase",
+      "verificationRequired": "Released drawings WPS PQR inspection capability and signed review"
+    },
+    {
+      "id": "DI-SRV-001",
+      "name": "Service intervals lubricants wear limits and torques",
+      "value": null,
+      "unit": null,
+      "qualifier": "planning intervals remain proposed",
+      "status": "TBD",
+      "source": "No OEM-equivalent released manual",
+      "verificationRequired": "Supplier requirements design life regulations tests and approved service review"
+    }
+  ],
+  "evidenceRecords": []
+}

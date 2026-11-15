@@ -1,0 +1,15 @@
+system_id,parent_id,name,functional_scope,key_interfaces,safety_relevance,maturity,owner_role
+OCE-CTL-01,NONE,Complete concept loader,Manual electric compact track loader and future sim-only research interfaces,All,Complete machine safety case open,concept,Unassigned responsible engineer
+SYS-STR,OCE-CTL-01,Chassis and operator structure,Main structure guards operator zone future protective structures,IF-MEC-001;IF-MEC-002;IF-MEC-005;IF-MEC-006,Structural and crush protection,concept,Mechanical engineer TBD
+SYS-UND,OCE-CTL-01,Undercarriage,Tracks rollers idlers tensioning final drive supports,IF-MEC-001,Travel stability and separation hazards,concept,Mechanical engineer TBD
+SYS-TRAC,OCE-CTL-01,Traction drives,Dual motors inverters braking and steering torque,IF-HV-002;IF-SAF-002,Uncommanded motion and stop behavior,concept,Drive engineer TBD
+SYS-BAT,OCE-CTL-01,Battery system,LFP modules pack BMS enclosure thermal management service disconnect,IF-MEC-005;IF-HV-001;IF-HV-004,Shock arc fire stored energy,concept,Battery engineer TBD
+SYS-HV,OCE-CTL-01,HV distribution,Contactors protection precharge discharge charging distribution,IF-HV-001;IF-HV-002;IF-HV-003;IF-HV-004,Hazardous energy control,concept,Electrical engineer TBD
+SYS-LV,OCE-CTL-01,Low voltage supply,DC/DC LV battery branches and control power,IF-LV-001,Loss of control and safety supply,concept,Electrical engineer TBD
+SYS-HYD,OCE-CTL-01,Hydraulic system,Pump valves reservoir lift tilt filtration cooling,IF-HYD-001;IF-HYD-002;IF-HYD-003,Suspended load pressure injection,concept,Hydraulic engineer TBD
+SYS-CTL,OCE-CTL-01,Manual vehicle controls,Operator inputs VCU state management actuator outputs,IF-LV-002;IF-DAT-001,Command validity and restart prevention,concept,Controls engineer TBD
+SYS-SEN,OCE-CTL-01,Sensing,Machine-state sensors and future autonomy perception mounts,IF-DAT-001,Diagnostics not sole protective path,concept,Controls engineer TBD
+SYS-SAF,OCE-CTL-01,Independent protective chain,E-stops interlocks safety logic actuator inhibit manual reset,IF-SAF-001;IF-SAF-002,Protective functions and common cause,concept,Functional safety engineer TBD
+SYS-ATT,OCE-CTL-01,Attachment system,Quick attach bucket and future bounded attachments,IF-MEC-003;IF-MEC-004,Dropped load and unintended release,concept,Mechanical engineer TBD
+SYS-THM,OCE-CTL-01,Thermal systems,Battery drive and hydraulic thermal management,IF-THM-001,Overtemperature and fluid/electrical interaction,concept,Thermal engineer TBD
+SYS-SRV,OCE-CTL-01,Service provisions,Isolation test points supports access labels diagnostics records,IF-SRV-001,Stored energy and safe maintenance,concept,Safety and service engineer TBD

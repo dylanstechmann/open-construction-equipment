@@ -1,0 +1,64 @@
+item_id,subsystem,item_name,quantity,unit,make_buy,specification_or_selection_criteria,safety_critical,lifecycle_status
+BOM-STR-001,Structure,Main chassis frame weldment,1,assembly,make,Load-case derived members material joints drawings weld map; all sections and dimensions TBD,yes,concept_unreleased
+BOM-STR-002,Structure,Lift arm paired weldments,1,assembly,make,Geometry synchronized load path static fatigue buckling pivots weld controls TBD,yes,concept_unreleased
+BOM-STR-003,Structure,Operator protective structure assembly,1,assembly,make_or_buy,ROPS FOPS applicability structural and test evidence; CAD visualization not acceptable,yes,concept_unreleased
+BOM-STR-004,Structure,Battery enclosure and reinforced mounting,1,assembly,make_or_buy,Pack impact vibration fire fluid environment lift restraint and service requirements TBD,yes,concept_unreleased
+BOM-STR-005,Structure,Guards and access panels set,1,set,make,Pinch heat HV hydraulic spray access interlocking and service requirements TBD,yes,concept_unreleased
+BOM-STR-006,Structure,Lift-arm mechanical service support,1,assembly,make_or_buy,Rated positive support geometry stability misuse proof and marked storage TBD,yes,concept_unreleased
+BOM-STR-007,Structure,Lifting recovery and tiedown provisions,1,set,make,Whole-machine mass angles proof identification access; no use until released,yes,concept_unreleased
+BOM-UND-001,Undercarriage,Left track undercarriage module,1,assembly,buy_or_make,Reaction loads gear interface rollers frame retention debris environment and supplier duty data TBD,yes,concept_unreleased
+BOM-UND-002,Undercarriage,Right track undercarriage module,1,assembly,buy_or_make,Reaction loads gear interface rollers frame retention debris environment and supplier duty data TBD,yes,concept_unreleased
+BOM-UND-003,Undercarriage,Left endless track,1,each,buy,Width relative to envelope ground pressure speed shock load durability and drive interface TBD,yes,concept_unreleased
+BOM-UND-004,Undercarriage,Right endless track,1,each,buy,Width relative to envelope ground pressure speed shock load durability and drive interface TBD,yes,concept_unreleased
+BOM-UND-005,Undercarriage,Track tensioning systems,2,each,buy_or_make,Track supplier method stored energy retention service tooling dirt durability and limits TBD,yes,concept_unreleased
+BOM-DRV-001,Traction,Left traction electric motor 15 kW target,1,each,buy,15 kW unvalidated target duty cooling torque speed insulation interface brake and supplier data TBD,yes,concept_selection
+BOM-DRV-002,Traction,Right traction electric motor 15 kW target,1,each,buy,15 kW unvalidated target duty cooling torque speed insulation interface brake and supplier data TBD,yes,concept_selection
+BOM-DRV-003,Traction,Traction motor inverters,2,each,buy_DC_AC_drive,Pack voltage continuous peak current regen protective inhibit diagnostics environmental safety manual TBD,yes,concept_selection
+BOM-DRV-004,Traction,Final drive gearboxes,2,each,buy_or_integrate,Motor track torque ratio shock efficiency parking braking retention and service criteria TBD,yes,concept_selection
+BOM-DRV-005,Traction,Service and parking brake assemblies,2,each,buy_or_integrate,Power loss stop and holding single fault slope load released torque thermal and application TBD,yes,concept_selection
+BOM-BAT-001,Battery,LFP cell or module system around 30 kWh target,1,assembly,buy_or_controlled_build,96 V nominal target verified supplier cell data cycle abuse transport service BMS compatibility TBD,yes,concept_selection
+BOM-BAT-002,Battery,Battery management system,1,each,buy_or_integrate,Cell configuration monitoring protection fault outputs contactor control charger and safety manual TBD,yes,concept_selection
+BOM-BAT-003,Battery,Lockable HV service disconnect,1,each,buy,Pack fault current visible secure isolation verification access interlock and short circuit ratings TBD,yes,concept_selection
+BOM-BAT-004,Battery,Battery thermal management package,1,assembly,make_or_buy,Worst-case charge discharge ambient thermal event leak detection isolation and service TBD,yes,concept_selection
+BOM-HV-001,HV distribution,Main and precharge contactors,1,set,buy,Voltage current breaking weld detection precharge coil and independent control feedback TBD,yes,concept_selection
+BOM-HV-002,HV distribution,HV fuse and protection set,1,set,buy,Available fault current selectivity voltage interrupt ratings drive charger branch coordination TBD,yes,concept_selection
+BOM-HV-003,HV distribution,Precharge and discharge resistive network,1,assembly,make_or_buy,Bus capacitance safe close discharge energy thermal duty and accessible verification TBD,yes,concept_selection
+BOM-HV-004,HV distribution,Insulation monitoring device,1,each,buy_if_analysis_requires,System voltage isolated architecture charger drives alarm thresholds safety manual TBD,yes,concept_selection
+BOM-HV-005,HV distribution,HV distribution enclosure and bus assembly,1,assembly,make_or_buy,Fault energy bonding clearance creepage service interlock ingress impact and arc assessment TBD,yes,concept_selection
+BOM-HV-006,Charging,Charge inlet and charger system,1,assembly,buy,Pack BMS protocol site supply earthing environment interlocks cable and regulatory compatibility TBD,yes,concept_selection
+BOM-LV-001,Low voltage,Isolated DC DC converter,1,each,buy,Input transients safety/control loads isolation backup safe state protection thermal qualification TBD,yes,concept_selection
+BOM-LV-002,Low voltage,LV energy storage and distribution,1,assembly,buy_or_make,Control supply ride through requirements chemistry fuse branches service battery isolation TBD,yes,concept_selection
+BOM-HYD-001,Hydraulic,Hydraulic pump electric motor 10 kW target,1,each,buy,10 kW target duty pump speed torque cooling HV drive interface and protective behavior TBD,yes,concept_selection
+BOM-HYD-002,Hydraulic,Hydraulic pump,1,each,buy,Displacement pressure flow duty fluid suction noise efficiency temperature and supplier cleanliness TBD,yes,concept_selection
+BOM-HYD-003,Hydraulic,Hydraulic pump inverter,1,each,buy,Pack voltage motor control protective inhibit sensing regeneration EMC and safe response TBD,yes,concept_selection
+BOM-HYD-004,Hydraulic,Lift tilt control and load-holding valve assembly,1,assembly,buy_or_integrate,Spool states load lowering hose failure pressure flow coils ports leakage safety manuals TBD,yes,concept_selection
+BOM-HYD-005,Hydraulic,Lift hydraulic cylinders,2,each,buy_or_make,Geometry load buckling seals cushioning load-control mounting corrosion and procurement drawing TBD,yes,concept_selection
+BOM-HYD-006,Hydraulic,Tilt hydraulic cylinder or cylinders,1,set_TBD,buy_or_make,Crowd dump reactions geometry synchronization seals load control and mount details TBD,yes,concept_selection
+BOM-HYD-007,Hydraulic,Hydraulic reservoir,1,each,make_or_buy,Volume deaeration suction thermal contamination access isolation fluid spill and cleaning TBD,no,concept_selection
+BOM-HYD-008,Hydraulic,Return suction and offline filtration,1,set,buy,Component cleanliness beta efficiency indicators bypass compatibility sampling and changing access TBD,yes,concept_selection
+BOM-HYD-009,Hydraulic,Hydraulic oil cooler and thermal controls,1,assembly,buy,Heat duty cold bypass fan control ingress vibration hose routing and surface temperature TBD,yes,concept_selection
+BOM-HYD-010,Hydraulic,Hydraulic hose tube fittings and clamps kit,1,controlled_kit,buy_or_make,Per-line drawings pressure impulse fluid temperature bend sleeves routing inspection no register substitution,yes,concept_only
+BOM-HYD-011,Hydraulic,Approved hydraulic fluid volume,1,lot_TBD,buy,System derived viscosity additives fire environmental material compatibility disposal and fill TBD,no,TBD
+BOM-ATT-001,Attachment,Universal-style quick attach coupler,1,each,make_or_buy,Engineered interface load moment lock engagement wear sensors no universal compatibility presumed,yes,concept_selection
+BOM-ATT-002,Attachment,General-purpose concept bucket,1,each,make_or_buy,Capacity mass CG wear hydraulic mechanical loads and capacity calculations TBD,yes,concept_selection
+BOM-ATT-003,Attachment,Attachment lock sensor and indication,1,assembly,buy_or_integrate,Direct engagement evidence diagnostics environment and unintended release behavior TBD,yes,concept_selection
+BOM-CTL-001,Controls,Vehicle control unit,1,each,buy_or_develop,Environment deterministic IO diagnostics manual machine states cybersecurity and no sole safety role,yes,concept_selection
+BOM-CTL-002,Controls,Manual travel and implement controls,1,set,buy,Neutral diagnostics ergonomics environmental rating command ranges and safety validation TBD,yes,concept_selection
+BOM-CTL-003,Controls,Operator display controls and alarm indicators,1,assembly,buy_or_integrate,Legibility fault priority manual states no sole protection and language usability review TBD,no,concept_selection
+BOM-SAF-001,Safety,Independent safety logic controller or relay system,1,assembly,buy_or_integrate,SRS PLr or SIL needs diagnostic coverage independent output and supplier safety manual TBD,yes,concept_selection
+BOM-SAF-002,Safety,Emergency stop devices,1,set_TBD,buy,Risk assessment accessible locations latching monitored contacts reset no restart and environment TBD,yes,concept_selection
+BOM-SAF-003,Safety,Guard and service interlock devices,1,set_TBD,buy,Defeat resistance coding actuator access fault diagnostics response and tamper review TBD,yes,concept_selection
+BOM-SAF-004,Safety,Safety rated actuator inhibit interface,2,channels_or_set_TBD,buy_or_integrate,Drive and contactor dual channels diagnostics independence common cause and restart validation TBD,yes,concept_selection
+BOM-SEN-001,Sensing,Lift and attachment position sensors,1,set,buy,Range redundancy calibration environment mechanical linkage diagnostic validity and service limits TBD,yes,concept_selection
+BOM-SEN-002,Sensing,Hydraulic pressure and temperature sensors,1,set,buy,Derived measurement range rated ports diagnostic and calibration fluid compatibility TBD,yes,concept_selection
+BOM-SEN-003,Sensing,Wheel or final-drive speed sensors,2,each,buy,Low speed plausibility direction environment diagnostics and stopping use TBD,yes,concept_selection
+BOM-SEN-004,Sensing,Autonomy research sensing kit,1,optional_sim_only,buy_optional,Mounts supply data only; coverage false negatives weather ODD cybersecurity no physical use claim,no,deferred_sim_only
+BOM-OPS-001,Operator station,Operator seat and restraint,1,assembly,buy,ROPS system compatibility anchorages ergonomics operator detection and standards evidence TBD,yes,concept_selection
+BOM-OPS-002,Operator station,Access steps handholds and non-slip surfaces,1,set,make_or_buy,Applicable ISO 2867 and actual geometry user use ice mud and strength TBD,yes,concept_selection
+BOM-OPS-003,Operator station,Lighting horn and external alarms,1,set_TBD,buy,Use case visibility warnings battery load legal and operator-site interface review TBD,yes,concept_selection
+BOM-SRV-001,Service,Isolation verification and mechanical support kit,1,set_TBD,buy_or_controlled_make,Rated voltage test equipment mechanical supports wheel chocks tooling PPE site-specific release TBD,yes,concept_selection
+BOM-SRV-002,Service,Replaceable wear and seal service kit,1,set_TBD,buy,Released component-specific wear pins bushings filters seals track parts; not generic substitution,yes,concept_selection
+BOM-SRV-003,Service,Safety labels capacity plates and record plate set,1,set,make,Only released values and residual risk; durable environment legal marking and unit traceability TBD,yes,awaiting_release
+BOM-SRV-004,Service,Diagnostic service interface,1,each,buy_or_integrate,Read-only by default access control calibration service logs no interlock defeat or physical flash by agents,yes,concept_selection
+BOM-MFG-001,Manufacturing,Safety-critical fastener kits,1,controlled_kit,buy,Joint-specific grade coatings locking preload lubrication reuse torque derived engineering and lot traceability,yes,TBD
+BOM-MFG-002,Manufacturing,Assembly lubricants sealants and coatings,1,controlled_kit,buy,Material fluid environmental torque impacts process WPS coating and compatibility review TBD,yes,TBD

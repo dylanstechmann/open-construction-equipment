@@ -1,0 +1,36 @@
+# SPDX-License-Identifier: Apache-2.0
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "open-construction-equipment"
+version = "0.2.0"
+description = "Simulation-only host reference tools for the OCE-CTL-01 concept"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE.md", "LICENSES/*.txt"]
+authors = [{name = "OCE contributors; AI-assisted personal project"}]
+dependencies = []
+
+[project.scripts]
+oce = "open_construction_equipment.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["open_construction_equipment*"]
+
+[tool.setuptools.data-files]
+"share/open-construction-equipment/configs" = ["configs/ctl01.simulation.json"]
+"share/open-construction-equipment/examples/missions" = ["examples/missions/synthetic-yard.json"]
+"share/open-construction-equipment/examples/maintenance" = ["examples/maintenance/synthetic-service-history.json"]
+"share/open-construction-equipment/maintenance/ctl01" = [
+  "maintenance/ctl01/service-intervals.json",
+  "maintenance/ctl01/service-schedule.csv",
+]
+"share/open-construction-equipment/maintenance/ctl01/procedures" = ["maintenance/ctl01/procedures/*.md"]
+"share/open-construction-equipment/hardware/ctl01/bom" = ["hardware/ctl01/bom/ctl01-bom.csv"]

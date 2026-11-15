@@ -1,0 +1,29 @@
+Open Construction Equipment — license scope
+
+Original materials in this repository are made available under the following licenses:
+
+- Software source and executable tooling: Apache License 2.0 (Apache-2.0).
+  See LICENSES/Apache-2.0.txt.
+- Hardware designs and design data, including OpenSCAD: CERN Open Hardware
+  Licence Version 2, Strongly Reciprocal (CERN-OHL-S-2.0).
+  See LICENSES/CERN-OHL-S-2.0.txt.
+- Original documentation and media (Markdown, prose sheets, and generated
+  documentation artwork): Creative Commons Attribution-ShareAlike 4.0
+  International (CC-BY-SA-4.0). See LICENSES/CC-BY-SA-4.0.txt.
+
+Structured hardware registers (CSV/JSON design data) follow the hardware
+license unless a file explicitly states otherwise. A file-level SPDX
+identifier takes precedence when a contribution legitimately uses a
+compatible different license. The included Python/C++ host-reference software
+is simulation-only and non-certified; its inclusion is not a machine release.
+
+License notices must be retained. Hardware recipients should consult the
+full CERN-OHL-S-2.0 source, product, notice, and reciprocal-source duties;
+this summary is not a substitute for it. Documentation adaptations must
+retain attribution, indicate changes, and use CC-BY-SA-4.0 as required.
+
+Third-party standards, manufacturer documentation, publications, license
+texts, and other identified external material are not relicensed by this
+project. No license grants permission to violate law, bypass competent
+review, make conformity claims, or represent this concept as validated.
+No physical warranty or operational suitability is offered.

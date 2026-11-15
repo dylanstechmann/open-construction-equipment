@@ -1,0 +1,72 @@
+{
+  "spdxLicenseIdentifier": "CC-BY-SA-4.0",
+  "schemaVersion": "1.0.0",
+  "recordType": "OCE-CTL-01-service-record",
+  "syntheticNotice": "SYNTHETIC NON-OPERATIONAL SAMPLE ONLY. No service or approval occurred.",
+  "platform": "OCE-CTL-01",
+  "record": {
+    "recordId": "SYNTHETIC-SERVICE-004",
+    "unitId": "SYNTHETIC-NOT-A-MACHINE",
+    "recordStatus": "SYNTHETIC_NOT_EVIDENCE",
+    "configuration": {
+      "hardwareRevision": "SYNTHETIC-NO-RELEASE",
+      "bomRevision": "SYNTHETIC-NO-RELEASE",
+      "softwareManifestRevision": null,
+      "attachmentId": null,
+      "attachmentIcdRevision": null
+    },
+    "workAuthorization": {
+      "authorizationId": null,
+      "scope": "Synthetic schema example only; not authorized",
+      "authorizedBy": null,
+      "authorizedAt": null,
+      "siteProcedureId": "TBD"
+    },
+    "serviceContext": {
+      "scheduleId": "SVC-004",
+      "intervalStatus": "PROPOSED_NOT_OEM_SCHEDULE",
+      "reportedSymptoms": [],
+      "observedConditions": "Synthetic data only",
+      "operatingHours": 120.0,
+      "operatingHoursUnit": "h",
+      "previousRecordId": null
+    },
+    "personnel": [],
+    "isolation": {
+      "procedureRevision": "PR-002-release-TBD",
+      "required": true,
+      "energySourceRecords": [],
+      "lockTagRecords": [],
+      "zeroEnergyVerified": false,
+      "verifiedBy": null,
+      "verifiedAt": null,
+      "verificationInstrumentIds": []
+    },
+    "workEntries": [
+      {
+        "serviceId": "SVC-004",
+        "status": "SYNTHETIC_NOT_EVIDENCE",
+        "completedAt": "2026-11-14T12:00:00Z",
+        "useCount": 13,
+        "note": "Illustrative record linkage only"
+      }
+    ],
+    "actualMeasurements": [],
+    "removedAndInstalledParts": [],
+    "softwareChanges": [],
+    "nonconformanceIds": [],
+    "postServiceTests": [],
+    "rawEvidenceReferences": [],
+    "returnToService": {
+      "allowed": false,
+      "scopeLimitation": "SYNTHETIC_SAMPLE_NEVER_AUTHORIZED",
+      "unitConfigurationVerified": false,
+      "guardsAndInterlocksRestored": false,
+      "qualifiedReviewer": null,
+      "responsibleEngineer": null,
+      "reviewedAt": null,
+      "signatureReferences": []
+    },
+    "corrections": []
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Proposed non-OEM service interval plan",
+  "type": "object",
+  "required": [
+    "recordType",
+    "platform",
+    "intervalStatus",
+    "items"
+  ],
+  "properties": {
+    "recordType": {
+      "const": "OCE-CTL-01-service-interval-plan"
+    },
+    "platform": {
+      "const": "OCE-CTL-01"
+    },
+    "intervalStatus": {
+      "const": "PROPOSED_NOT_OEM_SCHEDULE"
+    },
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "serviceId",
+          "intervalHours",
+          "intervalDays",
+          "everyUse",
+          "eventTriggers",
+          "basis"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "serviceId": {
+            "type": "string",
+            "pattern": "^SVC-[0-9]{3}$"
+          },
+          "intervalHours": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "exclusiveMinimum": 0
+          },
+          "intervalDays": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "exclusiveMinimum": 0
+          },
+          "everyUse": {
+            "type": "boolean"
+          },
+          "eventTriggers": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "basis": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": true
+}

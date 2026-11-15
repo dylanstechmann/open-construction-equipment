@@ -1,0 +1,61 @@
+{
+  "spdxLicenseIdentifier": "CC-BY-SA-4.0",
+  "schemaVersion": "1.0.0",
+  "recordType": "OCE-CTL-01-service-history",
+  "platform": "OCE-CTL-01",
+  "syntheticNotice": "SYNTHETIC DATA ONLY: no machine, service, event, inspection, measurement, person, or approval exists.",
+  "asOf": "2026-11-15T12:00:00Z",
+  "operatingHours": 125.5,
+  "useCount": 14,
+  "completedServices": [
+    {
+      "serviceId": "SVC-003",
+      "completedAt": "2026-11-10T12:00:00Z",
+      "operatingHours": 80.0,
+      "useCount": 9,
+      "sourceRecordId": "SYNTHETIC-SERVICE-003",
+      "recordStatus": "SYNTHETIC_NOT_EVIDENCE"
+    },
+    {
+      "serviceId": "SVC-004",
+      "completedAt": "2026-11-14T12:00:00Z",
+      "operatingHours": 120.0,
+      "useCount": 13,
+      "sourceRecordId": "SYNTHETIC-SERVICE-004",
+      "recordStatus": "SYNTHETIC_NOT_EVIDENCE"
+    },
+    {
+      "serviceId": "SVC-005",
+      "completedAt": "2026-11-13T12:00:00Z",
+      "operatingHours": 100.0,
+      "useCount": 10,
+      "sourceRecordId": "SYNTHETIC-SERVICE-005",
+      "recordStatus": "SYNTHETIC_NOT_EVIDENCE"
+    },
+    {
+      "serviceId": "SVC-008",
+      "completedAt": "2025-11-16T12:00:00Z",
+      "operatingHours": 0.0,
+      "useCount": 0,
+      "sourceRecordId": "SYNTHETIC-SERVICE-008",
+      "recordStatus": "SYNTHETIC_NOT_EVIDENCE"
+    },
+    {
+      "serviceId": "SVC-011",
+      "completedAt": "2026-11-11T12:00:00Z",
+      "operatingHours": 100.0,
+      "useCount": 10,
+      "sourceRecordId": "SYNTHETIC-SERVICE-011",
+      "recordStatus": "SYNTHETIC_NOT_EVIDENCE"
+    }
+  ],
+  "events": [
+    {
+      "eventType": "impact",
+      "occurredAt": "2026-11-14T18:00:00Z",
+      "operatingHours": 122.0,
+      "useCount": 13,
+      "synthetic": true
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+hose_id,circuit,from_function,to_function,function,failure_consequence,selection_requirements,status
+HOSE-001,Pump pressure,Pump outlet,Main valve pressure inlet,Supply implement flow,Injection burst loss of motion,Pressure flow impulse temperature fluid fittings routing guards TBD,TBD
+HOSE-002,Main return,Main valve return,Reservoir return conditioning,Return filtered fluid,Leak overheating contamination,Backpressure thermal filtration fluid and size TBD,TBD
+HOSE-003,Pump suction,Reservoir outlet,Pump suction inlet,Supply pump inlet,Cavitation loss of control aeration,Suction head flow temperature collapse resistance sealing TBD,TBD
+HOSE-004,Lift cap supply,Lift valve load control A,Lift cap-end distribution architecture TBD,Raise lift arms,Descent uneven lift injection,Load control hose burst synchronization pressure impulse TBD,TBD
+HOSE-005,Lift rod supply,Lift valve B,Lift rod-end distribution architecture TBD,Lower control,Unexpected movement trapped pressure,Lowering flow counterbalance cavitation dynamics TBD,TBD
+HOSE-006,Left lift cap end,Lift cap-end manifold TBD,Left lift cylinder cap end,Raise left side,Burst rapid descent injection,Cylinder reaction hose motion guards proof strategy TBD,TBD
+HOSE-007,Right lift cap end,Lift cap-end manifold TBD,Right lift cylinder cap end,Raise right side,Burst rapid descent injection,Cylinder reaction hose motion guards proof strategy TBD,TBD
+HOSE-008,Left lift rod end,Lift rod-end manifold TBD,Left lift cylinder rod end,Controlled lower left side,Crossflow uneven descent,Route bend dynamic pressure port design TBD,TBD
+HOSE-009,Right lift rod end,Lift rod-end manifold TBD,Right lift cylinder rod end,Controlled lower right side,Crossflow uneven descent,Route bend dynamic pressure port design TBD,TBD
+HOSE-010,Tilt cap end,Tilt valve and load control TBD,Tilt cylinder cap end circuit,Curl attachment,Uncommanded curl load drop injection,Reaction stall impulse hose failure load control TBD,TBD
+HOSE-011,Tilt rod end,Tilt valve B,Tilt cylinder rod end circuit,Dump attachment,Uncommanded dump trapped pressure,Dynamic pressure flow control route TBD,TBD
+HOSE-012,Case drain if required,Motor or valve drains,Reservoir case drain port,Low pressure leakage return,Overpressure component damage contamination,Supplier drain pressure backpressure filters ports TBD,TBD
+HOSE-013,Cooler supply,Return thermal routing TBD,Hydraulic cooler inlet,Heat rejection,Overheat leaks fluid spray,Thermal model backpressure cold bypass service TBD,TBD
+HOSE-014,Cooler return,Hydraulic cooler outlet,Return filter reservoir,Cooled return,Cold restriction contamination,Cold bypass filtration pressure analysis TBD,TBD
+HOSE-015,Test and service,Approved test port,Diagnostic or flush equipment only,Isolation sampling pressure verification,Accidental pressurization whip contamination,Port rating cap access LOTO and written test plan TBD,TBD

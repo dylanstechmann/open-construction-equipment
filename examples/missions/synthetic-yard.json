@@ -1,0 +1,57 @@
+{
+  "spdxLicenseIdentifier": "Apache-2.0",
+  "schemaVersion": "1.0.0",
+  "name": "Synthetic rectangular yard obstacle detour",
+  "platform": "OCE-CTL-01",
+  "simulationOnly": true,
+  "syntheticNotice": "Synthetic site coordinates in metres. No real site, coordinates, people, bystanders, or operating instructions.",
+  "geofence": [
+    [
+      0.0,
+      0.0
+    ],
+    [
+      16.0,
+      0.0
+    ],
+    [
+      16.0,
+      12.0
+    ],
+    [
+      0.0,
+      12.0
+    ]
+  ],
+  "obstacles": [
+    {
+      "id": "SYNTH-OBS-001",
+      "center": [
+        8.0,
+        5.5
+      ],
+      "radius_m": 2.0
+    },
+    {
+      "id": "SYNTH-OBS-002",
+      "center": [
+        11.5,
+        9.0
+      ],
+      "radius_m": 0.7
+    }
+  ],
+  "start": {
+    "x_m": 2.0,
+    "y_m": 2.0,
+    "yaw_rad": 0.0
+  },
+  "goal": {
+    "x_m": 14.0,
+    "y_m": 10.0,
+    "yaw_rad": 0.0
+  },
+  "grid_resolution_m": 0.25,
+  "safety_margin_m": 0.2,
+  "max_duration_s": 120.0
+}

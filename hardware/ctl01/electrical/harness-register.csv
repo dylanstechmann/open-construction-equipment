@@ -1,0 +1,15 @@
+harness_id,from_function,to_function,circuit_class,signal_or_load,routing_hazards,required_design_evidence,status
+HRN-001,Battery pack,HV distribution,HV,Traction and auxiliary DC bus,Shock arc abrasion heat fluid,Voltage current fault protection insulation interlock drawing,TBD
+HRN-002,HV distribution,Left traction inverter,HV,Left traction power,Chassis flex track debris heat,Load conductor protection terminals EMC and drawing,TBD
+HRN-003,HV distribution,Right traction inverter,HV,Right traction power,Chassis flex track debris heat,Load conductor protection terminals EMC and drawing,TBD
+HRN-004,HV distribution,Hydraulic pump inverter,HV,Pump DC power,Hydraulic fluid heat vibration,Duty protection separation service access and drawing,TBD
+HRN-005,Charge inlet,Pack charge distribution,HV charging,Charging power and interlock,Connector moisture external supply,Charger interface earthing touch protection interlock review,TBD
+HRN-006,HV distribution,DC DC converter,HV to isolated LV,LV source supply,Isolation boundary heat,Isolation protection converter data LV backup analysis,TBD
+HRN-007,LV distribution,Manual controls and VCU,LV control,Control supply manual inputs,Pinch water operator movement,Protection diagnostic architecture and pinout TBD,TBD
+HRN-008,Independent safety devices,Protective logic and actuator inhibits,Safety LV TBD,E-stop interlocks monitored outputs,Common cause short cross circuit reset access,SRS architecture separation diagnostics routing validation,TBD
+HRN-009,BMS sensing contactor controls,Pack modules HV coordinator,Pack sensing and control TBD,Cell data contactor control HVIL,Internal shock isolation connector keying,Pack schematic clearance isolation service design,TBD
+HRN-010,Machine sensors,VCU acquisition,LV signal,Position pressure temperature sensing,EMC spray track pinch,Supplier transfer functions shielding diagnostics pinout,TBD
+HRN-011,Sensing gateway,Research compute connector,Data reserved LV supply,Telemetry sim interface,Supply overload cyber unauthorized access,Read-only default partitioning power connector and no physical commands,TBD
+HRN-012,Chassis protective bonding,Enclosures exposed conductive parts,Protective bonding,Fault current path TBD,Corrosion paint loose joints,Bonding design torque continuity verification,TBD
+HRN-013,Hydraulic valve outputs,Valve coils load controls,LV actuator,Solenoid power diagnostics,Heat fluid vibration current,Coil power suppression fuse connector keying pinout,TBD
+HRN-014,Lighting and work area,Controls to lights horn alarms,LV auxiliary,Visibility warning accessories,Water impact polarity,Use case wiring protection regulatory needs,TBD

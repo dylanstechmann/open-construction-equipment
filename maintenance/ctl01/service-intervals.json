@@ -1,0 +1,205 @@
+{
+  "spdxLicenseIdentifier": "CC-BY-SA-4.0",
+  "schemaVersion": "1.0.0",
+  "recordType": "OCE-CTL-01-service-interval-plan",
+  "platform": "OCE-CTL-01",
+  "intervalStatus": "PROPOSED_NOT_OEM_SCHEDULE",
+  "notice": "Initial AI-authored proposed intervals; owner review pending. Exact OEM, supplier, legal and site schedules take precedence. SVC-005 combines visual/detailed schedule text conservatively and does not authorize work.",
+  "items": [
+    {
+      "serviceId": "SVC-001",
+      "intervalHours": null,
+      "intervalDays": null,
+      "everyUse": true,
+      "eventTriggers": [],
+      "basis": "PROPOSED initial AI-authored planning value; owner/component OEM/legal review pending; not an OEM schedule"
+    },
+    {
+      "serviceId": "SVC-002",
+      "intervalHours": null,
+      "intervalDays": null,
+      "everyUse": true,
+      "eventTriggers": [],
+      "basis": "PROPOSED initial AI-authored planning value; owner/component OEM/legal review pending; not an OEM schedule"
+    },
+    {
+      "serviceId": "SVC-003",
+      "intervalHours": 50,
+      "intervalDays": null,
+      "everyUse": false,
+      "eventTriggers": [
+        "impact",
+        "overload",
+        "repair"
+      ],
+      "basis": "PROPOSED initial AI-authored planning value; owner/component OEM/legal review pending; not an OEM schedule"
+    },
+    {
+      "serviceId": "SVC-004",
+      "intervalHours": null,
+      "intervalDays": null,
+      "everyUse": true,
+      "eventTriggers": [
+        "attachment_change"
+      ],
+      "basis": "PROPOSED initial AI-authored planning value; owner/component OEM/legal review pending; not an OEM schedule"
+    },
+    {
+      "serviceId": "SVC-005",
+      "intervalHours": 50,
+      "intervalDays": 1,
+      "everyUse": true,
+      "eventTriggers": [],
+      "basis": "PROPOSED initial AI-authored planning value; owner/component OEM/legal review pending; not an OEM schedule"
+    },
+    {
+      "serviceId": "SVC-006",
+      "intervalHours": 50,
+      "intervalDays": null,
+      "everyUse": true,
+      "eventTriggers": [],
+      "basis": "PROPOSED initial AI-authored planning value; owner/component OEM/legal review pending; not an OEM schedule"
+    },
+    {
+      "serviceId": "SVC-007",
+      "intervalHours": null,
+      "intervalDays": null,
+      "everyUse": true,
+      "eventTriggers": [],
+      "basis": "PROPOSED initial AI-authored planning value; owner/component OEM/legal review pending; not an OEM schedule"
+    },
+    {
+      "serviceId": "SVC-008",
+      "intervalHours": 250,
+      "intervalDays": 365,
+      "everyUse": false,
+      "eventTriggers": [],
+      "basis": "PROPOSED initial AI-authored planning value; owner/component OEM/legal review pending; not an OEM schedule"
+    },
+    {
+      "serviceId": "SVC-009",
+      "intervalHours": null,
+      "intervalDays": null,
+      "everyUse": true,
+      "eventTriggers": [
+        "condition_event"
+      ],
+      "basis": "PROPOSED initial AI-authored planning value; owner/component OEM/legal review pending; not an OEM schedule"
+    },
+    {
+      "serviceId": "SVC-010",
+      "intervalHours": null,
+      "intervalDays": null,
+      "everyUse": true,
+      "eventTriggers": [
+        "impact",
+        "hose_abrasion"
+      ],
+      "basis": "PROPOSED initial AI-authored planning value; owner/component OEM/legal review pending; not an OEM schedule"
+    },
+    {
+      "serviceId": "SVC-011",
+      "intervalHours": 250,
+      "intervalDays": null,
+      "everyUse": false,
+      "eventTriggers": [],
+      "basis": "PROPOSED initial AI-authored planning value; owner/component OEM/legal review pending; not an OEM schedule"
+    },
+    {
+      "serviceId": "SVC-012",
+      "intervalHours": 250,
+      "intervalDays": null,
+      "everyUse": false,
+      "eventTriggers": [
+        "service",
+        "circuit_change"
+      ],
+      "basis": "PROPOSED initial AI-authored planning value; owner/component OEM/legal review pending; not an OEM schedule"
+    },
+    {
+      "serviceId": "SVC-013",
+      "intervalHours": null,
+      "intervalDays": null,
+      "everyUse": false,
+      "eventTriggers": [
+        "released_point_interval_due"
+      ],
+      "basis": "PROPOSED initial AI-authored planning value; owner/component OEM/legal review pending; not an OEM schedule"
+    },
+    {
+      "serviceId": "SVC-014",
+      "intervalHours": 50,
+      "intervalDays": null,
+      "everyUse": false,
+      "eventTriggers": [
+        "structural_service",
+        "component_service"
+      ],
+      "basis": "PROPOSED initial AI-authored planning value; owner/component OEM/legal review pending; not an OEM schedule"
+    },
+    {
+      "serviceId": "SVC-015",
+      "intervalHours": 250,
+      "intervalDays": null,
+      "everyUse": false,
+      "eventTriggers": [
+        "replacement",
+        "fault",
+        "configuration_change"
+      ],
+      "basis": "PROPOSED initial AI-authored planning value; owner/component OEM/legal review pending; not an OEM schedule"
+    },
+    {
+      "serviceId": "SVC-016",
+      "intervalHours": 250,
+      "intervalDays": null,
+      "everyUse": false,
+      "eventTriggers": [
+        "rollover",
+        "impact",
+        "structural_event"
+      ],
+      "basis": "PROPOSED initial AI-authored planning value; owner/component OEM/legal review pending; not an OEM schedule"
+    },
+    {
+      "serviceId": "SVC-017",
+      "intervalHours": 250,
+      "intervalDays": null,
+      "everyUse": false,
+      "eventTriggers": [],
+      "basis": "PROPOSED initial AI-authored planning value; owner/component OEM/legal review pending; not an OEM schedule"
+    },
+    {
+      "serviceId": "SVC-018",
+      "intervalHours": null,
+      "intervalDays": null,
+      "everyUse": false,
+      "eventTriggers": [
+        "every_service",
+        "owner_service_communication"
+      ],
+      "basis": "PROPOSED initial AI-authored planning value; owner/component OEM/legal review pending; not an OEM schedule"
+    },
+    {
+      "serviceId": "SVC-019",
+      "intervalHours": null,
+      "intervalDays": null,
+      "everyUse": false,
+      "eventTriggers": [
+        "every_intervention"
+      ],
+      "basis": "PROPOSED initial AI-authored planning value; owner/component OEM/legal review pending; not an OEM schedule"
+    },
+    {
+      "serviceId": "SVC-020",
+      "intervalHours": null,
+      "intervalDays": null,
+      "everyUse": false,
+      "eventTriggers": [
+        "storage_planned",
+        "disposal_planned"
+      ],
+      "basis": "PROPOSED initial AI-authored planning value; owner/component OEM/legal review pending; not an OEM schedule"
+    }
+  ]
+}
