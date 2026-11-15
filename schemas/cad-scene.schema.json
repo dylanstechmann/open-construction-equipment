@@ -1,0 +1,357 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/oce-ctl-01/cad-scene.schema.json",
+  "title": "Synthetic local OCE-CTL-01 / BUNKER-01 CAD scene",
+  "description": "Local relative metres only. Runtime additionally enforces ID/reference uniqueness, animation chronology, machine/bunker presence, rigid/bunker non-overlap, and finite mesh arithmetic. No surveyed location, fabrication release, or validated physics.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "spdxLicenseIdentifier",
+    "schemaVersion",
+    "platform",
+    "scope",
+    "unitSystem",
+    "coordinateConvention",
+    "sceneId",
+    "provenance",
+    "materials",
+    "bodies",
+    "animation",
+    "physics"
+  ],
+  "properties": {
+    "spdxLicenseIdentifier": {
+      "const": "CC-BY-SA-4.0"
+    },
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "platform": {
+      "const": "OCE-CTL-01"
+    },
+    "scope": {
+      "const": "BUNKER-01"
+    },
+    "unitSystem": {
+      "const": "SI"
+    },
+    "coordinateConvention": {
+      "const": "RIGHT_HANDED_LOCAL_METRES_Z_UP"
+    },
+    "sceneId": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "provenance": {
+      "$ref": "#/$defs/provenance"
+    },
+    "materials": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/material"
+      }
+    },
+    "bodies": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/body"
+      }
+    },
+    "animation": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/animation"
+      }
+    },
+    "physics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "timestep_s",
+        "duration_s",
+        "gravity_mps2",
+        "friction",
+        "restitution"
+      ],
+      "properties": {
+        "timestep_s": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "duration_s": {
+          "type": "number",
+          "minimum": 0
+        },
+        "gravity_mps2": {
+          "$ref": "#/$defs/gravity"
+        },
+        "friction": {
+          "type": "number",
+          "minimum": 0
+        },
+        "restitution": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    }
+  },
+  "$defs": {
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceType",
+        "statement",
+        "aiAuthored",
+        "ownerSupplied",
+        "siteSupplied",
+        "physicalValidationPerformed"
+      ],
+      "properties": {
+        "sourceType": {
+          "const": "SYNTHETIC_AGENT_AUTHORED"
+        },
+        "statement": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "aiAuthored": {
+          "const": true
+        },
+        "ownerSupplied": {
+          "const": false
+        },
+        "siteSupplied": {
+          "const": false
+        },
+        "physicalValidationPerformed": {
+          "const": false
+        }
+      }
+    },
+    "vector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "x_m",
+        "y_m",
+        "z_m"
+      ],
+      "properties": {
+        "x_m": {
+          "type": "number"
+        },
+        "y_m": {
+          "type": "number"
+        },
+        "z_m": {
+          "type": "number"
+        }
+      }
+    },
+    "positiveVector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "x_m",
+        "y_m",
+        "z_m"
+      ],
+      "properties": {
+        "x_m": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "y_m": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "z_m": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "color": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "red",
+        "green",
+        "blue",
+        "alpha"
+      ],
+      "properties": {
+        "red": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "green": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "blue": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "alpha": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "material": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "materialId",
+        "diffuse",
+        "metallic",
+        "roughness"
+      ],
+      "properties": {
+        "materialId": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "diffuse": {
+          "$ref": "#/$defs/color"
+        },
+        "metallic": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "roughness": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "body": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "bodyId",
+        "kind",
+        "center_m",
+        "size_m",
+        "yaw_rad",
+        "mass_kg",
+        "physicsMode",
+        "materialId"
+      ],
+      "properties": {
+        "bodyId": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "kind": {
+          "enum": [
+            "MACHINE",
+            "BUNKER",
+            "ATTACHMENT",
+            "TERRAIN",
+            "MICROGRID",
+            "PRIVACY_BERM"
+          ]
+        },
+        "center_m": {
+          "$ref": "#/$defs/vector"
+        },
+        "size_m": {
+          "$ref": "#/$defs/positiveVector"
+        },
+        "yaw_rad": {
+          "type": "number"
+        },
+        "mass_kg": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "physicsMode": {
+          "enum": [
+            "STATIC",
+            "RIGID",
+            "KINEMATIC"
+          ]
+        },
+        "materialId": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9_]*$"
+        }
+      }
+    },
+    "animation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "bodyId",
+        "time_s",
+        "translation_m",
+        "yaw_rad",
+        "interpolation"
+      ],
+      "properties": {
+        "bodyId": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "time_s": {
+          "type": "number",
+          "minimum": 0
+        },
+        "translation_m": {
+          "$ref": "#/$defs/vector"
+        },
+        "yaw_rad": {
+          "type": "number"
+        },
+        "interpolation": {
+          "enum": [
+            "LINEAR",
+            "CONSTANT"
+          ]
+        }
+      }
+    },
+    "gravity": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/vector"
+        },
+        {
+          "properties": {
+            "x_m": {
+              "const": 0
+            },
+            "y_m": {
+              "const": 0
+            },
+            "z_m": {
+              "type": "number",
+              "exclusiveMaximum": 0
+            }
+          }
+        }
+      ]
+    }
+  }
+}

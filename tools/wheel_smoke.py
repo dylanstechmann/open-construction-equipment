@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import importlib.metadata
 import json
 import os
@@ -41,6 +42,47 @@ def _build_tools() -> str | None:
     if parts < (77, 0):
         return None
     return version
+
+
+def check_installed_new_commands(run_dir: Path, oce: Path, env: dict[str, str]) -> None:
+    """Exercise all five v0.5.0 commands, including both site modes."""
+
+    commands = (
+        (("physics",), "builds/physics/result.json"),
+        (("export-cad",), "builds/cad/result.json"),
+        (("powertrain",), "builds/powertrain/result.json"),
+        (("site", "--mode", "screen"), "builds/geohazard/screen/result.json"),
+        (("site", "--mode", "adapt"), "builds/geohazard/adapt/result.json"),
+        (("economics",), "builds/economics/result.json"),
+    )
+    reports = {}
+    for arguments, relative_result in commands:
+        report_text = _run([str(oce), *arguments, "--json"], cwd=run_dir, env=env)
+        result_path = run_dir / relative_result
+        if not result_path.is_file() or result_path.read_text(encoding="utf-8") != report_text:
+            raise RuntimeError(f"installed {arguments[0]} result.json does not match stdout")
+        reports[arguments] = json.loads(report_text)
+    cad = reports[("export-cad",)]
+    cad_dir = run_dir / "builds/cad"
+    expected = (
+        "scene.obj", "scene.mtl", "blender_scene.py", "ctl01_bunker_physics.xml",
+        "scene.scad", "scene_freecad.py",
+    )
+    if tuple(artifact["filename"] for artifact in cad["artifacts"]) != expected:
+        raise RuntimeError("installed CAD manifest has wrong artifact names/order")
+    for artifact in cad["artifacts"]:
+        payload = (cad_dir / artifact["filename"]).read_bytes()
+        if len(payload) != artifact["sizeBytes"] or hashlib.sha256(payload).hexdigest() != artifact["sha256"]:
+            raise RuntimeError(f"installed CAD artifact hash/size mismatch: {artifact['filename']}")
+    if "mtllib scene.mtl\n" not in (cad_dir / "scene.obj").read_text(encoding="utf-8"):
+        raise RuntimeError("installed CAD OBJ lacks its scene.mtl reference")
+    screen = reports[("site", "--mode", "screen")]
+    adapt = reports[("site", "--mode", "adapt")]
+    if screen["purchaseRecommendationMade"] or adapt["constructionAuthorized"]:
+        raise RuntimeError("installed site commands made a prohibited decision")
+    if reports[("economics",)]["procurementAuthorized"] or reports[("powertrain",)]["operationalRelease"]:
+        raise RuntimeError("installed economics/powertrain made a prohibited release")
+    print("Installed v0.5.0 commands: physics, export-cad, powertrain, site screen/adapt, economics passed")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -103,6 +145,18 @@ def main(argv: list[str] | None = None) -> int:
                 suffix = f".data/data/share/open-construction-equipment/{relative}"
                 if not any(name.endswith(suffix) for name in names):
                     raise RuntimeError(f"wheel lacks installed BUNKER-01 resource: {relative}")
+            required_v050_data = (
+                "examples/physics/synthetic-physics.json",
+                "examples/cad/synthetic-scene.json",
+                "examples/powertrain/synthetic-microgrid.json",
+                "examples/geohazard/synthetic-screen.json",
+                "examples/geohazard/synthetic-adapt.json",
+                "examples/economics/synthetic-pathways.json",
+            )
+            for relative in required_v050_data:
+                suffix = f".data/data/share/open-construction-equipment/{relative}"
+                if not any(name.endswith(suffix) for name in names):
+                    raise RuntimeError(f"wheel lacks installed v0.5.0 resource: {relative}")
         target = work / "venv"
         venv.EnvBuilder(with_pip=False, clear=True, symlinks=True).create(target)
         python = target / "bin/python"
@@ -117,6 +171,12 @@ def main(argv: list[str] | None = None) -> int:
         validation = json.loads(_run([str(oce), "validate", "--json"], cwd=run_dir, env=installed_env))
         if validation["status"] != "passed" or validation["validationScope"] != "package-resources" or validation["fullRepositoryValidation"]:
             raise RuntimeError(f"installed package validation has wrong result/scope: {validation}")
+        new_counters = (
+            "physicsInputsChecked", "cadScenesChecked", "powertrainInputsChecked",
+            "geohazardScreenInputsChecked", "geohazardAdaptInputsChecked", "economicsInputsChecked",
+        )
+        if any(validation.get(counter) != 1 for counter in new_counters):
+            raise RuntimeError(f"installed package validation did not check every v0.5.0 input: {validation}")
         simulation = json.loads(_run([str(oce), "simulate", "--json"], cwd=run_dir, env=installed_env))
         if simulation["status"] != "succeeded":
             raise RuntimeError(f"installed default simulation failed: {simulation['finalReasons']}")
@@ -147,6 +207,11 @@ def main(argv: list[str] | None = None) -> int:
         bom = json.loads(_run([str(oce), "bom", "--json"], cwd=run_dir, env=installed_env))
         if bom["itemCount"] != 63:
             raise RuntimeError("installed BOM data is incomplete")
+        check_installed_new_commands(run_dir, oce, installed_env)
+        _run([str(python), "-c",
+              "import importlib.util; assert all(importlib.util.find_spec(name) is None "
+              "for name in ('cadquery', 'mujoco', 'jsonschema'))"],
+             cwd=run_dir, env=installed_env)
         print(f"Wheel: {wheel.name}")
         print(f"Installed validation: {validation['status']} ({validation['validationScope']}; "
               f"{validation['jsonFilesChecked']} JSON, {validation['csvFilesChecked']} CSV)")

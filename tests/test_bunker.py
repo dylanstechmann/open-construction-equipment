@@ -722,7 +722,7 @@ class BunkerTests(unittest.TestCase):
         import tomllib
         with (ROOT / "pyproject.toml").open("rb") as handle:
             project = tomllib.load(handle)
-        self.assertEqual(project["project"]["version"], "0.4.0")
+        self.assertEqual(project["project"]["version"], "0.5.0")
         data_files = project["tool"]["setuptools"]["data-files"]
         prefix = "share/open-construction-equipment/"
         self.assertEqual(data_files[prefix + "examples/bunker"], ["examples/bunker/synthetic-bunker01.json"])

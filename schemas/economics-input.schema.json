@@ -1,0 +1,454 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/oce-ctl-01/economics-input.schema.json",
+  "title": "OCE-CTL-01 / BUNKER-01 synthetic fabrication and pathway economics input",
+  "description": "Strict synthetic interchange only. Runtime additionally enforces unique IDs and roles, resolvable policy references and applies_to authorization, exactly one policy per pathway, available labor, currency consistency, finite checked arithmetic, and nonnegative adapted totals. Linear proration is not a vendor quote or procurement authorization.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "spdxLicenseIdentifier",
+    "schemaVersion",
+    "platform",
+    "scope",
+    "unitSystem",
+    "analysisId",
+    "currency",
+    "provenance",
+    "tooling",
+    "fabrication",
+    "laborRates",
+    "rentals",
+    "fabricationLaborRole",
+    "evaluationHours_h",
+    "annualFixedOwnershipCost",
+    "ownershipHoursPerYear",
+    "ownedMicrogridEnergyCostPer_h",
+    "siteAdaptations",
+    "policies"
+  ],
+  "properties": {
+    "spdxLicenseIdentifier": {
+      "const": "CC-BY-SA-4.0"
+    },
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "platform": {
+      "const": "OCE-CTL-01"
+    },
+    "scope": {
+      "const": "BUNKER-01"
+    },
+    "unitSystem": {
+      "const": "SI"
+    },
+    "analysisId": {
+      "$ref": "#/$defs/nonEmptyString"
+    },
+    "currency": {
+      "$ref": "#/$defs/currency"
+    },
+    "provenance": {
+      "$ref": "#/$defs/provenance"
+    },
+    "tooling": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/toolingItem"
+      }
+    },
+    "fabrication": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/fabricationItem"
+      }
+    },
+    "laborRates": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/laborRate"
+      }
+    },
+    "rentals": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/rentalItem"
+      }
+    },
+    "fabricationLaborRole": {
+      "$ref": "#/$defs/nonEmptyString"
+    },
+    "evaluationHours_h": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "number",
+        "minimum": 0
+      }
+    },
+    "annualFixedOwnershipCost": {
+      "type": "number",
+      "minimum": 0
+    },
+    "ownershipHoursPerYear": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "ownedMicrogridEnergyCostPer_h": {
+      "type": "number",
+      "minimum": 0
+    },
+    "siteAdaptations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/costScheduleDelta"
+      }
+    },
+    "policies": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "$ref": "#/$defs/pathwayPolicy"
+      },
+      "allOf": [
+        {
+          "contains": {
+            "properties": {
+              "pathway": {
+                "const": "diy"
+              }
+            }
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "pathway": {
+                "const": "rental"
+              }
+            }
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "pathway": {
+                "const": "hybrid"
+              }
+            }
+          },
+          "minContains": 1,
+          "maxContains": 1
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "currency": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$"
+    },
+    "nonnegativeNumber": {
+      "type": "number",
+      "minimum": 0
+    },
+    "idArray": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/nonEmptyString"
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceType",
+        "statement",
+        "aiAuthored",
+        "ownerSupplied",
+        "siteSupplied",
+        "physicalValidationPerformed"
+      ],
+      "properties": {
+        "sourceType": {
+          "const": "SYNTHETIC_AGENT_AUTHORED"
+        },
+        "statement": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "aiAuthored": {
+          "const": true
+        },
+        "ownerSupplied": {
+          "const": false
+        },
+        "siteSupplied": {
+          "const": false
+        },
+        "physicalValidationPerformed": {
+          "const": false
+        }
+      }
+    },
+    "toolingItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "itemId",
+        "startupCapex",
+        "serviceLife_h",
+        "maintenancePer_h",
+        "appliesTo"
+      ],
+      "properties": {
+        "itemId": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "startupCapex": {
+          "$ref": "#/$defs/nonnegativeNumber"
+        },
+        "serviceLife_h": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "maintenancePer_h": {
+          "$ref": "#/$defs/nonnegativeNumber"
+        },
+        "appliesTo": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": ["diy", "hybrid"]
+          }
+        }
+      }
+    },
+    "fabricationItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "itemId",
+        "quantity",
+        "unitMaterialCost",
+        "unitComponentCost",
+        "laborHoursPerUnit",
+        "hourlyWearReserve",
+        "appliesTo"
+      ],
+      "properties": {
+        "itemId": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "quantity": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "unitMaterialCost": {
+          "$ref": "#/$defs/nonnegativeNumber"
+        },
+        "unitComponentCost": {
+          "$ref": "#/$defs/nonnegativeNumber"
+        },
+        "laborHoursPerUnit": {
+          "$ref": "#/$defs/nonnegativeNumber"
+        },
+        "hourlyWearReserve": {
+          "$ref": "#/$defs/nonnegativeNumber"
+        },
+        "appliesTo": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": ["diy", "hybrid"]
+          }
+        }
+      }
+    },
+    "laborRate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "ratePer_h", "availableHours_h"],
+      "properties": {
+        "role": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "ratePer_h": {
+          "$ref": "#/$defs/nonnegativeNumber"
+        },
+        "availableHours_h": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "rentalItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "itemId",
+        "billingUnit",
+        "ratePerBillingUnit",
+        "deliveryPerMobilization",
+        "mobilizationsPerProject",
+        "fuelOrEnergyPer_h",
+        "hourlyWearReserve",
+        "hourlyWearReserveIncluded",
+        "appliesTo"
+      ],
+      "properties": {
+        "itemId": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "billingUnit": {
+          "enum": ["HOUR", "DAY_8H", "WEEK_40H"]
+        },
+        "ratePerBillingUnit": {
+          "$ref": "#/$defs/nonnegativeNumber"
+        },
+        "deliveryPerMobilization": {
+          "$ref": "#/$defs/nonnegativeNumber"
+        },
+        "mobilizationsPerProject": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "fuelOrEnergyPer_h": {
+          "$ref": "#/$defs/nonnegativeNumber"
+        },
+        "hourlyWearReserve": {
+          "$ref": "#/$defs/nonnegativeNumber"
+        },
+        "hourlyWearReserveIncluded": {
+          "type": "boolean"
+        },
+        "appliesTo": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": ["rental", "hybrid"]
+          }
+        }
+      }
+    },
+    "costScheduleDelta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "adaptationId",
+        "costDelta",
+        "scheduleDelta_h",
+        "laborDelta_h",
+        "currency",
+        "basis"
+      ],
+      "properties": {
+        "adaptationId": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "costDelta": {
+          "type": "number"
+        },
+        "scheduleDelta_h": {
+          "type": "number"
+        },
+        "laborDelta_h": {
+          "type": "number"
+        },
+        "currency": {
+          "$ref": "#/$defs/currency"
+        },
+        "basis": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "pathwayPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pathway", "ownedItemIds", "rentalItemIds", "siteAdaptationIds"],
+      "properties": {
+        "pathway": {
+          "enum": ["diy", "rental", "hybrid"]
+        },
+        "ownedItemIds": {
+          "$ref": "#/$defs/idArray"
+        },
+        "rentalItemIds": {
+          "$ref": "#/$defs/idArray"
+        },
+        "siteAdaptationIds": {
+          "$ref": "#/$defs/idArray"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "pathway": {
+                "const": "diy"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "rentalItemIds": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "pathway": {
+                "const": "rental"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "ownedItemIds": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "pathway": {
+                "const": "hybrid"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "ownedItemIds": {
+                "minItems": 1
+              },
+              "rentalItemIds": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

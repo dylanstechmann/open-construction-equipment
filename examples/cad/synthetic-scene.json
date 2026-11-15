@@ -1,0 +1,248 @@
+{
+  "spdxLicenseIdentifier": "CC-BY-SA-4.0",
+  "schemaVersion": "1.0.0",
+  "platform": "OCE-CTL-01",
+  "scope": "BUNKER-01",
+  "unitSystem": "SI",
+  "coordinateConvention": "RIGHT_HANDED_LOCAL_METRES_Z_UP",
+  "sceneId": "synthetic_ctl01_bunker",
+  "provenance": {
+    "sourceType": "SYNTHETIC_AGENT_AUTHORED",
+    "statement": "AI-authored synthetic calculator demonstration only; no owner/site evidence, engineering review, physical validation, construction release, or operational authorization.",
+    "aiAuthored": true,
+    "ownerSupplied": false,
+    "siteSupplied": false,
+    "physicalValidationPerformed": false
+  },
+  "materials": [
+    {
+      "materialId": "machine_yellow",
+      "diffuse": {
+        "red": 0.85,
+        "green": 0.62,
+        "blue": 0.12,
+        "alpha": 1.0
+      },
+      "metallic": 0.25,
+      "roughness": 0.55
+    },
+    {
+      "materialId": "bunker_concrete",
+      "diffuse": {
+        "red": 0.55,
+        "green": 0.56,
+        "blue": 0.58,
+        "alpha": 1.0
+      },
+      "metallic": 0.0,
+      "roughness": 0.9
+    },
+    {
+      "materialId": "terrain_soil",
+      "diffuse": {
+        "red": 0.28,
+        "green": 0.2,
+        "blue": 0.12,
+        "alpha": 1.0
+      },
+      "metallic": 0.0,
+      "roughness": 1.0
+    },
+    {
+      "materialId": "attachment_steel",
+      "diffuse": {
+        "red": 0.22,
+        "green": 0.25,
+        "blue": 0.28,
+        "alpha": 1.0
+      },
+      "metallic": 0.7,
+      "roughness": 0.4
+    },
+    {
+      "materialId": "microgrid_green",
+      "diffuse": {
+        "red": 0.12,
+        "green": 0.42,
+        "blue": 0.3,
+        "alpha": 1.0
+      },
+      "metallic": 0.15,
+      "roughness": 0.6
+    },
+    {
+      "materialId": "privacy_earth",
+      "diffuse": {
+        "red": 0.38,
+        "green": 0.29,
+        "blue": 0.17,
+        "alpha": 1.0
+      },
+      "metallic": 0.0,
+      "roughness": 0.95
+    }
+  ],
+  "bodies": [
+    {
+      "bodyId": "terrain",
+      "kind": "TERRAIN",
+      "center_m": {
+        "x_m": 0.0,
+        "y_m": 0.0,
+        "z_m": -0.15
+      },
+      "size_m": {
+        "x_m": 20.0,
+        "y_m": 16.0,
+        "z_m": 0.3
+      },
+      "yaw_rad": 0.0,
+      "mass_kg": 50000.0,
+      "physicsMode": "STATIC",
+      "materialId": "terrain_soil"
+    },
+    {
+      "bodyId": "machine_body",
+      "kind": "MACHINE",
+      "center_m": {
+        "x_m": -3.0,
+        "y_m": 0.0,
+        "z_m": 0.75
+      },
+      "size_m": {
+        "x_m": 3.2,
+        "y_m": 1.8,
+        "z_m": 1.5
+      },
+      "yaw_rad": 0.0,
+      "mass_kg": 1800.0,
+      "physicsMode": "KINEMATIC",
+      "materialId": "machine_yellow"
+    },
+    {
+      "bodyId": "bunker_shell",
+      "kind": "BUNKER",
+      "center_m": {
+        "x_m": 4.0,
+        "y_m": 1.0,
+        "z_m": 1.2
+      },
+      "size_m": {
+        "x_m": 4.5,
+        "y_m": 3.5,
+        "z_m": 2.4
+      },
+      "yaw_rad": 0.0,
+      "mass_kg": 12000.0,
+      "physicsMode": "STATIC",
+      "materialId": "bunker_concrete"
+    },
+    {
+      "bodyId": "bucket",
+      "kind": "ATTACHMENT",
+      "center_m": {
+        "x_m": -1.0,
+        "y_m": 0.0,
+        "z_m": 0.4
+      },
+      "size_m": {
+        "x_m": 1.0,
+        "y_m": 1.9,
+        "z_m": 0.8
+      },
+      "yaw_rad": 0.0,
+      "mass_kg": 240.0,
+      "physicsMode": "KINEMATIC",
+      "materialId": "attachment_steel"
+    },
+    {
+      "bodyId": "tool_crate",
+      "kind": "ATTACHMENT",
+      "center_m": {
+        "x_m": -4.0,
+        "y_m": 2.0,
+        "z_m": 0.4
+      },
+      "size_m": {
+        "x_m": 0.8,
+        "y_m": 0.8,
+        "z_m": 0.8
+      },
+      "yaw_rad": 0.0,
+      "mass_kg": 80.0,
+      "physicsMode": "RIGID",
+      "materialId": "attachment_steel"
+    },
+    {
+      "bodyId": "microgrid",
+      "kind": "MICROGRID",
+      "center_m": {
+        "x_m": -3.0,
+        "y_m": 4.0,
+        "z_m": 0.6
+      },
+      "size_m": {
+        "x_m": 2.0,
+        "y_m": 1.2,
+        "z_m": 1.2
+      },
+      "yaw_rad": 0.0,
+      "mass_kg": 500.0,
+      "physicsMode": "STATIC",
+      "materialId": "microgrid_green"
+    },
+    {
+      "bodyId": "privacy_berm",
+      "kind": "PRIVACY_BERM",
+      "center_m": {
+        "x_m": 3.0,
+        "y_m": -4.0,
+        "z_m": 0.5
+      },
+      "size_m": {
+        "x_m": 6.0,
+        "y_m": 1.5,
+        "z_m": 1.0
+      },
+      "yaw_rad": 0.0,
+      "mass_kg": 7000.0,
+      "physicsMode": "STATIC",
+      "materialId": "privacy_earth"
+    }
+  ],
+  "animation": [
+    {
+      "bodyId": "machine_body",
+      "time_s": 0.0,
+      "translation_m": {
+        "x_m": -3.0,
+        "y_m": 0.0,
+        "z_m": 0.75
+      },
+      "yaw_rad": 0.0,
+      "interpolation": "LINEAR"
+    },
+    {
+      "bodyId": "machine_body",
+      "time_s": 4.0,
+      "translation_m": {
+        "x_m": -1.5,
+        "y_m": 0.0,
+        "z_m": 0.75
+      },
+      "yaw_rad": 0.2,
+      "interpolation": "CONSTANT"
+    }
+  ],
+  "physics": {
+    "timestep_s": 0.02,
+    "duration_s": 4.0,
+    "gravity_mps2": {
+      "x_m": 0.0,
+      "y_m": 0.0,
+      "z_m": -9.80665
+    },
+    "friction": 0.7,
+    "restitution": 0.05
+  }
+}

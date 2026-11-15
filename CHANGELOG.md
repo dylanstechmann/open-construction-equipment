@@ -5,6 +5,15 @@ All notable changes are recorded here. Dates document repository activity, not p
 
 ## [Unreleased]
 
+### Added — v0.5.0, 2026-11-15
+
+- Five standard-library modules for simplified multi-physics checks, deterministic native CAD/Blender/MuJoCo/OpenSCAD/FreeCAD text export, interval microgrid/solar-hydrogen comparisons, privacy-safe rural screening/adaptation, and DIY/rental/hybrid lifecycle economics.
+- Eleven-command source and installed-wheel defaults: `physics`, `export-cad`, `powertrain`, dual-mode `site`, and `economics` join the original six commands. Each new calculation emits deterministic ignored `result.json`; CAD also emits six hashed artifacts.
+- Six installed synthetic examples, five strict schemas, optional-only `cad`/`physics`/`schema` extras, recursive private-location rejection, unresolved human gates, and six new source/package validation counters.
+- Dual-run result/CAD byte comparison, MJCF parsing, generated Python compilation, OpenSCAD delimiter checks, controlled CLI failures before output creation, and clean-wheel coverage without optional dependencies.
+
+All v0.5.0 results remain `SIMULATED_UNREVIEWED`; no external CAD/physics application was executed and no physical validation, fabrication, construction, procurement, or operational authorization occurred.
+
 ### Added — 2026-11-15
 
 - Unreleased BUNKER-01 documentation/design baseline under `projects/bunker01/`: civilian non-habitable utility-enclosure scope, null/TBD real-site inputs, architecture and hazard boundaries, official reference starting points, 22 dependency-linked synthetic work packages, 15 unresolved human gates, honest electric-fleet gaps, a conceptual unpriced BOM, maintenance/handover requirements and self-contained synthetic OpenSCAD visualization. A subsequent software change in this release adds the executable synthetic planner described below; no construction, entry, occupancy, protective use or physical autonomy is authorized.
@@ -40,6 +49,6 @@ All notable changes are recorded here. Dates document repository activity, not p
 
 ### Validation
 
-- `python3 tools/check_all.py` runs Python compilation, 208 Python unit/integration/CLI tests (140 preserved + 68 BUNKER-01), repository/config/CSV/BOM checks, two byte-identical deterministic demos, two byte-identical AN-LC-001A analyses, two byte-identical BUNKER-01 JSON/SVG plans, 45 strict C++17 host checks and clean offline wheel build/install smoke when setuptools 77+ is preinstalled. Four OpenSCAD sources receive static checks; rendering is optional and not required.
-- `tools/wheel_smoke.py --require-build-tools` verifies the non-editable wheel and all six installed default commands from a clean temporary directory with no dependency downloads; installed validation is explicitly package-scoped.
+- `python3 tools/check_all.py` runs Python compilation, 384 Python unit/integration/CLI tests, repository/config/CSV/BOM and all v0.5.0 input checks, two byte-identical runs of every deterministic legacy and v0.5.0 output, six CAD artifact/hash/syntax checks, 45 strict C++17 host checks and clean offline wheel build/install smoke when setuptools 77+ is preinstalled. Four tracked OpenSCAD sources plus generated `scene.scad` receive static checks; rendering is optional and not required.
+- `tools/wheel_smoke.py --require-build-tools` verifies the non-editable wheel and all eleven installed default commands, including both site modes and CAD artifacts, from a clean temporary directory with no dependency downloads or optional packages; installed validation is explicitly package-scoped.
 - Software results are simulated/agent-run consistency evidence only. AN-LC-001A and BUNKER-01 arithmetic do not constitute design verification; BUNKER-01 remains blocked by all 15 unresolved human gates; no physical inspection, fabrication, energization, controller flashing, deployment or machine test has been performed.

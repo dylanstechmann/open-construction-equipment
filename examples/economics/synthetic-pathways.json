@@ -1,0 +1,151 @@
+{
+  "spdxLicenseIdentifier": "CC-BY-SA-4.0",
+  "schemaVersion": "1.0.0",
+  "platform": "OCE-CTL-01",
+  "scope": "BUNKER-01",
+  "unitSystem": "SI",
+  "analysisId": "AN-ECON-001",
+  "currency": "USD",
+  "provenance": {
+    "sourceType": "SYNTHETIC_AGENT_AUTHORED",
+    "statement": "AI-authored synthetic lifecycle trade study only; every monetary amount is an unquoted assumption, not owner/site evidence, a vendor price, a procurement decision, physical validation, or authorization for fabrication, construction, rental, or operation.",
+    "aiAuthored": true,
+    "ownerSupplied": false,
+    "siteSupplied": false,
+    "physicalValidationPerformed": false
+  },
+  "tooling": [
+    {
+      "itemId": "tool-welder",
+      "startupCapex": 6000.0,
+      "serviceLife_h": 1200.0,
+      "maintenancePer_h": 0.5,
+      "appliesTo": ["diy"]
+    },
+    {
+      "itemId": "tool-fixture",
+      "startupCapex": 1500.0,
+      "serviceLife_h": 750.0,
+      "maintenancePer_h": 0.25,
+      "appliesTo": ["diy", "hybrid"]
+    }
+  ],
+  "fabrication": [
+    {
+      "itemId": "fab-chassis",
+      "quantity": 1.0,
+      "unitMaterialCost": 9000.0,
+      "unitComponentCost": 3000.0,
+      "laborHoursPerUnit": 80.0,
+      "hourlyWearReserve": 1.0,
+      "appliesTo": ["diy"]
+    },
+    {
+      "itemId": "fab-attachment",
+      "quantity": 2.0,
+      "unitMaterialCost": 1500.0,
+      "unitComponentCost": 500.0,
+      "laborHoursPerUnit": 20.0,
+      "hourlyWearReserve": 0.5,
+      "appliesTo": ["diy", "hybrid"]
+    }
+  ],
+  "laborRates": [
+    {
+      "role": "fabricator",
+      "ratePer_h": 45.0,
+      "availableHours_h": 160.0
+    },
+    {
+      "role": "review-technician",
+      "ratePer_h": 65.0,
+      "availableHours_h": 40.0
+    }
+  ],
+  "rentals": [
+    {
+      "itemId": "rental-hour",
+      "billingUnit": "HOUR",
+      "ratePerBillingUnit": 96.75,
+      "deliveryPerMobilization": 400.0,
+      "mobilizationsPerProject": 2,
+      "fuelOrEnergyPer_h": 10.0,
+      "hourlyWearReserve": 0.0,
+      "hourlyWearReserveIncluded": true,
+      "appliesTo": ["rental"]
+    },
+    {
+      "itemId": "rental-day",
+      "billingUnit": "DAY_8H",
+      "ratePerBillingUnit": 480.0,
+      "deliveryPerMobilization": 300.0,
+      "mobilizationsPerProject": 1,
+      "fuelOrEnergyPer_h": 4.0,
+      "hourlyWearReserve": 0.0,
+      "hourlyWearReserveIncluded": true,
+      "appliesTo": ["rental", "hybrid"]
+    },
+    {
+      "itemId": "rental-week",
+      "billingUnit": "WEEK_40H",
+      "ratePerBillingUnit": 1000.0,
+      "deliveryPerMobilization": 500.0,
+      "mobilizationsPerProject": 1,
+      "fuelOrEnergyPer_h": 3.0,
+      "hourlyWearReserve": 0.5,
+      "hourlyWearReserveIncluded": false,
+      "appliesTo": ["rental", "hybrid"]
+    }
+  ],
+  "fabricationLaborRole": "fabricator",
+  "evaluationHours_h": [0.0, 80.0, 250.0, 600.0, 1200.0],
+  "annualFixedOwnershipCost": 2400.0,
+  "ownershipHoursPerYear": 600.0,
+  "ownedMicrogridEnergyCostPer_h": 6.0,
+  "siteAdaptations": [
+    {
+      "adaptationId": "SA-ECON-DIY",
+      "costDelta": 1100.0,
+      "scheduleDelta_h": 16.0,
+      "laborDelta_h": 8.0,
+      "currency": "USD",
+      "basis": "Synthetic owned-fabrication site allowance; not a quote, surveyed scope, or construction authorization."
+    },
+    {
+      "adaptationId": "SA-ECON-RENTAL",
+      "costDelta": 1400.0,
+      "scheduleDelta_h": 12.0,
+      "laborDelta_h": 4.0,
+      "currency": "USD",
+      "basis": "Synthetic rental-access adaptation allowance; not a quote, route approval, or site release."
+    },
+    {
+      "adaptationId": "SA-ECON-HYBRID",
+      "costDelta": 400.0,
+      "scheduleDelta_h": 10.0,
+      "laborDelta_h": 3.0,
+      "currency": "USD",
+      "basis": "Synthetic hybrid drainage allowance; signed deltas are scenario inputs only and require human correction if totals become negative."
+    }
+  ],
+  "policies": [
+    {
+      "pathway": "diy",
+      "ownedItemIds": ["tool-welder", "tool-fixture", "fab-chassis", "fab-attachment"],
+      "rentalItemIds": [],
+      "siteAdaptationIds": ["SA-ECON-DIY"]
+    },
+    {
+      "pathway": "rental",
+      "ownedItemIds": [],
+      "rentalItemIds": ["rental-hour", "rental-day", "rental-week"],
+      "siteAdaptationIds": ["SA-ECON-RENTAL"]
+    },
+    {
+      "pathway": "hybrid",
+      "ownedItemIds": ["tool-fixture", "fab-attachment"],
+      "rentalItemIds": ["rental-day", "rental-week"],
+      "siteAdaptationIds": ["SA-ECON-HYBRID"]
+    }
+  ]
+}

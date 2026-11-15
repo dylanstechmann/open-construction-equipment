@@ -8,12 +8,32 @@ import math
 from pathlib import Path
 import re
 from typing import Any
+import xml.etree.ElementTree as ET
 
 from .bom import read_bom
 from .bunker import BunkerPlanInput, load_bunker_input, load_bunker_registers, load_bunker_site, plan_bunker
+from .cad_blender import (
+    export_wavefront,
+    generate_blender_python,
+    generate_freecad_python,
+    generate_mujoco_mjcf,
+    generate_openscad,
+    load_cad_scene,
+    mesh_box,
+)
 from .config import ConfigError, load_json, load_mission_config, load_simulation_config
+from .economics import compare_pathways, economics_result_json, load_economics_input
 from .engineering import LongitudinalAnalysisInput, load_analysis_input
+from .geohazard_rural import (
+    adapt_to_existing_site,
+    geohazard_result_json,
+    load_geohazard_document,
+    parse_geohazard_input,
+    screen_candidate_parcels,
+)
 from .maintenance import load_service_history, load_service_plan
+from .physics import evaluate_physics, load_physics_input, physics_result_json
+from .powertrain import compare_powertrains, load_powertrain_input, powertrain_result_json
 from .resources import default_data_root, is_source_repository
 
 IGNORED_PARTS = {".git", ".venv", "venv", "builds", "__pycache__"}
@@ -114,19 +134,82 @@ def _validate_design_inputs(value: dict[str, Any]) -> None:
 def _false_owner_attribution(text: str) -> bool:
     for line in text.splitlines():
         for match in _OWNER_ATTRIBUTION.finditer(line):
-            if not _NEGATION.search(line[:match.start()]):
+            # BUNKER-01 gate/handover records require future owner approval; they do
+            # not attribute the current synthetic assumptions to the owner.
+            required_future_approval = (
+                match.group(0).lower() == "owner-approved"
+                and ("UNRESOLVED" in line.upper() or "requirements and legal basis" in line.lower())
+            )
+            if not required_future_approval and not _NEGATION.search(line[:match.start()]):
                 return True
     return False
 
 
 def _provenance_files(root: Path) -> list[Path]:
     files = [root / name for name in ("AGENTS.md", "CHANGELOG.md", "LICENSE", "NOTICE.md", "README.md")]
-    for directory in ("configs", "docs", "examples", "hardware", "maintenance", "manufacturing"):
+    for directory in ("configs", "docs", "examples", "hardware", "maintenance", "manufacturing", "projects"):
         base = root / directory
         if base.is_dir():
             files.extend(path for path in base.rglob("*")
                          if path.is_file() and path.suffix.lower() in {".csv", ".json", ".md", ".scad"})
     return sorted(path for path in files if path.is_file())
+
+
+def _validate_cad_scene_in_memory(scene: Any) -> tuple[str, ...]:
+    """Generate every CAD representation without creating output or importing tools."""
+
+    for body in scene.bodies:
+        mesh_box(body)
+    obj, mtl = export_wavefront(scene)
+    blender = generate_blender_python(scene)
+    mjcf = generate_mujoco_mjcf(scene)
+    openscad = generate_openscad(scene)
+    freecad = generate_freecad_python(scene)
+    if "mtllib scene.mtl\n" not in obj:
+        raise ConfigError("generated OBJ must reference scene.mtl")
+    ET.fromstring(mjcf)
+    compile(blender, "blender_scene.py", "exec")
+    compile(freecad, "scene_freecad.py", "exec")
+    for opening, closing in (("{", "}"), ("(", ")"), ("[", "]")):
+        if openscad.count(opening) != openscad.count(closing):
+            raise ConfigError("generated OpenSCAD delimiters are unbalanced")
+    return obj, mtl, blender, mjcf, openscad, freecad
+
+
+def _validate_new_schema_envelopes(root: Path) -> None:
+    pairs = (
+        ("physics-input.schema.json", "examples/physics/synthetic-physics.json"),
+        ("cad-scene.schema.json", "examples/cad/synthetic-scene.json"),
+        ("powertrain-input.schema.json", "examples/powertrain/synthetic-microgrid.json"),
+        ("economics-input.schema.json", "examples/economics/synthetic-pathways.json"),
+    )
+    for schema_name, example_name in pairs:
+        schema = load_json(root / "schemas" / schema_name)
+        example = load_json(root / example_name)
+        if schema.get("additionalProperties") is not False:
+            raise ConfigError(f"{schema_name} must reject additional properties")
+        if set(schema.get("required", ())) != set(example) or set(schema.get("properties", ())) != set(example):
+            raise ConfigError(f"{schema_name} top-level envelope does not match {example_name}")
+    schema = load_json(root / "schemas/geohazard-rural.schema.json")
+    if schema.get("additionalProperties") is not False:
+        raise ConfigError("geohazard-rural.schema.json must reject additional properties")
+    for example_name in ("examples/geohazard/synthetic-screen.json", "examples/geohazard/synthetic-adapt.json"):
+        example = load_json(root / example_name)
+        if not set(example).issubset(schema.get("properties", {})) or not set(schema.get("required", ())).issubset(example):
+            raise ConfigError(f"geohazard-rural.schema.json top-level envelope does not match {example_name}")
+
+
+def _validate_tracked_openscad(root: Path) -> None:
+    sources = sorted((root / "hardware/ctl01/cad").glob("*.scad")) + sorted(
+        (root / "projects/bunker01/cad").glob("*.scad")
+    )
+    if len(sources) != 4:
+        raise ConfigError(f"expected four tracked OpenSCAD sources, found {len(sources)}")
+    for source in sources:
+        text = source.read_text(encoding="utf-8")
+        for opening, closing in (("{", "}"), ("(", ")"), ("[", "]")):
+            if text.count(opening) != text.count(closing):
+                raise ConfigError(f"unbalanced OpenSCAD delimiters: {source.relative_to(root)}")
 
 
 def validate_repository(root: str | Path | None = None) -> dict[str, Any]:
@@ -210,6 +293,77 @@ def validate_repository(root: str | Path | None = None) -> dict[str, Any]:
             validate_bunker_cad_geometry(root, bunker_model)
         except (ConfigError, OSError, ValueError) as exc:
             errors.append(f"BUNKER-01 CAD geometry: {exc}")
+    physics_inputs_checked = 0
+    try:
+        physics_result = evaluate_physics(load_physics_input(root / "examples/physics/synthetic-physics.json"))
+        physics_result_json(physics_result)
+        if (physics_result.physical_validation_performed or physics_result.construction_authorized
+                or physics_result.operational_release or not physics_result.unresolved_human_gate_ids):
+            raise ConfigError("physics unresolved-gate/no-authorization invariant failed")
+        physics_inputs_checked = 1
+    except (ConfigError, OSError, ValueError, OverflowError) as exc:
+        errors.append(f"physics input/evaluator: {exc}")
+    cad_scenes_checked = 0
+    try:
+        cad_scene = load_cad_scene(root / "examples/cad/synthetic-scene.json")
+        generated = _validate_cad_scene_in_memory(cad_scene)
+        if full_repository and generated != _validate_cad_scene_in_memory(cad_scene):
+            raise ConfigError("in-memory CAD generation is not deterministic")
+        cad_scenes_checked = 1
+    except (ConfigError, OSError, ValueError, OverflowError, ET.ParseError, SyntaxError) as exc:
+        errors.append(f"CAD scene/generators: {exc}")
+    powertrain_inputs_checked = 0
+    try:
+        powertrain_result = compare_powertrains(load_powertrain_input(root / "examples/powertrain/synthetic-microgrid.json"))
+        powertrain_result_json(powertrain_result)
+        if (powertrain_result.physical_validation_performed or powertrain_result.operational_release
+                or not powertrain_result.unresolved_human_gate_ids):
+            raise ConfigError("powertrain unresolved-gate/no-authorization invariant failed")
+        powertrain_inputs_checked = 1
+    except (ConfigError, OSError, ValueError, OverflowError) as exc:
+        errors.append(f"powertrain input/evaluator: {exc}")
+    geohazard_screen_inputs_checked = 0
+    try:
+        screen_document = load_geohazard_document(root / "examples/geohazard/synthetic-screen.json")
+        screen_model = parse_geohazard_input(screen_document)
+        screen_result = screen_candidate_parcels(screen_model)
+        screen_json = geohazard_result_json(screen_result)
+        if (screen_result.purchase_recommendation_made or screen_result.location_data_retained
+                or screen_result.physical_validation_performed or "verticesLocal" in screen_json
+                or any(gate.status != "UNRESOLVED" for gate in screen_result.human_gates)):
+            raise ConfigError("geohazard screen privacy/unresolved-gate invariant failed")
+        geohazard_screen_inputs_checked = 1
+    except (ConfigError, OSError, ValueError, OverflowError) as exc:
+        errors.append(f"geohazard screen input/evaluator: {exc}")
+    geohazard_adapt_inputs_checked = 0
+    try:
+        adapt_document = load_geohazard_document(root / "examples/geohazard/synthetic-adapt.json")
+        adapt_model = parse_geohazard_input(adapt_document)
+        adapt_result = adapt_to_existing_site(adapt_model)
+        adapt_json = geohazard_result_json(adapt_result)
+        if (adapt_result.construction_authorized or adapt_result.site_engineering_complete
+                or adapt_result.location_data_retained or adapt_result.physical_validation_performed
+                or "verticesLocal" in adapt_json or any(gate.status != "UNRESOLVED" for gate in adapt_result.human_gates)):
+            raise ConfigError("geohazard adapt privacy/unresolved-gate invariant failed")
+        geohazard_adapt_inputs_checked = 1
+    except (ConfigError, OSError, ValueError, OverflowError) as exc:
+        errors.append(f"geohazard adapt input/evaluator: {exc}")
+    economics_inputs_checked = 0
+    try:
+        economics_result = compare_pathways(load_economics_input(root / "examples/economics/synthetic-pathways.json"))
+        economics_result_json(economics_result)
+        if (economics_result.quotes_obtained or economics_result.procurement_authorized
+                or economics_result.physical_validation_performed):
+            raise ConfigError("economics quote/procurement/no-authorization invariant failed")
+        economics_inputs_checked = 1
+    except (ConfigError, OSError, ValueError, OverflowError) as exc:
+        errors.append(f"economics input/evaluator: {exc}")
+    if full_repository:
+        try:
+            _validate_new_schema_envelopes(root)
+            _validate_tracked_openscad(root)
+        except (ConfigError, OSError, ValueError, OverflowError) as exc:
+            errors.append(f"new schemas/examples/tracked OpenSCAD: {exc}")
     try:
         read_bom(root / "hardware/ctl01/bom/ctl01-bom.csv")
     except ConfigError as exc:
@@ -237,6 +391,12 @@ def validate_repository(root: str | Path | None = None) -> dict[str, Any]:
         "csvFilesChecked": len(csv_files),
         "serviceIdsChecked": 20,
         "analysisInputsChecked": 1 if analysis_model is not None else 0,
+        "physicsInputsChecked": physics_inputs_checked,
+        "cadScenesChecked": cad_scenes_checked,
+        "powertrainInputsChecked": powertrain_inputs_checked,
+        "geohazardScreenInputsChecked": geohazard_screen_inputs_checked,
+        "geohazardAdaptInputsChecked": geohazard_adapt_inputs_checked,
+        "economicsInputsChecked": economics_inputs_checked,
         "analysisTraceIdsChecked": len(analysis_model.trace_ids) if analysis_model is not None else 0,
         "bunkerInputsChecked": 1 if bunker_model is not None else 0,
         "bunkerWorkPackagesChecked": len(bunker_registers.packages) if bunker_registers is not None else 0,

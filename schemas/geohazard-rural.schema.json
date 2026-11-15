@@ -1,0 +1,699 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/oce-ctl-01/geohazard-rural.schema.json",
+  "title": "OCE-CTL-01 / BUNKER-01 anonymous rural site screening and adaptation input",
+  "description": "Strict synthetic local-frame interchange. Runtime additionally rejects private data recursively, validates simple polygons, unique labels and assumptions, finite arithmetic, and unresolved human gates. No schema validation is a survey, purchase recommendation, permit determination, or construction release.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "spdxLicenseIdentifier",
+    "schemaVersion",
+    "platform",
+    "scope",
+    "unitSystem",
+    "analysisId",
+    "provenance",
+    "mode"
+  ],
+  "properties": {
+    "spdxLicenseIdentifier": {
+      "const": "CC-BY-SA-4.0"
+    },
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "platform": {
+      "const": "OCE-CTL-01"
+    },
+    "scope": {
+      "const": "BUNKER-01"
+    },
+    "unitSystem": {
+      "const": "SI"
+    },
+    "analysisId": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "provenance": {
+      "$ref": "#/$defs/provenance"
+    },
+    "mode": {
+      "enum": [
+        "screen",
+        "adapt"
+      ]
+    },
+    "candidates": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/candidateParcel"
+      }
+    },
+    "site": {
+      "$ref": "#/$defs/existingSite"
+    }
+  },
+  "oneOf": [
+    {
+      "required": [
+        "mode",
+        "candidates"
+      ],
+      "properties": {
+        "mode": {
+          "const": "screen"
+        }
+      },
+      "not": {
+        "required": [
+          "site"
+        ]
+      }
+    },
+    {
+      "required": [
+        "mode",
+        "site"
+      ],
+      "properties": {
+        "mode": {
+          "const": "adapt"
+        }
+      },
+      "not": {
+        "required": [
+          "candidates"
+        ]
+      }
+    }
+  ],
+  "$defs": {
+    "riskLevel": {
+      "enum": [
+        "LOW",
+        "MODERATE",
+        "HIGH",
+        "UNKNOWN"
+      ]
+    },
+    "adaptationKind": {
+      "enum": [
+        "SHALLOW_MOUND",
+        "CELLULAR_RAFT",
+        "ANTI_FLOTATION_COLLAR",
+        "REDUNDANT_SOLAR_DRAINAGE",
+        "PRIVACY_SPOIL_BERM",
+        "WATERWAY_SETBACK",
+        "ACCESS_REVIEW"
+      ]
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceType",
+        "statement",
+        "aiAuthored",
+        "ownerSupplied",
+        "siteSupplied",
+        "physicalValidationPerformed"
+      ],
+      "properties": {
+        "sourceType": {
+          "const": "SYNTHETIC_AGENT_AUTHORED"
+        },
+        "statement": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "aiAuthored": {
+          "const": true
+        },
+        "ownerSupplied": {
+          "const": false
+        },
+        "siteSupplied": {
+          "const": false
+        },
+        "physicalValidationPerformed": {
+          "const": false
+        }
+      }
+    },
+    "localPoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "x_m",
+        "y_m"
+      ],
+      "properties": {
+        "x_m": {
+          "type": "number"
+        },
+        "y_m": {
+          "type": "number"
+        }
+      }
+    },
+    "localFeature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "featureLabel",
+        "kind",
+        "vertices_local_m",
+        "requiredSetback_m"
+      ],
+      "properties": {
+        "featureLabel": {
+          "type": "string",
+          "pattern": "^FEATURE-[A-Z0-9-]+$"
+        },
+        "kind": {
+          "enum": [
+            "WATERWAY",
+            "WETLAND",
+            "ROAD",
+            "SIGHTLINE",
+            "CLOSED_DEPRESSION",
+            "STRUCTURE"
+          ]
+        },
+        "vertices_local_m": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "$ref": "#/$defs/localPoint"
+          }
+        },
+        "requiredSetback_m": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "enum": [
+                  "WATERWAY",
+                  "ROAD",
+                  "SIGHTLINE"
+                ]
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "vertices_local_m": {
+                "minItems": 2,
+                "maxItems": 2
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "vertices_local_m": {
+                "minItems": 3
+              }
+            }
+          }
+        }
+      ]
+    },
+    "karstProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "closedDepressionDistance_m",
+        "closedDepressionReviewDistance_m",
+        "karstBedrockDepth_m",
+        "karstDepthReviewThreshold_m",
+        "subsidenceRisk"
+      ],
+      "properties": {
+        "closedDepressionDistance_m": {
+          "type": "number",
+          "minimum": 0
+        },
+        "closedDepressionReviewDistance_m": {
+          "type": "number",
+          "minimum": 0
+        },
+        "karstBedrockDepth_m": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "karstDepthReviewThreshold_m": {
+          "type": "number",
+          "minimum": 0
+        },
+        "subsidenceRisk": {
+          "$ref": "#/$defs/riskLevel"
+        }
+      }
+    },
+    "waterProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "groundwaterDepth_m",
+        "groundwaterReviewDepth_m",
+        "nearestWaterwayDistance_m",
+        "nearestWetlandDistance_m",
+        "flood100yrDepth_m",
+        "requiredWaterwaySetback_m",
+        "requiredWetlandSetback_m",
+        "buoyancyDisplacedVolume_m3",
+        "resistingMass_kg",
+        "concreteDensity_kg_m3",
+        "waterDensity_kg_m3",
+        "collarSubmergedFraction"
+      ],
+      "properties": {
+        "groundwaterDepth_m": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "groundwaterReviewDepth_m": {
+          "type": "number",
+          "minimum": 0
+        },
+        "nearestWaterwayDistance_m": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "nearestWetlandDistance_m": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "flood100yrDepth_m": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "requiredWaterwaySetback_m": {
+          "type": "number",
+          "minimum": 0
+        },
+        "requiredWetlandSetback_m": {
+          "type": "number",
+          "minimum": 0
+        },
+        "buoyancyDisplacedVolume_m3": {
+          "type": "number",
+          "minimum": 0
+        },
+        "resistingMass_kg": {
+          "type": "number",
+          "minimum": 0
+        },
+        "concreteDensity_kg_m3": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "waterDensity_kg_m3": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "collarSubmergedFraction": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "slopeProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "slopeAngle_rad",
+        "expansiveClayRisk",
+        "landShiftRate_mm_year",
+        "landShiftReviewThreshold_mm_year",
+        "modeledFactorOfSafety",
+        "requiredFactorOfSafety"
+      ],
+      "properties": {
+        "slopeAngle_rad": {
+          "type": "number",
+          "minimum": 0,
+          "exclusiveMaximum": 1.5707963267948966
+        },
+        "expansiveClayRisk": {
+          "$ref": "#/$defs/riskLevel"
+        },
+        "landShiftRate_mm_year": {
+          "type": "number",
+          "minimum": 0
+        },
+        "landShiftReviewThreshold_mm_year": {
+          "type": "number",
+          "minimum": 0
+        },
+        "modeledFactorOfSafety": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0
+        },
+        "requiredFactorOfSafety": {
+          "type": "number",
+          "minimum": 1
+        }
+      }
+    },
+    "climateProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "meanDailyInsolation_kWh_m2_day",
+        "minimumInsolation_kWh_m2_day",
+        "winterDesignTemperature_C",
+        "minimumWinterTemperature_C",
+        "annualPrecipitation_mm"
+      ],
+      "properties": {
+        "meanDailyInsolation_kWh_m2_day": {
+          "type": "number",
+          "minimum": 0
+        },
+        "minimumInsolation_kWh_m2_day": {
+          "type": "number",
+          "minimum": 0
+        },
+        "winterDesignTemperature_C": {
+          "type": "number",
+          "exclusiveMinimum": -273.15
+        },
+        "minimumWinterTemperature_C": {
+          "type": "number",
+          "exclusiveMinimum": -273.15
+        },
+        "annualPrecipitation_mm": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "permitProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ruralUnincorporated",
+        "agriculturalAccessoryCandidate",
+        "nonhabitableUtilityStructure",
+        "groundDisturbance_m2",
+        "swpppTriggerArea_m2",
+        "wellOrSepticWork",
+        "newDrivewayCulvert",
+        "ahjDeterminationObtained"
+      ],
+      "properties": {
+        "ruralUnincorporated": {
+          "type": "boolean"
+        },
+        "agriculturalAccessoryCandidate": {
+          "type": "boolean"
+        },
+        "nonhabitableUtilityStructure": {
+          "type": "boolean"
+        },
+        "groundDisturbance_m2": {
+          "type": "number",
+          "minimum": 0
+        },
+        "swpppTriggerArea_m2": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "wellOrSepticWork": {
+          "type": "boolean"
+        },
+        "newDrivewayCulvert": {
+          "type": "boolean"
+        },
+        "ahjDeterminationObtained": {
+          "const": false
+        }
+      }
+    },
+    "roadAccessProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lowestRouteAxleLimit_kg",
+        "maximumTransportAxleLoad_kg",
+        "minimumOverheadClearance_m",
+        "transportHeight_m",
+        "requiredOverheadClearance_m"
+      ],
+      "properties": {
+        "lowestRouteAxleLimit_kg": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0
+        },
+        "maximumTransportAxleLoad_kg": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "minimumOverheadClearance_m": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0
+        },
+        "transportHeight_m": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "requiredOverheadClearance_m": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "privacyProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nearestSightlineDistance_m",
+        "receiverTarget_dBA",
+        "ambient_dBA",
+        "sourceDbaAt15m",
+        "privacyBermLength_m",
+        "privacyBermCrossSection_m2",
+        "requiredVisualScreenHeight_m",
+        "availableCompactedSpoil_m3"
+      ],
+      "properties": {
+        "nearestSightlineDistance_m": {
+          "type": "number",
+          "minimum": 0
+        },
+        "receiverTarget_dBA": {
+          "type": "number",
+          "minimum": 0
+        },
+        "ambient_dBA": {
+          "type": "number",
+          "minimum": 0
+        },
+        "sourceDbaAt15m": {
+          "type": "number",
+          "minimum": 0
+        },
+        "privacyBermLength_m": {
+          "type": "number",
+          "minimum": 0
+        },
+        "privacyBermCrossSection_m2": {
+          "type": "number",
+          "minimum": 0
+        },
+        "requiredVisualScreenHeight_m": {
+          "type": "number",
+          "minimum": 0
+        },
+        "availableCompactedSpoil_m3": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "siteFactors": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "features",
+        "karst",
+        "water",
+        "slope",
+        "climate",
+        "permits",
+        "road",
+        "privacy"
+      ],
+      "properties": {
+        "features": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/localFeature"
+          }
+        },
+        "karst": {
+          "$ref": "#/$defs/karstProfile"
+        },
+        "water": {
+          "$ref": "#/$defs/waterProfile"
+        },
+        "slope": {
+          "$ref": "#/$defs/slopeProfile"
+        },
+        "climate": {
+          "$ref": "#/$defs/climateProfile"
+        },
+        "permits": {
+          "$ref": "#/$defs/permitProfile"
+        },
+        "road": {
+          "$ref": "#/$defs/roadAccessProfile"
+        },
+        "privacy": {
+          "$ref": "#/$defs/privacyProfile"
+        }
+      }
+    },
+    "candidateParcel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "anonymousLabel",
+        "factors"
+      ],
+      "properties": {
+        "anonymousLabel": {
+          "type": "string",
+          "pattern": "^CANDIDATE-[A-Z0-9-]+$"
+        },
+        "factors": {
+          "$ref": "#/$defs/siteFactors"
+        }
+      }
+    },
+    "adaptationAssumption": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "costDelta",
+        "scheduleDelta_h",
+        "laborDelta_h",
+        "basis"
+      ],
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/adaptationKind"
+        },
+        "costDelta": {
+          "type": "number"
+        },
+        "scheduleDelta_h": {
+          "type": "number"
+        },
+        "laborDelta_h": {
+          "type": "number"
+        },
+        "basis": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        }
+      }
+    },
+    "existingSite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "anonymousLabel",
+        "factors",
+        "baselineExcavationDepth_m",
+        "baselineFoundation",
+        "baselineStrategy",
+        "baselineCost",
+        "baselineSchedule_h",
+        "costCurrency",
+        "antiFlotationRequiredFactor",
+        "adaptationAssumptions"
+      ],
+      "properties": {
+        "anonymousLabel": {
+          "const": "EXISTING-SITE"
+        },
+        "factors": {
+          "$ref": "#/$defs/siteFactors"
+        },
+        "baselineExcavationDepth_m": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "baselineFoundation": {
+          "const": "STRIP_CONCEPT_ONLY"
+        },
+        "baselineStrategy": {
+          "const": "DEEP_CUT_AND_COVER"
+        },
+        "baselineCost": {
+          "type": "number",
+          "minimum": 0
+        },
+        "baselineSchedule_h": {
+          "type": "number",
+          "minimum": 0
+        },
+        "costCurrency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "antiFlotationRequiredFactor": {
+          "type": "number",
+          "minimum": 1
+        },
+        "adaptationAssumptions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/adaptationAssumption"
+          }
+        }
+      }
+    }
+  }
+}

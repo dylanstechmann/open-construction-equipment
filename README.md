@@ -41,6 +41,12 @@ oce analyze
 oce bunker
 oce maintenance
 oce bom
+oce physics
+oce export-cad
+oce powertrain
+oce site --mode screen
+oce site --mode adapt
+oce economics
 make check
 ```
 
@@ -52,6 +58,12 @@ An installation-free alternative is:
 PYTHONPATH=src python3 -m open_construction_equipment simulate
 PYTHONPATH=src python3 -m open_construction_equipment analyze
 PYTHONPATH=src python3 -m open_construction_equipment bunker
+PYTHONPATH=src python3 -m open_construction_equipment physics
+PYTHONPATH=src python3 -m open_construction_equipment export-cad
+PYTHONPATH=src python3 -m open_construction_equipment powertrain
+PYTHONPATH=src python3 -m open_construction_equipment site --mode screen
+PYTHONPATH=src python3 -m open_construction_equipment site --mode adapt
+PYTHONPATH=src python3 -m open_construction_equipment economics
 PYTHONPATH=src python3 -m unittest discover -s tests -v
 python3 tools/check_all.py
 ```
@@ -70,11 +82,23 @@ The JSON contains structured termination/event data, paths and metrics; the SVG 
 
 `oce bunker` runs blocked BUNKER-01 synthetic quantity/dependency/energy arithmetic and writes deterministic `builds/bunker01/result.json` plus `schedule.svg`. The default geometric excavation is 109.5 m³, gross concrete is 17.6625 m³, relative duration is 472 h, and the eight-assumption energy subtotal is 246 kWh. These are not order quantities, total project energy, an excavation/structural design, or an executable construction schedule. All 15 human gates remain unresolved. See [BUNKER-01 planning](docs/bunker-planning.md).
 
+## v0.5.0 deterministic trade studies and interchange
+
+All eleven CLI commands work from source defaults and from an installed wheel. The v0.5.0 additions write only ignored `builds/` outputs and return `SIMULATED_UNREVIEWED` results; threshold findings and unresolved gates do not constitute acceptance, physical validation, construction, procurement, or operational release.
+
+- **`oce physics`** evaluates transparent track/soil, bearing, infinite-slope, buoyancy, concrete-maturity, and weather-derating screens. These are simplified arithmetic models, not finite-element/CFD analysis, concrete acceptance, or an equipment rating. Output: `builds/physics/result.json`. See [multi-physics and CAD](docs/multiphysics-and-cad.md).
+- **`oce export-cad`** writes `scene.obj`, `scene.mtl`, `blender_scene.py`, `ctl01_bunker_physics.xml` (MuJoCo MJCF), `scene.scad`, `scene_freecad.py`, and their `result.json` manifest under `builds/cad/`. Geometry is generated natively without importing Blender, FreeCAD, OpenSCAD, MuJoCo, or a CAD kernel. Running those applications is a separate manual opt-in; generated geometry and scripts are not released manufacturing CAD or physical simulation evidence. See [external tools](docs/cad-external-tools.md).
+- **`oce powertrain`** compares LFP battery, solar-hydrogen PEMFC/H2-ICE, diesel, and gasoline paths using interval energy/mass ledgers, cold derating, curtailment, water/CHP, fuel logistics, noise/exhaust indicators, and allocated versus one-time costs. It does not design an electrical/hydrogen system, establish ventilation or safe entry, or authorize equipment operation. Output: `builds/powertrain/result.json`. See [powertrain microgrid](docs/powertrain-microgrid.md).
+- **`oce site --mode screen`** compares anonymous candidate parcels; **`--mode adapt`** derives concept adaptations and signed cost/schedule deltas for one anonymous existing site. Inputs fail closed on GPS/GNSS, latitude/longitude, geohashes, addresses, assessor/APN/parcel identifiers, and similar real-location data. Use only anonymous labels and local relative metres. Outputs under `builds/geohazard/{screen,adapt}/` omit raw feature vertices, retain no location data, make no purchase/permit decision, and leave all human gates unresolved. See [rural geohazards and privacy](docs/geohazard-rural.md).
+- **`oce economics`** compares DIY, rental, and hybrid pathways across tooling, fabrication, labor, wear, rental proration, energy, and selected site adaptations, with break-even operating hours. Every amount is synthetic and unquoted; results are not supplier prices or procurement authorization. Output: `builds/economics/result.json`. See [fabrication economics](docs/fabrication-economics.md).
+
+Core runtime remains `dependencies = []`. Optional extras `cad` (`cadquery`), `physics` (`mujoco`), and `schema` (`jsonschema`) support only local inspection/validation experiments. They are not needed to build, install, run any CLI command, or pass offline tests; `tools/check_all.py` never installs or executes them. Blender, OpenSCAD, and FreeCAD remain separate optional applications.
+
 ## Repository guide
 
-- [`src/open_construction_equipment/`](src/open_construction_equipment/) — strict config loaders, geometry, A*, pure pursuit, supervisor, kinematic simulator, mission, maintenance, BOM, deterministic engineering and BUNKER-01 synthetic planning calculations, validation and CLI.
+- [`src/open_construction_equipment/`](src/open_construction_equipment/) — strict config loaders, geometry, A*, pure pursuit, supervisor, kinematic simulator, mission, maintenance, BOM, deterministic engineering, BUNKER-01 planning, multi-physics, CAD/interchange, microgrid, privacy-safe geohazard, economics, validation and CLI modules.
 - [`configs/`](configs/ctl01.simulation.json) and [`schemas/`](schemas/) — explicit simulation assumptions and interchange schemas; internal runtime validation needs no schema package.
-- [`examples/`](examples/README.md) — synthetic yard, analysis, BUNKER-01 planning, service history and record envelopes only.
+- [`examples/`](examples/README.md) — synthetic yard, analysis, BUNKER-01 planning, service history, multi-physics, CAD scene, microgrid, anonymous geohazard and lifecycle-economics envelopes only.
 - [`firmware/ctl01/`](firmware/ctl01/) — portable non-safety-rated C++17 command-gate reference and host tests.
 - [`tests/`](tests/) and [`tools/check_all.py`](tools/check_all.py) — offline unit/integration/CLI tests and unified verification.
 - [`docs/`](docs/engineering-status.md) — status, architecture, safety case, algorithms, engineering calculations, maintenance tooling, standards and decisions.

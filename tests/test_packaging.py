@@ -3,6 +3,7 @@ from pathlib import Path
 import tomllib
 import unittest
 
+from open_construction_equipment import __version__
 from open_construction_equipment.resources import default_data_root
 from open_construction_equipment.validation import repository_root
 
@@ -25,7 +26,26 @@ class PackagingTests(unittest.TestCase):
         self.assertIn("share/open-construction-equipment/configs", data_files)
         self.assertIn("share/open-construction-equipment/hardware/ctl01/bom", data_files)
         self.assertIn("share/open-construction-equipment/examples/analysis", data_files)
-        self.assertEqual(project["project"]["version"], "0.4.0")
+        self.assertEqual(project["project"]["version"], "0.5.0")
+        self.assertEqual(__version__, "0.5.0")
+        self.assertEqual(project["project"]["dependencies"], [])
+        self.assertEqual(project["project"]["optional-dependencies"], {
+            "cad": ["cadquery>=2.5,<3"],
+            "physics": ["mujoco>=3.2,<4"],
+            "schema": ["jsonschema>=4.23,<5"],
+        })
+        expected_examples = {
+            "physics": ["examples/physics/synthetic-physics.json"],
+            "cad": ["examples/cad/synthetic-scene.json"],
+            "powertrain": ["examples/powertrain/synthetic-microgrid.json"],
+            "geohazard": ["examples/geohazard/synthetic-screen.json", "examples/geohazard/synthetic-adapt.json"],
+            "economics": ["examples/economics/synthetic-pathways.json"],
+        }
+        for directory, sources in expected_examples.items():
+            key = f"share/open-construction-equipment/examples/{directory}"
+            self.assertEqual(data_files[key], sources)
+            for source in sources:
+                self.assertTrue((ROOT / source).is_file())
         self.assertEqual(project["build-system"]["requires"], ["setuptools>=77"])
 
     def test_license_references_have_complete_local_targets(self):

@@ -1,0 +1,207 @@
+{
+  "analysisId": "AN-SITE-ADAPT-001",
+  "mode": "adapt",
+  "platform": "OCE-CTL-01",
+  "provenance": {
+    "aiAuthored": true,
+    "ownerSupplied": false,
+    "physicalValidationPerformed": false,
+    "siteSupplied": false,
+    "sourceType": "SYNTHETIC_AGENT_AUTHORED",
+    "statement": "AI-authored synthetic anonymous local-frame study only; no real-world site evidence, engineering review, physical validation, purchase recommendation, permit determination, or construction authorization is claimed."
+  },
+  "schemaVersion": "1.0.0",
+  "scope": "BUNKER-01",
+  "site": {
+    "adaptationAssumptions": [
+      {
+        "basis": "Synthetic reduction from omitting the deep-cut concept; specialist mound scope remains unpriced.",
+        "costDelta": -12000,
+        "kind": "SHALLOW_MOUND",
+        "laborDelta_h": 60,
+        "scheduleDelta_h": -80
+      },
+      {
+        "basis": "Synthetic stiffened cellular raft and geogrid allowance, not a fabrication quote.",
+        "costDelta": 28000,
+        "kind": "CELLULAR_RAFT",
+        "laborDelta_h": 180,
+        "scheduleDelta_h": 120
+      },
+      {
+        "basis": "Synthetic collar allowance without released dimensions, reinforcement, or mix design.",
+        "costDelta": 9000,
+        "kind": "ANTI_FLOTATION_COLLAR",
+        "laborDelta_h": 70,
+        "scheduleDelta_h": 48
+      },
+      {
+        "basis": "Synthetic two-unit solar sump and battery-backup concept allocation only.",
+        "costDelta": 6500,
+        "kind": "REDUNDANT_SOLAR_DRAINAGE",
+        "laborDelta_h": 40,
+        "scheduleDelta_h": 32
+      },
+      {
+        "basis": "Synthetic capped spoil-handling concept subject to geotechnical and receiver review.",
+        "costDelta": 1600,
+        "kind": "PRIVACY_SPOIL_BERM",
+        "laborDelta_h": 24,
+        "scheduleDelta_h": 16
+      }
+    ],
+    "anonymousLabel": "EXISTING-SITE",
+    "antiFlotationRequiredFactor": 1.5,
+    "baselineCost": 180000,
+    "baselineExcavationDepth_m": 4,
+    "baselineFoundation": "STRIP_CONCEPT_ONLY",
+    "baselineSchedule_h": 1200,
+    "baselineStrategy": "DEEP_CUT_AND_COVER",
+    "costCurrency": "USD",
+    "factors": {
+      "climate": {
+        "annualPrecipitation_mm": 850,
+        "meanDailyInsolation_kWh_m2_day": 5,
+        "minimumInsolation_kWh_m2_day": 3,
+        "minimumWinterTemperature_C": -20,
+        "winterDesignTemperature_C": -12
+      },
+      "features": [
+        {
+          "featureLabel": "FEATURE-WATER-1",
+          "kind": "WATERWAY",
+          "requiredSetback_m": 40,
+          "vertices_local_m": [
+            {
+              "x_m": 80,
+              "y_m": -50
+            },
+            {
+              "x_m": 80,
+              "y_m": 50
+            }
+          ]
+        },
+        {
+          "featureLabel": "FEATURE-WET-1",
+          "kind": "WETLAND",
+          "requiredSetback_m": 50,
+          "vertices_local_m": [
+            {
+              "x_m": 120,
+              "y_m": -10
+            },
+            {
+              "x_m": 140,
+              "y_m": -10
+            },
+            {
+              "x_m": 140,
+              "y_m": 10
+            },
+            {
+              "x_m": 120,
+              "y_m": 10
+            }
+          ]
+        },
+        {
+          "featureLabel": "FEATURE-DEP-1",
+          "kind": "CLOSED_DEPRESSION",
+          "requiredSetback_m": 25,
+          "vertices_local_m": [
+            {
+              "x_m": 160,
+              "y_m": 160
+            },
+            {
+              "x_m": 170,
+              "y_m": 160
+            },
+            {
+              "x_m": 170,
+              "y_m": 170
+            },
+            {
+              "x_m": 160,
+              "y_m": 170
+            }
+          ]
+        },
+        {
+          "featureLabel": "FEATURE-SIGHT-1",
+          "kind": "SIGHTLINE",
+          "requiredSetback_m": 0,
+          "vertices_local_m": [
+            {
+              "x_m": 120,
+              "y_m": 100
+            },
+            {
+              "x_m": 140,
+              "y_m": 100
+            }
+          ]
+        }
+      ],
+      "karst": {
+        "closedDepressionDistance_m": 160,
+        "closedDepressionReviewDistance_m": 40,
+        "karstBedrockDepth_m": 2.5,
+        "karstDepthReviewThreshold_m": 8,
+        "subsidenceRisk": "HIGH"
+      },
+      "permits": {
+        "agriculturalAccessoryCandidate": true,
+        "ahjDeterminationObtained": false,
+        "groundDisturbance_m2": 100,
+        "newDrivewayCulvert": false,
+        "nonhabitableUtilityStructure": true,
+        "ruralUnincorporated": true,
+        "swpppTriggerArea_m2": 1000,
+        "wellOrSepticWork": false
+      },
+      "privacy": {
+        "ambient_dBA": 40,
+        "availableCompactedSpoil_m3": 80,
+        "nearestSightlineDistance_m": 120,
+        "privacyBermCrossSection_m2": 4,
+        "privacyBermLength_m": 30,
+        "receiverTarget_dBA": 45,
+        "requiredVisualScreenHeight_m": 2,
+        "sourceDbaAt15m": 78
+      },
+      "road": {
+        "lowestRouteAxleLimit_kg": 12000,
+        "maximumTransportAxleLoad_kg": 9000,
+        "minimumOverheadClearance_m": 5,
+        "requiredOverheadClearance_m": 0.3,
+        "transportHeight_m": 4.2
+      },
+      "slope": {
+        "expansiveClayRisk": "HIGH",
+        "landShiftRate_mm_year": 12,
+        "landShiftReviewThreshold_mm_year": 5,
+        "modeledFactorOfSafety": 1.1,
+        "requiredFactorOfSafety": 1.3,
+        "slopeAngle_rad": 0.08
+      },
+      "water": {
+        "buoyancyDisplacedVolume_m3": 8,
+        "collarSubmergedFraction": 0.5,
+        "concreteDensity_kg_m3": 2400,
+        "flood100yrDepth_m": 0.4,
+        "groundwaterDepth_m": 1.2,
+        "groundwaterReviewDepth_m": 3,
+        "nearestWaterwayDistance_m": 80,
+        "nearestWetlandDistance_m": 120,
+        "requiredWaterwaySetback_m": 40,
+        "requiredWetlandSetback_m": 50,
+        "resistingMass_kg": 2000,
+        "waterDensity_kg_m3": 1000
+      }
+    }
+  },
+  "spdxLicenseIdentifier": "CC-BY-SA-4.0",
+  "unitSystem": "SI"
+}

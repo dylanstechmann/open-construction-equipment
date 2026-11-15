@@ -1,0 +1,154 @@
+{
+  "spdxLicenseIdentifier": "CC-BY-SA-4.0",
+  "schemaVersion": "1.0.0",
+  "platform": "OCE-CTL-01",
+  "scope": "BUNKER-01",
+  "unitSystem": "SI",
+  "analysisId": "AN-PWR-001",
+  "provenance": {
+    "sourceType": "SYNTHETIC_AGENT_AUTHORED",
+    "statement": "AI-authored synthetic microgrid trade study only; all costs are unquoted assumptions and no owner/site evidence, supplier rating, engineering review, physical validation, construction release, or operational authorization is claimed.",
+    "aiAuthored": true,
+    "ownerSupplied": false,
+    "siteSupplied": false,
+    "physicalValidationPerformed": false
+  },
+  "tasks": [
+    {
+      "taskId": "TASK-DAILY-EXCAVATION",
+      "shaftEnergy_kWh": 30.0,
+      "auxiliaryEnergy_kWh": 5.0,
+      "shaftToElectricEfficiency": 0.85,
+      "peakElectricPower_kW": 38.0,
+      "recoverableHeatDemand_kWh": 0.0,
+      "confinedExcavation": true,
+      "solarProfile": [
+        {
+          "duration_h": 2.0,
+          "availableDcEnergy_kWh": 24.0,
+          "ambientTemperature_C": 18.0
+        },
+        {
+          "duration_h": 2.0,
+          "availableDcEnergy_kWh": 8.0,
+          "ambientTemperature_C": 12.0
+        }
+      ]
+    },
+    {
+      "taskId": "TASK-SEASONAL-SURPLUS",
+      "shaftEnergy_kWh": 0.0,
+      "auxiliaryEnergy_kWh": 0.0,
+      "shaftToElectricEfficiency": 1.0,
+      "peakElectricPower_kW": 0.0,
+      "recoverableHeatDemand_kWh": 0.0,
+      "confinedExcavation": false,
+      "solarProfile": [
+        {
+          "duration_h": 8.0,
+          "availableDcEnergy_kWh": 800.0,
+          "ambientTemperature_C": 22.0
+        }
+      ]
+    },
+    {
+      "taskId": "TASK-WINTER-UTILITY",
+      "shaftEnergy_kWh": 20.0,
+      "auxiliaryEnergy_kWh": 8.0,
+      "shaftToElectricEfficiency": 0.9,
+      "peakElectricPower_kW": 28.0,
+      "recoverableHeatDemand_kWh": 18.0,
+      "confinedExcavation": false,
+      "solarProfile": [
+        {
+          "duration_h": 3.0,
+          "availableDcEnergy_kWh": 4.0,
+          "ambientTemperature_C": -5.0
+        }
+      ]
+    }
+  ],
+  "pv": {
+    "nameplate_kW": 100.0,
+    "dcCollectionEfficiency": 0.96,
+    "acInverterEfficiency": 0.925
+  },
+  "battery": {
+    "nominalEnergy_kWh": 120.0,
+    "minimumStoredEnergy_kWh": 12.0,
+    "maximumStoredEnergy_kWh": 108.0,
+    "initialStoredEnergy_kWh": 60.0,
+    "chargeEfficiency": 0.96,
+    "dischargeEfficiency": 0.96,
+    "maximumChargePower_kW": 40.0,
+    "maximumDischargePower_kW": 45.0,
+    "sourceDbaAtReferenceDistance": null,
+    "referenceDistance_m": null,
+    "receiverTargetDba": null,
+    "coldReferenceTemperature_C": 15.0,
+    "coldDerating_per_C": 0.03,
+    "cutoffTemperature_C": -20.0
+  },
+  "hydrogen": {
+    "electrolyzerLhvEfficiency": 0.7,
+    "compressionEnergy_kWh_kg": 4.0,
+    "storageCapacity_kg": 20.0,
+    "initialStored_kg": 2.0,
+    "pemFuelCellLhvEfficiency": 0.5,
+    "h2IceLhvEfficiency": 0.3,
+    "maximumElectrolyzerPower_kW": 50.0,
+    "maximumReconversionPower_kW": 30.0,
+    "deionizedWater_l_per_kg": 12.0,
+    "chpHeatRecoveryFraction": 0.35,
+    "useCase": "SEASONAL_CURTAILMENT"
+  },
+  "fuels": [
+    {
+      "fuelKind": "DIESEL",
+      "lowerHeatingValue_kWh_l": 10.0,
+      "generatorEfficiency": 0.36,
+      "tankCapacity_l": 200.0,
+      "maximumElectricalPower_kW": 100.0,
+      "fuelCostPer_l": 1.8,
+      "refillDeliveryRoundTrip_km": 120.0,
+      "deliveryCostPer_km": 0.9,
+      "sourceDbaAtReferenceDistance": 85.0,
+      "referenceDistance_m": 7.0,
+      "receiverTargetDba": 55.0,
+      "exhaustCo_ppm": 80.0,
+      "exhaustNox_ppm": 300.0
+    },
+    {
+      "fuelKind": "GASOLINE",
+      "lowerHeatingValue_kWh_l": 9.0,
+      "generatorEfficiency": 0.32,
+      "tankCapacity_l": 150.0,
+      "maximumElectricalPower_kW": 80.0,
+      "fuelCostPer_l": 1.65,
+      "refillDeliveryRoundTrip_km": 140.0,
+      "deliveryCostPer_km": 0.85,
+      "sourceDbaAtReferenceDistance": 82.0,
+      "referenceDistance_m": 7.0,
+      "receiverTargetDba": 55.0,
+      "exhaustCo_ppm": 120.0,
+      "exhaustNox_ppm": 180.0
+    }
+  ],
+  "costs": {
+    "solarCapex": 18000.0,
+    "batteryCapex": 24000.0,
+    "electrolyzerCapex": 16000.0,
+    "hydrogenCompressorCapex": 9000.0,
+    "hydrogenStorageCapex": 14000.0,
+    "pemFuelCellCapex": 12000.0,
+    "h2IceCapex": 8000.0,
+    "dieselGeneratorCapex": 7000.0,
+    "gasolineGeneratorCapex": 5000.0,
+    "serviceLife_h": 4000.0,
+    "batteryMaintenancePer_h": 0.8,
+    "hydrogenInspectionPer_h": 1.5,
+    "iceMaintenancePer_h": 1.2,
+    "deionizedWaterCostPer_l": 0.03,
+    "currency": "USD"
+  }
+}

@@ -1,0 +1,388 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/oce-ctl-01/physics-input.schema.json",
+  "title": "OCE-CTL-01 / BUNKER-01 synthetic multi-physics input",
+  "description": "Strict interchange only. Runtime additionally checks cross-field limits, unique gate identifiers, finite arithmetic, and unresolved human gates. No result is a design acceptance or physical validation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "spdxLicenseIdentifier",
+    "schemaVersion",
+    "platform",
+    "scope",
+    "unitSystem",
+    "analysisId",
+    "provenance",
+    "terramechanics",
+    "bearing",
+    "slope",
+    "buoyancy",
+    "curing",
+    "weather",
+    "weatherLimits",
+    "requiredHumanGateIds"
+  ],
+  "properties": {
+    "spdxLicenseIdentifier": {
+      "const": "CC-BY-SA-4.0"
+    },
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "platform": {
+      "const": "OCE-CTL-01"
+    },
+    "scope": {
+      "const": "BUNKER-01"
+    },
+    "unitSystem": {
+      "const": "SI"
+    },
+    "analysisId": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "provenance": {
+      "$ref": "#/$defs/provenance"
+    },
+    "terramechanics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "track",
+        "soilCohesion_kPa",
+        "soilFrictionAngle_rad",
+        "soilStiffness_kPa_per_m",
+        "rollingResistanceCoefficient",
+        "tractionEfficiency",
+        "slopeAngle_rad",
+        "maximumModeledSinkage_m"
+      ],
+      "properties": {
+        "track": {
+          "$ref": "#/$defs/track"
+        },
+        "soilCohesion_kPa": {
+          "type": "number",
+          "minimum": 0
+        },
+        "soilFrictionAngle_rad": {
+          "type": "number",
+          "minimum": 0,
+          "exclusiveMaximum": 1.5707963267948966
+        },
+        "soilStiffness_kPa_per_m": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "rollingResistanceCoefficient": {
+          "type": "number",
+          "minimum": 0
+        },
+        "tractionEfficiency": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1
+        },
+        "slopeAngle_rad": {
+          "type": "number",
+          "minimum": 0,
+          "exclusiveMaximum": 1.5707963267948966
+        },
+        "maximumModeledSinkage_m": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "bearing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "foundationLength_m",
+        "foundationWidth_m",
+        "verticalServiceLoad_N",
+        "allowableBearingPressure_kPa",
+        "requiredFactorOfSafety"
+      ],
+      "properties": {
+        "foundationLength_m": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "foundationWidth_m": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "verticalServiceLoad_N": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "allowableBearingPressure_kPa": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "requiredFactorOfSafety": {
+          "type": "number",
+          "minimum": 1
+        }
+      }
+    },
+    "slope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "slopeAngle_rad",
+        "cohesion_kPa",
+        "frictionAngle_rad",
+        "soilUnitWeight_kN_m3",
+        "verticalSliceHeight_m",
+        "porePressureRatio",
+        "requiredFactorOfSafety"
+      ],
+      "properties": {
+        "slopeAngle_rad": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "exclusiveMaximum": 1.5707963267948966
+        },
+        "cohesion_kPa": {
+          "type": "number",
+          "minimum": 0
+        },
+        "frictionAngle_rad": {
+          "type": "number",
+          "minimum": 0,
+          "exclusiveMaximum": 1.5707963267948966
+        },
+        "soilUnitWeight_kN_m3": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "verticalSliceHeight_m": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "porePressureRatio": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "requiredFactorOfSafety": {
+          "type": "number",
+          "minimum": 1
+        }
+      }
+    },
+    "buoyancy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "displacedWaterVolume_m3",
+        "resistingMass_kg",
+        "waterDensity_kg_m3",
+        "requiredFactorOfSafety"
+      ],
+      "properties": {
+        "displacedWaterVolume_m3": {
+          "type": "number",
+          "minimum": 0
+        },
+        "resistingMass_kg": {
+          "type": "number",
+          "minimum": 0
+        },
+        "waterDensity_kg_m3": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "requiredFactorOfSafety": {
+          "type": "number",
+          "minimum": 1
+        }
+      }
+    },
+    "curing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "intervals",
+        "datumTemperature_C",
+        "referenceTemperature_C",
+        "activationEnergy_J_mol",
+        "targetEquivalentAge_h"
+      ],
+      "properties": {
+        "intervals": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/interval"
+          }
+        },
+        "datumTemperature_C": {
+          "type": "number",
+          "exclusiveMinimum": -273.15
+        },
+        "referenceTemperature_C": {
+          "type": "number",
+          "exclusiveMinimum": -273.15
+        },
+        "activationEnergy_J_mol": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "targetEquivalentAge_h": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "weather": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "temperature_C",
+        "precipitation_mm_h",
+        "windSpeed_mps"
+      ],
+      "properties": {
+        "temperature_C": {
+          "type": "number",
+          "exclusiveMinimum": -273.15
+        },
+        "precipitation_mm_h": {
+          "type": "number",
+          "minimum": 0
+        },
+        "windSpeed_mps": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "weatherLimits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "minimumTemperature_C",
+        "maximumTemperature_C",
+        "coldReferenceTemperature_C",
+        "coldDerating_per_C",
+        "maximumPrecipitation_mm_h",
+        "maximumWindSpeed_mps"
+      ],
+      "properties": {
+        "minimumTemperature_C": {
+          "type": "number"
+        },
+        "maximumTemperature_C": {
+          "type": "number"
+        },
+        "coldReferenceTemperature_C": {
+          "type": "number"
+        },
+        "coldDerating_per_C": {
+          "type": "number",
+          "minimum": 0
+        },
+        "maximumPrecipitation_mm_h": {
+          "type": "number",
+          "minimum": 0
+        },
+        "maximumWindSpeed_mps": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "requiredHumanGateIds": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "pattern": "^PG-\\d{3}$"
+      }
+    }
+  },
+  "$defs": {
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceType",
+        "statement",
+        "aiAuthored",
+        "ownerSupplied",
+        "siteSupplied",
+        "physicalValidationPerformed"
+      ],
+      "properties": {
+        "sourceType": {
+          "const": "SYNTHETIC_AGENT_AUTHORED"
+        },
+        "statement": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "aiAuthored": {
+          "const": true
+        },
+        "ownerSupplied": {
+          "const": false
+        },
+        "siteSupplied": {
+          "const": false
+        },
+        "physicalValidationPerformed": {
+          "const": false
+        }
+      }
+    },
+    "track": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "length_m",
+        "width_m",
+        "normalLoad_N"
+      ],
+      "properties": {
+        "length_m": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "width_m": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "normalLoad_N": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "interval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "duration_h",
+        "meanTemperature_C"
+      ],
+      "properties": {
+        "duration_h": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "meanTemperature_C": {
+          "type": "number",
+          "exclusiveMinimum": -273.15
+        }
+      }
+    }
+  }
+}

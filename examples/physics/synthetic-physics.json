@@ -1,0 +1,93 @@
+{
+  "spdxLicenseIdentifier": "CC-BY-SA-4.0",
+  "schemaVersion": "1.0.0",
+  "platform": "OCE-CTL-01",
+  "scope": "BUNKER-01",
+  "unitSystem": "SI",
+  "analysisId": "AN-PHYS-001",
+  "provenance": {
+    "sourceType": "SYNTHETIC_AGENT_AUTHORED",
+    "statement": "AI-authored synthetic calculator demonstration only; no owner/site evidence, engineering review, physical validation, construction release, or operational authorization.",
+    "aiAuthored": true,
+    "ownerSupplied": false,
+    "siteSupplied": false,
+    "physicalValidationPerformed": false
+  },
+  "terramechanics": {
+    "track": {
+      "length_m": 2.2,
+      "width_m": 0.45,
+      "normalLoad_N": 12000.0
+    },
+    "soilCohesion_kPa": 8.0,
+    "soilFrictionAngle_rad": 0.4363323129985824,
+    "soilStiffness_kPa_per_m": 1200.0,
+    "rollingResistanceCoefficient": 0.08,
+    "tractionEfficiency": 0.8,
+    "slopeAngle_rad": 0.08726646259971647,
+    "maximumModeledSinkage_m": 0.03
+  },
+  "bearing": {
+    "foundationLength_m": 4.5,
+    "foundationWidth_m": 3.5,
+    "verticalServiceLoad_N": 180000.0,
+    "allowableBearingPressure_kPa": 120.0,
+    "requiredFactorOfSafety": 1.5
+  },
+  "slope": {
+    "slopeAngle_rad": 0.3490658503988659,
+    "cohesion_kPa": 5.0,
+    "frictionAngle_rad": 0.4363323129985824,
+    "soilUnitWeight_kN_m3": 18.0,
+    "verticalSliceHeight_m": 3.0,
+    "porePressureRatio": 0.2,
+    "requiredFactorOfSafety": 1.3
+  },
+  "buoyancy": {
+    "displacedWaterVolume_m3": 8.0,
+    "resistingMass_kg": 6500.0,
+    "waterDensity_kg_m3": 1000.0,
+    "requiredFactorOfSafety": 1.2
+  },
+  "curing": {
+    "intervals": [
+      {
+        "duration_h": 8.0,
+        "meanTemperature_C": 12.0
+      },
+      {
+        "duration_h": 12.0,
+        "meanTemperature_C": 18.0
+      },
+      {
+        "duration_h": 8.0,
+        "meanTemperature_C": 22.0
+      }
+    ],
+    "datumTemperature_C": 0.0,
+    "referenceTemperature_C": 20.0,
+    "activationEnergy_J_mol": 40000.0,
+    "targetEquivalentAge_h": 20.0
+  },
+  "weather": {
+    "temperature_C": 8.0,
+    "precipitation_mm_h": 2.0,
+    "windSpeed_mps": 6.0
+  },
+  "weatherLimits": {
+    "minimumTemperature_C": 2.0,
+    "maximumTemperature_C": 32.0,
+    "coldReferenceTemperature_C": 15.0,
+    "coldDerating_per_C": 0.04,
+    "maximumPrecipitation_mm_h": 10.0,
+    "maximumWindSpeed_mps": 12.0
+  },
+  "requiredHumanGateIds": [
+    "PG-001",
+    "PG-002",
+    "PG-003",
+    "PG-004",
+    "PG-005",
+    "PG-006"
+  ]
+}

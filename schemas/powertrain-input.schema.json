@@ -1,0 +1,570 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/oce-ctl-01/powertrain-input.schema.json",
+  "title": "OCE-CTL-01 / BUNKER-01 synthetic powertrain and microgrid input",
+  "description": "Strict interchange only. Runtime additionally enforces unique task IDs, cross-field capacity ordering, acoustic triple consistency, finite arithmetic, and canonical diesel/gasoline ordering. No result is physical validation or operational release.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "spdxLicenseIdentifier",
+    "schemaVersion",
+    "platform",
+    "scope",
+    "unitSystem",
+    "analysisId",
+    "provenance",
+    "tasks",
+    "pv",
+    "battery",
+    "hydrogen",
+    "fuels",
+    "costs"
+  ],
+  "properties": {
+    "spdxLicenseIdentifier": {
+      "const": "CC-BY-SA-4.0"
+    },
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "platform": {
+      "const": "OCE-CTL-01"
+    },
+    "scope": {
+      "const": "BUNKER-01"
+    },
+    "unitSystem": {
+      "const": "SI"
+    },
+    "analysisId": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "provenance": {
+      "$ref": "#/$defs/provenance"
+    },
+    "tasks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/constructionTask"
+      }
+    },
+    "pv": {
+      "$ref": "#/$defs/pvSystem"
+    },
+    "battery": {
+      "$ref": "#/$defs/batterySystem"
+    },
+    "hydrogen": {
+      "$ref": "#/$defs/hydrogenSystem"
+    },
+    "fuels": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "prefixItems": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/fuelSystem"
+            },
+            {
+              "properties": {
+                "fuelKind": {
+                  "const": "DIESEL"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/fuelSystem"
+            },
+            {
+              "properties": {
+                "fuelKind": {
+                  "const": "GASOLINE"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "items": false
+    },
+    "costs": {
+      "$ref": "#/$defs/costAssumptions"
+    }
+  },
+  "$defs": {
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceType",
+        "statement",
+        "aiAuthored",
+        "ownerSupplied",
+        "siteSupplied",
+        "physicalValidationPerformed"
+      ],
+      "properties": {
+        "sourceType": {
+          "const": "SYNTHETIC_AGENT_AUTHORED"
+        },
+        "statement": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "aiAuthored": {
+          "const": true
+        },
+        "ownerSupplied": {
+          "const": false
+        },
+        "siteSupplied": {
+          "const": false
+        },
+        "physicalValidationPerformed": {
+          "const": false
+        }
+      }
+    },
+    "solarInterval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "duration_h",
+        "availableDcEnergy_kWh",
+        "ambientTemperature_C"
+      ],
+      "properties": {
+        "duration_h": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "availableDcEnergy_kWh": {
+          "type": "number",
+          "minimum": 0
+        },
+        "ambientTemperature_C": {
+          "type": "number",
+          "exclusiveMinimum": -273.15
+        }
+      }
+    },
+    "constructionTask": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "taskId",
+        "shaftEnergy_kWh",
+        "auxiliaryEnergy_kWh",
+        "shaftToElectricEfficiency",
+        "peakElectricPower_kW",
+        "recoverableHeatDemand_kWh",
+        "confinedExcavation",
+        "solarProfile"
+      ],
+      "properties": {
+        "taskId": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "shaftEnergy_kWh": {
+          "type": "number",
+          "minimum": 0
+        },
+        "auxiliaryEnergy_kWh": {
+          "type": "number",
+          "minimum": 0
+        },
+        "shaftToElectricEfficiency": {
+          "type": "number",
+          "maximum": 1,
+          "exclusiveMinimum": 0
+        },
+        "peakElectricPower_kW": {
+          "type": "number",
+          "minimum": 0
+        },
+        "recoverableHeatDemand_kWh": {
+          "type": "number",
+          "minimum": 0
+        },
+        "confinedExcavation": {
+          "type": "boolean"
+        },
+        "solarProfile": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/solarInterval"
+          }
+        }
+      }
+    },
+    "pvSystem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nameplate_kW",
+        "dcCollectionEfficiency",
+        "acInverterEfficiency"
+      ],
+      "properties": {
+        "nameplate_kW": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "dcCollectionEfficiency": {
+          "type": "number",
+          "maximum": 1,
+          "exclusiveMinimum": 0
+        },
+        "acInverterEfficiency": {
+          "type": "number",
+          "maximum": 1,
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "batterySystem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nominalEnergy_kWh",
+        "minimumStoredEnergy_kWh",
+        "maximumStoredEnergy_kWh",
+        "initialStoredEnergy_kWh",
+        "chargeEfficiency",
+        "dischargeEfficiency",
+        "maximumChargePower_kW",
+        "maximumDischargePower_kW",
+        "sourceDbaAtReferenceDistance",
+        "referenceDistance_m",
+        "receiverTargetDba",
+        "coldReferenceTemperature_C",
+        "coldDerating_per_C",
+        "cutoffTemperature_C"
+      ],
+      "properties": {
+        "nominalEnergy_kWh": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "minimumStoredEnergy_kWh": {
+          "type": "number",
+          "minimum": 0
+        },
+        "maximumStoredEnergy_kWh": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "initialStoredEnergy_kWh": {
+          "type": "number",
+          "minimum": 0
+        },
+        "chargeEfficiency": {
+          "type": "number",
+          "maximum": 1,
+          "exclusiveMinimum": 0
+        },
+        "dischargeEfficiency": {
+          "type": "number",
+          "maximum": 1,
+          "exclusiveMinimum": 0
+        },
+        "maximumChargePower_kW": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "maximumDischargePower_kW": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "sourceDbaAtReferenceDistance": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "referenceDistance_m": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0
+        },
+        "receiverTargetDba": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0
+        },
+        "coldReferenceTemperature_C": {
+          "type": "number"
+        },
+        "coldDerating_per_C": {
+          "type": "number",
+          "minimum": 0
+        },
+        "cutoffTemperature_C": {
+          "type": "number"
+        }
+      }
+    },
+    "hydrogenSystem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "electrolyzerLhvEfficiency",
+        "compressionEnergy_kWh_kg",
+        "storageCapacity_kg",
+        "initialStored_kg",
+        "pemFuelCellLhvEfficiency",
+        "h2IceLhvEfficiency",
+        "maximumElectrolyzerPower_kW",
+        "maximumReconversionPower_kW",
+        "deionizedWater_l_per_kg",
+        "chpHeatRecoveryFraction",
+        "useCase"
+      ],
+      "properties": {
+        "electrolyzerLhvEfficiency": {
+          "type": "number",
+          "maximum": 1,
+          "exclusiveMinimum": 0
+        },
+        "compressionEnergy_kWh_kg": {
+          "type": "number",
+          "minimum": 0
+        },
+        "storageCapacity_kg": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "initialStored_kg": {
+          "type": "number",
+          "minimum": 0
+        },
+        "pemFuelCellLhvEfficiency": {
+          "type": "number",
+          "maximum": 1,
+          "exclusiveMinimum": 0
+        },
+        "h2IceLhvEfficiency": {
+          "type": "number",
+          "maximum": 1,
+          "exclusiveMinimum": 0
+        },
+        "maximumElectrolyzerPower_kW": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "maximumReconversionPower_kW": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "deionizedWater_l_per_kg": {
+          "type": "number",
+          "minimum": 9,
+          "maximum": 15
+        },
+        "chpHeatRecoveryFraction": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "useCase": {
+          "$ref": "#/$defs/hydrogenUseCase"
+        }
+      }
+    },
+    "hydrogenUseCase": {
+      "type": "string",
+      "enum": [
+        "DAILY_CYCLING",
+        "SEASONAL_CURTAILMENT",
+        "WINTER_CHP"
+      ]
+    },
+    "fuelKind": {
+      "type": "string",
+      "enum": [
+        "DIESEL",
+        "GASOLINE"
+      ]
+    },
+    "fuelSystem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fuelKind",
+        "lowerHeatingValue_kWh_l",
+        "generatorEfficiency",
+        "tankCapacity_l",
+        "maximumElectricalPower_kW",
+        "fuelCostPer_l",
+        "refillDeliveryRoundTrip_km",
+        "deliveryCostPer_km",
+        "sourceDbaAtReferenceDistance",
+        "referenceDistance_m",
+        "receiverTargetDba",
+        "exhaustCo_ppm",
+        "exhaustNox_ppm"
+      ],
+      "properties": {
+        "fuelKind": {
+          "$ref": "#/$defs/fuelKind"
+        },
+        "lowerHeatingValue_kWh_l": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "generatorEfficiency": {
+          "type": "number",
+          "maximum": 1,
+          "exclusiveMinimum": 0
+        },
+        "tankCapacity_l": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "maximumElectricalPower_kW": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "fuelCostPer_l": {
+          "type": "number",
+          "minimum": 0
+        },
+        "refillDeliveryRoundTrip_km": {
+          "type": "number",
+          "minimum": 0
+        },
+        "deliveryCostPer_km": {
+          "type": "number",
+          "minimum": 0
+        },
+        "sourceDbaAtReferenceDistance": {
+          "type": "number",
+          "minimum": 0
+        },
+        "referenceDistance_m": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "receiverTargetDba": {
+          "type": "number",
+          "minimum": 0
+        },
+        "exhaustCo_ppm": {
+          "type": "number",
+          "minimum": 0
+        },
+        "exhaustNox_ppm": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "costAssumptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "solarCapex",
+        "batteryCapex",
+        "electrolyzerCapex",
+        "hydrogenCompressorCapex",
+        "hydrogenStorageCapex",
+        "pemFuelCellCapex",
+        "h2IceCapex",
+        "dieselGeneratorCapex",
+        "gasolineGeneratorCapex",
+        "serviceLife_h",
+        "batteryMaintenancePer_h",
+        "hydrogenInspectionPer_h",
+        "iceMaintenancePer_h",
+        "deionizedWaterCostPer_l",
+        "currency"
+      ],
+      "properties": {
+        "solarCapex": {
+          "type": "number",
+          "minimum": 0
+        },
+        "batteryCapex": {
+          "type": "number",
+          "minimum": 0
+        },
+        "electrolyzerCapex": {
+          "type": "number",
+          "minimum": 0
+        },
+        "hydrogenCompressorCapex": {
+          "type": "number",
+          "minimum": 0
+        },
+        "hydrogenStorageCapex": {
+          "type": "number",
+          "minimum": 0
+        },
+        "pemFuelCellCapex": {
+          "type": "number",
+          "minimum": 0
+        },
+        "h2IceCapex": {
+          "type": "number",
+          "minimum": 0
+        },
+        "dieselGeneratorCapex": {
+          "type": "number",
+          "minimum": 0
+        },
+        "gasolineGeneratorCapex": {
+          "type": "number",
+          "minimum": 0
+        },
+        "serviceLife_h": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "batteryMaintenancePer_h": {
+          "type": "number",
+          "minimum": 0
+        },
+        "hydrogenInspectionPer_h": {
+          "type": "number",
+          "minimum": 0
+        },
+        "iceMaintenancePer_h": {
+          "type": "number",
+          "minimum": 0
+        },
+        "deionizedWaterCostPer_l": {
+          "type": "number",
+          "minimum": 0
+        },
+        "currency": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S",
+          "allOf": [
+            {
+              "pattern": "^[A-Z]{3}$"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

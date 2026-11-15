@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "open-construction-equipment"
-version = "0.4.0"
+version = "0.5.0"
 description = "Simulation-only host reference tools for the OCE-CTL-01 concept"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -13,6 +13,11 @@ license = "Apache-2.0"
 license-files = ["LICENSE", "NOTICE.md", "LICENSES/*.txt"]
 authors = [{name = "OCE contributors; AI-assisted personal project"}]
 dependencies = []
+
+[project.optional-dependencies]
+cad = ["cadquery>=2.5,<3"]
+physics = ["mujoco>=3.2,<4"]
+schema = ["jsonschema>=4.23,<5"]
 
 [project.scripts]
 oce = "open_construction_equipment.cli:main"
@@ -30,6 +35,11 @@ include = ["open_construction_equipment*"]
 "share/open-construction-equipment/examples/maintenance" = ["examples/maintenance/synthetic-service-history.json"]
 "share/open-construction-equipment/examples/analysis" = ["examples/analysis/synthetic-lc001.json"]
 "share/open-construction-equipment/examples/bunker" = ["examples/bunker/synthetic-bunker01.json"]
+"share/open-construction-equipment/examples/physics" = ["examples/physics/synthetic-physics.json"]
+"share/open-construction-equipment/examples/cad" = ["examples/cad/synthetic-scene.json"]
+"share/open-construction-equipment/examples/powertrain" = ["examples/powertrain/synthetic-microgrid.json"]
+"share/open-construction-equipment/examples/geohazard" = ["examples/geohazard/synthetic-screen.json", "examples/geohazard/synthetic-adapt.json"]
+"share/open-construction-equipment/examples/economics" = ["examples/economics/synthetic-pathways.json"]
 "share/open-construction-equipment/projects/bunker01/construction" = [
   "projects/bunker01/construction/work-breakdown.csv",
   "projects/bunker01/construction/quality-gates.csv",

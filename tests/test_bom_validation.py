@@ -39,10 +39,15 @@ class RepositoryValidationTests(unittest.TestCase):
         self.assertEqual(report["status"], "passed", report["errors"])
         self.assertFalse(report["physicalValidationPerformed"])
         self.assertGreaterEqual(report["jsonFilesChecked"], 10)
+        for counter in (
+            "physicsInputsChecked", "cadScenesChecked", "powertrainInputsChecked",
+            "geohazardScreenInputsChecked", "geohazardAdaptInputsChecked", "economicsInputsChecked",
+        ):
+            self.assertEqual(report[counter], 1)
 
     def make_copy(self, directory):
         target = Path(directory)
-        for name in ("configs", "examples", "hardware", "maintenance"):
+        for name in ("configs", "examples", "hardware", "maintenance", "projects", "schemas"):
             shutil.copytree(ROOT / name, target / name)
         shutil.copyfile(ROOT / "LICENSE", target / "LICENSE")
         return target
@@ -110,6 +115,7 @@ class RepositoryValidationTests(unittest.TestCase):
             ("hardware/ctl01/cad/parameters.scad", "machine_width = 1500; // Owner concept target\n"),
             ("hardware/ctl01/interface-control.md", "These are owner-provided targets.\n"),
             ("LICENSE", "No software package is included in this phase.\n"),
+            ("projects/bunker01/requirements.md", "These synthetic values are owner-supplied targets.\n"),
         )
         for relative, content in mutations:
             with self.subTest(relative=relative), tempfile.TemporaryDirectory() as directory:
@@ -178,6 +184,47 @@ class RepositoryValidationTests(unittest.TestCase):
             report = validate_repository(root)
             self.assertEqual(report["status"], "failed")
             self.assertTrue(any("analysis source traces" in error for error in report["errors"]), report["errors"])
+
+    def test_new_example_mutations_fail_with_categorized_errors_and_zero_counters(self):
+        cases = (
+            ("examples/physics/synthetic-physics.json", ("unexpected",), True,
+             "physics input/evaluator", "physicsInputsChecked"),
+            ("examples/cad/synthetic-scene.json", ("physics", "timestep_s"), float("inf"),
+             "CAD scene/generators", "cadScenesChecked"),
+            ("examples/powertrain/synthetic-microgrid.json", ("unexpected",), True,
+             "powertrain input/evaluator", "powertrainInputsChecked"),
+            ("examples/geohazard/synthetic-screen.json", ("latitude",), 51.5,
+             "geohazard screen input/evaluator", "geohazardScreenInputsChecked"),
+            ("examples/geohazard/synthetic-adapt.json", ("site", "costCurrency"), "usd",
+             "geohazard adapt input/evaluator", "geohazardAdaptInputsChecked"),
+            ("examples/economics/synthetic-pathways.json", ("provenance", "physicalValidationPerformed"), True,
+             "economics input/evaluator", "economicsInputsChecked"),
+        )
+        for relative, field_path, value, category, counter in cases:
+            with self.subTest(relative=relative), tempfile.TemporaryDirectory() as directory:
+                root = self.make_copy(directory)
+                path = root / relative
+                data = json.loads(path.read_text(encoding="utf-8"))
+                target = data
+                for key in field_path[:-1]:
+                    target = target[key]
+                target[field_path[-1]] = value
+                path.write_text(json.dumps(data), encoding="utf-8")
+                report = validate_repository(root)
+                self.assertEqual(report["status"], "failed")
+                self.assertEqual(report[counter], 0)
+                self.assertTrue(any(category in error for error in report["errors"]), report["errors"])
+
+    def test_new_schema_envelope_mutation_is_reported(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.make_copy(directory)
+            path = root / "schemas/physics-input.schema.json"
+            data = json.loads(path.read_text(encoding="utf-8"))
+            data["required"].remove("analysisId")
+            path.write_text(json.dumps(data), encoding="utf-8")
+            report = validate_repository(root)
+            self.assertEqual(report["status"], "failed")
+            self.assertTrue(any("top-level envelope" in error for error in report["errors"]), report["errors"])
 
     def test_malformed_json_fails(self):
         with tempfile.TemporaryDirectory() as directory:
