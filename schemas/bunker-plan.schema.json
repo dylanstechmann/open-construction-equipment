@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/open-construction-equipment/bunker-plan.schema.json",
+  "title": "BUNKER-01 synthetic planning input",
+  "description": "Civilian non-habitable utility-enclosure arithmetic only. The standard-library runtime additionally checks finite floats, unique package/fleet energy pairs, canonical register references, DAG constraints, CAD agreement in source checkouts, and all human gates. No construction, excavation, entry, occupancy, protective use, procurement, physical autonomy or real-machine control is authorized.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "spdxLicenseIdentifier",
+    "schemaVersion",
+    "projectId",
+    "planStatus",
+    "unitSystem",
+    "siteKnown",
+    "constructionAuthorized",
+    "physicalValidationPerformed",
+    "syntheticNotice",
+    "provenance",
+    "geometry",
+    "soilModel",
+    "wasteModel",
+    "energyAssumptions"
+  ],
+  "properties": {
+    "spdxLicenseIdentifier": {"const": "CC-BY-SA-4.0"},
+    "schemaVersion": {"const": "1.0.0"},
+    "projectId": {"const": "BUNKER-01"},
+    "planStatus": {"const": "SYNTHETIC_UNREVIEWED"},
+    "unitSystem": {"const": "SI"},
+    "siteKnown": {"const": false},
+    "constructionAuthorized": {"const": false},
+    "physicalValidationPerformed": {"const": false},
+    "syntheticNotice": {"$ref": "#/$defs/nonEmptyString"},
+    "provenance": {"$ref": "#/$defs/provenance"},
+    "geometry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "internalLength_m",
+        "internalWidth_m",
+        "internalHeight_m",
+        "wallThickness_m",
+        "floorThickness_m",
+        "roofThickness_m",
+        "workingSpace_m",
+        "drainageLayer_m",
+        "roofCover_m",
+        "provenance"
+      ],
+      "properties": {
+        "internalLength_m": {"$ref": "#/$defs/positiveNumber"},
+        "internalWidth_m": {"$ref": "#/$defs/positiveNumber"},
+        "internalHeight_m": {"$ref": "#/$defs/positiveNumber"},
+        "wallThickness_m": {"$ref": "#/$defs/positiveNumber"},
+        "floorThickness_m": {"$ref": "#/$defs/positiveNumber"},
+        "roofThickness_m": {"$ref": "#/$defs/positiveNumber"},
+        "workingSpace_m": {"$ref": "#/$defs/nonnegativeNumber"},
+        "drainageLayer_m": {"$ref": "#/$defs/nonnegativeNumber"},
+        "roofCover_m": {"$ref": "#/$defs/nonnegativeNumber"},
+        "provenance": {"$ref": "#/$defs/provenance"}
+      }
+    },
+    "soilModel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["looseBulkingFactor", "compactedToInSituRatio", "provenance"],
+      "properties": {
+        "looseBulkingFactor": {"$ref": "#/$defs/positiveNumber"},
+        "compactedToInSituRatio": {"$ref": "#/$defs/positiveNumber"},
+        "provenance": {"$ref": "#/$defs/provenance"}
+      }
+    },
+    "wasteModel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["concreteWasteFraction", "waterproofingWasteFraction", "provenance"],
+      "properties": {
+        "concreteWasteFraction": {"$ref": "#/$defs/nonnegativeNumber"},
+        "waterproofingWasteFraction": {"$ref": "#/$defs/nonnegativeNumber"},
+        "provenance": {"$ref": "#/$defs/provenance"}
+      }
+    },
+    "energyAssumptions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["packageId", "fleetId", "electricEnergy_kWh", "basis", "provenance"],
+        "properties": {
+          "packageId": {"type": "string", "pattern": "^BW-[0-9]{3}$"},
+          "fleetId": {"type": "string", "pattern": "^BF-[0-9]{3}$"},
+          "electricEnergy_kWh": {"$ref": "#/$defs/positiveNumber"},
+          "basis": {"$ref": "#/$defs/nonEmptyString"},
+          "provenance": {"$ref": "#/$defs/provenance"}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "positiveNumber": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "nonnegativeNumber": {
+      "type": "number",
+      "minimum": 0
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceType",
+        "statement",
+        "aiAuthored",
+        "ownerSupplied",
+        "siteSupplied",
+        "physicalValidationPerformed"
+      ],
+      "properties": {
+        "sourceType": {"const": "SYNTHETIC_AGENT_AUTHORED"},
+        "statement": {"$ref": "#/$defs/nonEmptyString"},
+        "aiAuthored": {"const": true},
+        "ownerSupplied": {"const": false},
+        "siteSupplied": {"const": false},
+        "physicalValidationPerformed": {"const": false}
+      }
+    }
+  }
+}

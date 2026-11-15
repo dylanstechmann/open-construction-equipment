@@ -92,6 +92,17 @@ def main(argv: list[str] | None = None) -> int:
             if not any(name.endswith(".data/data/share/open-construction-equipment/examples/analysis/synthetic-lc001.json")
                        for name in names):
                 raise RuntimeError("wheel lacks installed synthetic analysis input")
+            required_bunker_data = (
+                "examples/bunker/synthetic-bunker01.json",
+                "projects/bunker01/construction/work-breakdown.csv",
+                "projects/bunker01/construction/quality-gates.csv",
+                "projects/bunker01/construction/fleet-register.csv",
+                "projects/bunker01/site-inputs.json",
+            )
+            for relative in required_bunker_data:
+                suffix = f".data/data/share/open-construction-equipment/{relative}"
+                if not any(name.endswith(suffix) for name in names):
+                    raise RuntimeError(f"wheel lacks installed BUNKER-01 resource: {relative}")
         target = work / "venv"
         venv.EnvBuilder(with_pip=False, clear=True, symlinks=True).create(target)
         python = target / "bin/python"
@@ -118,6 +129,18 @@ def main(argv: list[str] | None = None) -> int:
         analysis_path = run_dir / "builds/analysis/lc001/result.json"
         if not analysis_path.is_file() or json.loads(analysis_path.read_text(encoding="utf-8")) != analysis:
             raise RuntimeError("installed analysis did not write matching default deterministic output")
+        bunker = json.loads(_run([str(oce), "bunker", "--json"], cwd=run_dir, env=installed_env))
+        if (bunker["projectId"] != "BUNKER-01" or bunker["constructionAuthorized"]
+                or bunker["physicalValidationPerformed"]
+                or bunker["readinessStatus"] != "BLOCKED_UNRESOLVED_HUMAN_GATES"
+                or len(bunker["unresolvedGateIds"]) != 15):
+            raise RuntimeError(f"installed bunker plan has wrong identity/status: {bunker}")
+        bunker_json = run_dir / "builds/bunker01/result.json"
+        bunker_svg = run_dir / "builds/bunker01/schedule.svg"
+        if not bunker_json.is_file() or json.loads(bunker_json.read_text(encoding="utf-8")) != bunker:
+            raise RuntimeError("installed bunker planner did not write matching deterministic JSON")
+        if not bunker_svg.is_file() or "SYNTHETIC PLAN — CONSTRUCTION BLOCKED" not in bunker_svg.read_text(encoding="utf-8"):
+            raise RuntimeError("installed bunker planner did not write blocked schedule SVG")
         maintenance = json.loads(_run([str(oce), "maintenance", "--json"], cwd=run_dir, env=installed_env))
         if maintenance["summary"]["total"] != 20:
             raise RuntimeError("installed maintenance data is incomplete")
@@ -131,6 +154,8 @@ def main(argv: list[str] | None = None) -> int:
               f"goal error {simulation['metrics']['finalGoalError_m']:.3f} m")
         print(f"Installed analysis: {analysis['analysisId']}; resultant x {analysis['results']['resultantX_m']:.6f} m; "
               f"acceptance {analysis['acceptanceStatus']}")
+        print(f"Installed BUNKER-01: {bunker['schedule']['syntheticDurationHours']:g} synthetic h; "
+              f"{bunker['energy']['modeledOnlyElectricEnergy_kWh']:g} modeled-only kWh; construction BLOCKED")
         print(f"Installed maintenance/BOM: {maintenance['summary']['total']} service items; {bom['itemCount']} BOM items")
         print("Wheel licenses/NOTICE: complete and byte-identical to source")
         print("WHEEL SMOKE PASSED — clean non-editable install, offline commands, simulation only.")

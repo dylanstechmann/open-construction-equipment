@@ -31,7 +31,7 @@ def require(result: subprocess.CompletedProcess[str], label: str) -> str:
 
 
 def static_openscad_check() -> str:
-    sources = sorted((ROOT / "hardware/ctl01/cad").glob("*.scad"))
+    sources = sorted((ROOT / "hardware/ctl01/cad").glob("*.scad")) + sorted((ROOT / "projects/bunker01/cad").glob("*.scad"))
     for source in sources:
         text = source.read_text(encoding="utf-8")
         for opening, closing in (("{", "}"), ("(", ")"), ("[", "]")):
@@ -39,7 +39,7 @@ def static_openscad_check() -> str:
                 raise RuntimeError(f"static OpenSCAD delimiter check failed: {source}")
     if shutil.which("openscad") is None:
         return f"OpenSCAD unavailable; {len(sources)} sources passed static delimiter checks; rendering not run (optional)."
-    return "OpenSCAD is installed but rendering is not required by the offline gate; static checks passed."
+    return f"OpenSCAD is installed but rendering is not required by the offline gate; {len(sources)} sources passed static delimiter checks."
 
 
 def main() -> int:
@@ -72,6 +72,21 @@ def main() -> int:
     if analysis_outputs[0] != analysis_outputs[1]:
         raise RuntimeError("deterministic analysis outputs differ")
     print("Deterministic AN-LC-001A result JSON: byte-identical; UNREVIEWED; acceptance NOT_ASSESSED")
+    bunker_outputs = []
+    for name in ("bunker-a", "bunker-b"):
+        directory = ROOT / "builds/check" / name
+        result = require(run([sys.executable, "-m", "open_construction_equipment", "bunker",
+                              "--output-dir", str(directory), "--json"], capture=True), f"bunker {name}")
+        report = json.loads(result)
+        if (report["projectId"] != "BUNKER-01" or report["constructionAuthorized"]
+                or report["physicalValidationPerformed"]
+                or report["readinessStatus"] != "BLOCKED_UNRESOLVED_HUMAN_GATES"
+                or len(report["unresolvedGateIds"]) != 15):
+            raise RuntimeError(f"bunker {name} has an invalid identity/status")
+        bunker_outputs.append(((directory / "result.json").read_bytes(), (directory / "schedule.svg").read_bytes()))
+    if bunker_outputs[0] != bunker_outputs[1]:
+        raise RuntimeError("deterministic bunker JSON or SVG outputs differ")
+    print("Deterministic BUNKER-01 result JSON and schedule SVG: byte-identical; construction BLOCKED")
     require(run([sys.executable, "firmware/ctl01/run_host_tests.py"]), "firmware host tests")
     require(run([sys.executable, "tools/wheel_smoke.py"]), "offline wheel smoke")
     print(static_openscad_check())

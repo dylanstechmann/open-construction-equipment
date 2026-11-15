@@ -10,6 +10,7 @@ import sys
 from typing import Any, Sequence
 
 from .bom import summarize_bom
+from .bunker import load_bunker_input, load_bunker_registers, load_bunker_site, plan_bunker, write_bunker_outputs
 from .config import ConfigError, load_mission_config, load_simulation_config
 from .engineering import calculate_static_longitudinal, load_analysis_input, write_analysis_result
 from .maintenance import evaluate_maintenance, load_service_history, load_service_plan
@@ -25,7 +26,7 @@ def _emit(data: Any, as_json: bool) -> None:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="oce", description="OCE-CTL-01 SIMULATION-ONLY host tools; never hardware control.")
-    parser.add_argument("--version", action="version", version="oce 0.3.0 (simulation/calculation-only)")
+    parser.add_argument("--version", action="version", version="oce 0.4.0 (simulation/calculation-only)")
     subcommands = parser.add_subparsers(dest="command", required=True)
     data_root = default_data_root()
     validate = subcommands.add_parser("validate", help="validate source repository or installed runtime data")
@@ -47,6 +48,14 @@ def build_parser() -> argparse.ArgumentParser:
     analyze.add_argument("--input", type=Path, default=data_root / "examples/analysis/synthetic-lc001.json")
     analyze.add_argument("--output-dir", type=Path, default=Path.cwd() / "builds/analysis/lc001")
     analyze.add_argument("--json", action="store_true", help="emit the complete analysis result JSON to stdout")
+    bunker = subcommands.add_parser("bunker", help="calculate a blocked synthetic BUNKER-01 quantity/dependency plan")
+    bunker.add_argument("--input", type=Path, default=data_root / "examples/bunker/synthetic-bunker01.json")
+    bunker.add_argument("--work-breakdown", type=Path, default=data_root / "projects/bunker01/construction/work-breakdown.csv")
+    bunker.add_argument("--quality-gates", type=Path, default=data_root / "projects/bunker01/construction/quality-gates.csv")
+    bunker.add_argument("--fleet-register", type=Path, default=data_root / "projects/bunker01/construction/fleet-register.csv")
+    bunker.add_argument("--site-inputs", type=Path, default=data_root / "projects/bunker01/site-inputs.json")
+    bunker.add_argument("--output-dir", type=Path, default=Path.cwd() / "builds/bunker01")
+    bunker.add_argument("--json", action="store_true", help="emit the complete blocked synthetic plan JSON to stdout")
     return parser
 
 
@@ -95,6 +104,23 @@ def main(argv: Sequence[str] | None = None) -> int:
                 print(f"Minimum signed static moment margin: {values['staticMomentMargins_Nm']['minimum']:.3f} N*m")
                 print(f"Result: {result_path}")
                 print("UNREVIEWED synthetic arithmetic only; acceptance NOT_ASSESSED; no physical validation or operational verdict.")
+            return 0
+        if args.command == "bunker":
+            model = load_bunker_input(args.input)
+            registers = load_bunker_registers(args.work_breakdown, args.quality_gates, args.fleet_register)
+            site = load_bunker_site(args.site_inputs)
+            result = plan_bunker(model, registers, site)
+            result_path, svg_path = write_bunker_outputs(result, args.output_dir)
+            _emit(result, args.json)
+            if not args.json:
+                quantities = result["quantities"]
+                print(f"BUNKER-01 synthetic duration: {result['schedule']['syntheticDurationHours']:g} h; "
+                      f"critical path: {', '.join(result['schedule']['criticalPathPackageIds'])}")
+                print(f"Excavation {quantities['geometry']['excavationVolume_m3']:g} m^3; gross concrete "
+                      f"{quantities['concrete']['grossVolume_m3']:g} m^3; modeled-only energy "
+                      f"{result['energy']['modeledOnlyElectricEnergy_kWh']:g} kWh")
+                print(f"Reports: {result_path} and {svg_path}")
+                print("SYNTHETIC PLAN — CONSTRUCTION BLOCKED; all human gates unresolved; no physical validation or authorization.")
             return 0
         if args.command == "bom":
             report = summarize_bom(args.bom)

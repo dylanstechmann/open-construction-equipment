@@ -13,6 +13,7 @@ The `/workspace/AGENTS.md` rules apply. This is an independent personal hobby/le
 - `configs/`, `schemas/`, `examples/`: strict synthetic simulation/analysis inputs, interchange schemas and non-operational examples. Generated reports belong in ignored `builds/`.
 - `tests/`, `tools/check_all.py`: offline Python unit/integration/CLI tests and the unified check.
 - `firmware/ctl01/`: non-safety-rated portable C++17 host gate and tests, with no MCU/deployment integration.
+- `projects/bunker01/`: civilian non-habitable utility-enclosure concept documentation, null real-site inputs, human gates, planning/fleet/BOM registers and visualization-only OpenSCAD. No occupancy, protective-use, excavation, entry, construction, or physical autonomy authorization; host-only synthetic quantity/schedule software lives in `src/open_construction_equipment/bunker.py`; it never authorizes physical work.
 
 Use the exact platform identifier **OCE-CTL-01** and stable requirement, hazard, interface, BOM, load-case, service and work-instruction IDs. Keep CSV headers/row widths valid and JSON machine-readable. Prefer cross-links and IDs over copied requirements. Preserve meaningful data; do not replace unfinished work with empty placeholders. Numeric concept targets are initial AI-authored values with owner review pending, not owner-supplied requirements.
 
@@ -29,6 +30,6 @@ All outputs are concept-only and unvalidated. Distinguish `target`, `assumption`
 3. Cite verifiable primary/official sources. Record uncertainty and access dates; never fabricate references or attribute AI-proposed values to the owner.
 4. Physical tests require measured values, units, equipment identities/calibration, conditions, raw data, witnesses where required, and named signed reviewers. Agent-produced text/simulation is not such a record.
 5. Parse changed JSON/CSV with standard-library tools. OpenSCAD rendering is optional; static checks must not install it or make it mandatory.
-6. Run `python3 tools/check_all.py` (or `make check`) after software/data changes. It runs Python tests, repository validation, two deterministic demos, strict C++17 host tests and offline wheel smoke (with an explicit skip if setuptools 77+ is unavailable) without network access. Report exact results and unavailable optional rendering.
+6. Run `python3 tools/check_all.py` (or `make check`) after software/data changes. It runs Python tests, repository validation, two deterministic demos, analyses and BUNKER-01 plans, strict C++17 host tests and offline wheel smoke (with an explicit skip if setuptools 77+ is unavailable) without network access. Report exact results and unavailable optional rendering.
 7. Keep runtime dependency-light (standard library), deterministic and SI-unit explicit. Add behavioral regression tests for changed planner, tracker, supervisor, maintenance or CLI semantics.
 8. Before ending, inspect `git status --short` and report limitations. Do not commit, push, tag, or create releases unless the owner explicitly asks in a separate instruction.

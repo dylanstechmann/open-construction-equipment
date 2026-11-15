@@ -1,0 +1,23 @@
+id,name,dependencies,durationHours,autonomyClass,fleetRole,requiredGateIds,evidenceStatus
+BW-001,Requirements and non-habitable use classification,,16,human_gate,Owner and responsible design leads,,CONCEPT_ONLY
+BW-002,Site legal authority jurisdiction and permit pathway,BW-001,24,human_gate,Owner legal and AHJ coordination,BG-001,TBD
+BW-003,Geotechnical environmental and site investigations,BW-002,40,specialist,External geotechnical environmental and testing specialists,BG-002,TBD
+BW-004,Official utility locates and conflict clearance,BW-002,16,specialist,Official locators and utility owners,BG-002,TBD
+BW-005,Topographic survey and site control,BW-003;BW-004,16,specialist,Qualified survey and control specialist,BG-002;BG-003,TBD
+BW-006,Released multidisciplinary design and excavation planning,BW-003;BW-004;BW-005,80,specialist,Geotechnical structural civil electrical fire and ventilation designers,BG-002;BG-003;BG-004;BG-007,TBD
+BW-007,Temporary facilities utilities controls and exclusion zones,BW-006,24,specialist,External site services and safety setup; no autonomous execution,BG-002;BG-003;BG-005;BG-006;BG-007,TBD
+BW-008,Excavation and engineered support,BW-007,40,future_supervised_autonomy,Future electric excavator plus competent ground and support specialists,BG-002;BG-003;BG-005;BG-006;BG-007,TBD
+BW-009,Spoil handling characterization and lawful removal or stockpile,BW-008,24,future_supervised_autonomy,Future electric hauler with environmental and competent site supervision,BG-006;BG-007,TBD
+BW-010,Drainage foundations preparation and subbase,BW-008,24,specialist,External drainage and groundwork specialists; future machine assistance only,BG-005;BG-006;BG-007,TBD
+BW-011,Formwork falsework and reinforcement from released design,BW-006;BW-010,40,specialist,External formwork falsework and reinforcement specialists,BG-005;BG-006,TBD
+BW-012,Embeds sleeves and service penetrations from released design,BW-011,16,specialist,External structural and services coordination specialists,BG-005;BG-006,TBD
+BW-013,Lifting and preplacement inspection hold point,BW-011;BW-012,0,human_gate,Qualified lift team and responsible inspection authorities,BG-005;BG-006,TBD
+BW-014,Concrete placement testing and curing,BW-013,32,specialist,External concrete supply placement pump and testing specialists,BG-005;BG-008;BG-009,TBD
+BW-015,Waterproofing drainage completion and verification,BW-014,24,specialist,External waterproofing and drainage specialists,BG-009;BG-010,TBD
+BW-016,Backfill compaction and surface restoration,BW-015,32,future_supervised_autonomy,Future electric compactor and hauler under specialist inspection,BG-010;BG-011,TBD
+BW-017,Entrance door security and escape hardware fit-out,BW-014;BW-015,24,specialist,External access door security and life-safety specialists,BG-009;BG-010;BG-011,TBD
+BW-018,Power charging isolation grounding and bonding fit-out,BW-016;BW-017,32,specialist,Qualified electrical installer; charging location remains subject to fire approval,BG-010;BG-012,TBD
+BW-019,Ventilation lighting network sensors and fire systems fit-out,BW-018,32,specialist,Qualified mechanical fire network and controls specialists,BG-010;BG-012,TBD
+BW-020,Integrated systems inspection commissioning and emergency review,BW-018;BW-019,0,human_gate,Responsible discipline commissioning authorities and emergency coordinators,BG-010;BG-012,TBD
+BW-021,Final authority acceptance and maintenance handover,BW-016;BW-017;BW-020,0,human_gate,AHJ responsible engineers owner and maintenance receiver,BG-011;BG-012;BG-013,TBD
+BW-022,Final non-habitable use classification and controlled closeout,BW-021,0,human_gate,Owner AHJ and responsible life-safety authority,BG-013;BG-014,TBD

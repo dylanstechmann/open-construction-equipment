@@ -1,0 +1,133 @@
+{
+  "spdxLicenseIdentifier": "CC-BY-SA-4.0",
+  "schemaVersion": "1.0.0",
+  "projectId": "BUNKER-01",
+  "status": "CONCEPT_UNREVIEWED",
+  "siteKnown": false,
+  "constructionAuthorized": false,
+  "physicalValidationPerformed": false,
+  "locationPrivacy": "Do not place an actual private address, coordinates, parcel identifier, access credential, or sensitive security detail in this repository. Keep controlled evidence externally and record only a non-sensitive reference after owner review.",
+  "provenance": "All entries are AI-authored requests for real-site evidence. Nulls are intentional; no real-world site data or physical validation exists.",
+  "requiredInputs": {
+    "legalLocation": {
+      "value": null,
+      "status": "TBD",
+      "reason": "A privately controlled legal address and coordinate reference are needed for jurisdiction, survey, flood, utility, emergency, and design review; actual private location must not be collected in this public repository.",
+      "evidenceReference": null
+    },
+    "jurisdictionPermitting": {
+      "value": null,
+      "status": "TBD",
+      "reason": "Identify every AHJ, adopted code, zoning/planning constraint, permit, inspection, utility approval, and underground-structure requirement before design or work.",
+      "evidenceReference": null
+    },
+    "propertyAuthorization": {
+      "value": null,
+      "status": "TBD",
+      "reason": "Document ownership, easements, boundaries, rights of entry, neighbor constraints, and written authorization for investigation and any future work.",
+      "evidenceReference": null
+    },
+    "geotechnicalReport": {
+      "value": null,
+      "status": "TBD",
+      "reason": "A qualified geotechnical investigation must establish subsurface profiles, strength, stiffness, variability, bearing, uplift, settlement, constructability, and design recommendations.",
+      "evidenceReference": null
+    },
+    "soilClassification": {
+      "value": null,
+      "status": "TBD",
+      "reason": "Soil classification for excavation safety must be performed by the required competent person using actual conditions; geotechnical labels alone are not an excavation protective-system selection.",
+      "evidenceReference": null
+    },
+    "groundwater": {
+      "value": null,
+      "status": "TBD",
+      "reason": "Measured seasonal groundwater and perched-water conditions are required for excavation stability, dewatering assessment, buoyancy, durability, and waterproofing design.",
+      "evidenceReference": null
+    },
+    "drainageFlooding": {
+      "value": null,
+      "status": "TBD",
+      "reason": "Establish surface-water paths, lawful discharge, flood history/modeling, backflow, pump dependence, blockage and power-loss consequences without assuming a drain outlet exists.",
+      "evidenceReference": null
+    },
+    "utilitiesOfficialLocates": {
+      "value": null,
+      "status": "TBD",
+      "reason": "Obtain current official locates and utility-owner coordination for all buried and overhead services, then positively identify conflicts by approved means before ground disturbance.",
+      "evidenceReference": null
+    },
+    "surveyControl": {
+      "value": null,
+      "status": "TBD",
+      "reason": "A qualified survey must establish boundaries, topography, benchmarks, control, existing features, drainage levels, and later as-built verification in a documented datum.",
+      "evidenceReference": null
+    },
+    "accessTransport": {
+      "value": null,
+      "status": "TBD",
+      "reason": "Assess legal transport, delivery, crane and concrete access, ground bearing, overhead conflicts, temporary works, emergency access, and bystander/exclusion-zone constraints.",
+      "evidenceReference": null
+    },
+    "environmentalArchaeological": {
+      "value": null,
+      "status": "TBD",
+      "reason": "Complete required environmental, heritage/archaeological, ecological, erosion, spoil and waste assessments and define stop-work/notification responsibilities.",
+      "evidenceReference": null
+    },
+    "radonMethaneContamination": {
+      "value": null,
+      "status": "TBD",
+      "reason": "Assess radon, methane, other hazardous gases, contaminated soil/water and legacy uses so entry, ventilation, waste and material decisions use real evidence.",
+      "evidenceReference": null
+    },
+    "climateFloodFreeze": {
+      "value": null,
+      "status": "TBD",
+      "reason": "Obtain jurisdiction-approved rainfall, flood, temperature, freeze/thaw, frost and climate exposures for siting, earthworks, concrete, durability and maintenance design.",
+      "evidenceReference": null
+    },
+    "seismicWindSnow": {
+      "value": null,
+      "status": "TBD",
+      "reason": "Obtain applicable seismic, wind, snow and related environmental design actions and site coefficients from adopted code and qualified engineering review.",
+      "evidenceReference": null
+    },
+    "fireEmergency": {
+      "value": null,
+      "status": "TBD",
+      "reason": "Determine fire-service access, water/suppression strategy, alarms, responder communication, rescue constraints, emergency contacts and local emergency-planning obligations.",
+      "evidenceReference": null
+    },
+    "structuralLoads": {
+      "value": null,
+      "status": "TBD",
+      "reason": "Define equipment, storage, maintenance, vehicle, construction, soil, hydrostatic, uplift, impact, thermal, shrinkage and environmental load combinations for released structural design.",
+      "evidenceReference": null
+    },
+    "protectiveSystemDesign": {
+      "value": null,
+      "status": "TBD",
+      "reason": "Provide site-specific engineered sloping, benching, shoring, shielding or other protective systems, adjacent-structure assessment, access and inspection criteria; the CAD envelope is not this design.",
+      "evidenceReference": null
+    },
+    "egressOccupancy": {
+      "value": null,
+      "status": "TBD",
+      "reason": "Confirm non-habitable use and determine lawful maintenance access, travel distances, exits, door hardware, entrapment prevention, accessibility and rescue requirements without assuming one opening is adequate.",
+      "evidenceReference": null
+    },
+    "applicableCode": {
+      "value": null,
+      "status": "TBD",
+      "reason": "Create a current-edition code and standards matrix covering building, structural, geotechnical, excavation, electrical, mechanical, fire, energy, accessibility, environmental and worker safety requirements.",
+      "evidenceReference": null
+    },
+    "existingConditionsDocumentation": {
+      "value": null,
+      "status": "TBD",
+      "reason": "Collect controlled photographs, records, prior drawings, monitoring and nearby-structure condition information needed to establish the baseline without exposing private data publicly.",
+      "evidenceReference": null
+    }
+  }
+}

@@ -22,7 +22,7 @@ class CliTests(unittest.TestCase):
     def test_help_names_host_only_commands(self):
         result = self.run_cli("--help")
         self.assertEqual(result.returncode, 0, result.stderr)
-        for command in ("validate", "simulate", "maintenance", "bom", "analyze"):
+        for command in ("validate", "simulate", "maintenance", "bom", "analyze", "bunker"):
             self.assertIn(command, result.stdout)
         self.assertIn("SIMULATION-ONLY", result.stdout)
 

@@ -10,6 +10,7 @@ import re
 from typing import Any
 
 from .bom import read_bom
+from .bunker import BunkerPlanInput, load_bunker_input, load_bunker_registers, load_bunker_site, plan_bunker
 from .config import ConfigError, load_json, load_mission_config, load_simulation_config
 from .engineering import LongitudinalAnalysisInput, load_analysis_input
 from .maintenance import load_service_history, load_service_plan
@@ -63,6 +64,34 @@ def validate_analysis_source_traces(root: Path, model: LongitudinalAnalysisInput
         raise ConfigError("LC-001 must reference AN-LC-001A only as partial unreviewed analysis")
     if lc001["status"] != "TBD":
         raise ConfigError("LC-001 overall status must remain TBD")
+
+
+def validate_bunker_cad_geometry(root: Path, model: BunkerPlanInput) -> None:
+    """Source-only check: the example SI geometry must equal canonical CAD mm values."""
+    cad_path = root / "projects/bunker01/cad/parameters.scad"
+    text = cad_path.read_text(encoding="utf-8")
+    assignments = {
+        match.group(1): float(match.group(2))
+        for match in re.finditer(r"(?m)^([a-z][a-z0-9_]*)\s*=\s*([0-9]+(?:\.[0-9]+)?)\s*;", text)
+    }
+    fields = {
+        "internal_length": "internal_length_m",
+        "internal_width": "internal_width_m",
+        "internal_height": "internal_height_m",
+        "wall_thickness": "wall_thickness_m",
+        "floor_thickness": "floor_thickness_m",
+        "roof_thickness": "roof_thickness_m",
+        "working_space": "working_space_m",
+        "drainage_layer": "drainage_layer_m",
+        "roof_cover": "roof_cover_m",
+    }
+    for cad_name, attribute in fields.items():
+        if cad_name not in assignments:
+            raise ConfigError(f"CAD parameter {cad_name} is missing")
+        cad_m = assignments[cad_name] / 1000.0
+        example_m = getattr(model.geometry, attribute)
+        if not math.isclose(cad_m, example_m, rel_tol=0.0, abs_tol=1e-12):
+            raise ConfigError(f"bunker example {attribute}={example_m} does not match CAD {cad_name}={cad_m} m")
 
 
 def _validate_design_inputs(value: dict[str, Any]) -> None:
@@ -158,6 +187,29 @@ def validate_repository(root: str | Path | None = None) -> dict[str, Any]:
             validate_analysis_source_traces(root, analysis_model)
         except (ConfigError, OSError, csv.Error, KeyError) as exc:
             errors.append(f"analysis source traces: {exc}")
+    bunker_model = None
+    bunker_registers = None
+    try:
+        bunker_model = load_bunker_input(root / "examples/bunker/synthetic-bunker01.json")
+        bunker_registers = load_bunker_registers(
+            root / "projects/bunker01/construction/work-breakdown.csv",
+            root / "projects/bunker01/construction/quality-gates.csv",
+            root / "projects/bunker01/construction/fleet-register.csv",
+        )
+        bunker_site = load_bunker_site(root / "projects/bunker01/site-inputs.json")
+        bunker_result = plan_bunker(bunker_model, bunker_registers, bunker_site)
+        if (bunker_result["siteKnown"] or bunker_result["constructionAuthorized"]
+                or bunker_result["physicalValidationPerformed"] or bunker_result["unresolvedGateIds"] != [
+                    f"BG-{number:03d}" for number in range(1, 16)
+                ]):
+            raise ConfigError("BUNKER-01 unresolved-gate/no-authorization invariant failed")
+    except (ConfigError, OSError, ValueError, csv.Error, KeyError) as exc:
+        errors.append(f"BUNKER-01 planning inputs/references: {exc}")
+    if full_repository and bunker_model is not None:
+        try:
+            validate_bunker_cad_geometry(root, bunker_model)
+        except (ConfigError, OSError, ValueError) as exc:
+            errors.append(f"BUNKER-01 CAD geometry: {exc}")
     try:
         read_bom(root / "hardware/ctl01/bom/ctl01-bom.csv")
     except ConfigError as exc:
@@ -186,6 +238,11 @@ def validate_repository(root: str | Path | None = None) -> dict[str, Any]:
         "serviceIdsChecked": 20,
         "analysisInputsChecked": 1 if analysis_model is not None else 0,
         "analysisTraceIdsChecked": len(analysis_model.trace_ids) if analysis_model is not None else 0,
+        "bunkerInputsChecked": 1 if bunker_model is not None else 0,
+        "bunkerWorkPackagesChecked": len(bunker_registers.packages) if bunker_registers is not None else 0,
+        "bunkerGatesChecked": len(bunker_registers.gates) if bunker_registers is not None else 0,
+        "bunkerFleetEntriesChecked": len(bunker_registers.fleet) if bunker_registers is not None else 0,
+        "bunkerCadGeometryChecked": bool(full_repository and bunker_model is not None),
         "errors": errors,
         "physicalValidationPerformed": False,
     }

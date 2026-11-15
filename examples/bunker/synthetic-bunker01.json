@@ -1,0 +1,176 @@
+{
+  "spdxLicenseIdentifier": "CC-BY-SA-4.0",
+  "schemaVersion": "1.0.0",
+  "projectId": "BUNKER-01",
+  "planStatus": "SYNTHETIC_UNREVIEWED",
+  "unitSystem": "SI",
+  "siteKnown": false,
+  "constructionAuthorized": false,
+  "physicalValidationPerformed": false,
+  "syntheticNotice": "All values are AI-authored, synthetic and unreviewed. They are not owner-supplied or site-supplied and authorize no physical activity.",
+  "provenance": {
+    "sourceType": "SYNTHETIC_AGENT_AUTHORED",
+    "statement": "Synthetic calculator demonstration only; no owner/site evidence, engineering review, construction release or physical validation.",
+    "aiAuthored": true,
+    "ownerSupplied": false,
+    "siteSupplied": false,
+    "physicalValidationPerformed": false
+  },
+  "geometry": {
+    "internalLength_m": 4.0,
+    "internalWidth_m": 3.0,
+    "internalHeight_m": 2.4,
+    "wallThickness_m": 0.25,
+    "floorThickness_m": 0.25,
+    "roofThickness_m": 0.3,
+    "workingSpace_m": 0.75,
+    "drainageLayer_m": 0.2,
+    "roofCover_m": 0.5,
+    "provenance": {
+      "sourceType": "SYNTHETIC_AGENT_AUTHORED",
+      "statement": "Exactly matches projects/bunker01/cad/parameters.scad after millimetre-to-metre conversion; visualization assumptions only, not structural or excavation design.",
+      "aiAuthored": true,
+      "ownerSupplied": false,
+      "siteSupplied": false,
+      "physicalValidationPerformed": false
+    }
+  },
+  "soilModel": {
+    "looseBulkingFactor": 1.25,
+    "compactedToInSituRatio": 0.9,
+    "provenance": {
+      "sourceType": "SYNTHETIC_AGENT_AUTHORED",
+      "statement": "Explicit synthetic arithmetic factors only; not measured soil properties, compaction targets, spoil classification or haul decisions.",
+      "aiAuthored": true,
+      "ownerSupplied": false,
+      "siteSupplied": false,
+      "physicalValidationPerformed": false
+    }
+  },
+  "wasteModel": {
+    "concreteWasteFraction": 0.05,
+    "waterproofingWasteFraction": 0.1,
+    "provenance": {
+      "sourceType": "SYNTHETIC_AGENT_AUTHORED",
+      "statement": "Explicit synthetic sensitivity allowances for theoretical arithmetic only; not procurement quantities, supplier allowances or installation specifications.",
+      "aiAuthored": true,
+      "ownerSupplied": false,
+      "siteSupplied": false,
+      "physicalValidationPerformed": false
+    }
+  },
+  "energyAssumptions": [
+    {
+      "packageId": "BW-007",
+      "fleetId": "BF-001",
+      "electricEnergy_kWh": 12.0,
+      "basis": "Illustrative loader assistance allowance for temporary-facility material movement; excludes all unlisted temporary-power and specialist loads.",
+      "provenance": {
+        "sourceType": "SYNTHETIC_AGENT_AUTHORED",
+        "statement": "Agent-authored illustrative BW-007/BF-001 duty assumption; no measured equipment, route, site, supplier or operating data.",
+        "aiAuthored": true,
+        "ownerSupplied": false,
+        "siteSupplied": false,
+        "physicalValidationPerformed": false
+      }
+    },
+    {
+      "packageId": "BW-008",
+      "fleetId": "BF-002",
+      "electricEnergy_kWh": 80.0,
+      "basis": "Illustrative future electric-excavator duty allowance only; no soil, tool, cycle, support-system or route model is validated.",
+      "provenance": {
+        "sourceType": "SYNTHETIC_AGENT_AUTHORED",
+        "statement": "Agent-authored illustrative BW-008/BF-002 duty assumption; no measured equipment, route, site, supplier or operating data.",
+        "aiAuthored": true,
+        "ownerSupplied": false,
+        "siteSupplied": false,
+        "physicalValidationPerformed": false
+      }
+    },
+    {
+      "packageId": "BW-009",
+      "fleetId": "BF-003",
+      "electricEnergy_kWh": 36.0,
+      "basis": "Illustrative future electric-hauler duty allowance only; no payload, grade, rolling-resistance, stockpile or disposal-route selection.",
+      "provenance": {
+        "sourceType": "SYNTHETIC_AGENT_AUTHORED",
+        "statement": "Agent-authored illustrative BW-009/BF-003 duty assumption; no measured equipment, route, site, supplier or operating data.",
+        "aiAuthored": true,
+        "ownerSupplied": false,
+        "siteSupplied": false,
+        "physicalValidationPerformed": false
+      }
+    },
+    {
+      "packageId": "BW-014",
+      "fleetId": "BF-005",
+      "electricEnergy_kWh": 28.0,
+      "basis": "Illustrative external electric placement/pump interface allowance; not supplier data and excludes delivery, curing and unmodeled specialist systems.",
+      "provenance": {
+        "sourceType": "SYNTHETIC_AGENT_AUTHORED",
+        "statement": "Agent-authored illustrative BW-014/BF-005 duty assumption; no measured equipment, route, site, supplier or operating data.",
+        "aiAuthored": true,
+        "ownerSupplied": false,
+        "siteSupplied": false,
+        "physicalValidationPerformed": false
+      }
+    },
+    {
+      "packageId": "BW-016",
+      "fleetId": "BF-004",
+      "electricEnergy_kWh": 44.0,
+      "basis": "Illustrative future electric-compactor allowance only; no lift thickness, pass count, soil acceptance or hauler energy inference.",
+      "provenance": {
+        "sourceType": "SYNTHETIC_AGENT_AUTHORED",
+        "statement": "Agent-authored illustrative BW-016/BF-004 duty assumption; no measured equipment, route, site, supplier or operating data.",
+        "aiAuthored": true,
+        "ownerSupplied": false,
+        "siteSupplied": false,
+        "physicalValidationPerformed": false
+      }
+    },
+    {
+      "packageId": "BW-018",
+      "fleetId": "BF-007",
+      "electricEnergy_kWh": 18.0,
+      "basis": "Illustrative electrical fit-out tool and test-energy allowance; no supply, charger, isolation or charging design is implied.",
+      "provenance": {
+        "sourceType": "SYNTHETIC_AGENT_AUTHORED",
+        "statement": "Agent-authored illustrative BW-018/BF-007 duty assumption; no measured equipment, route, site, supplier or operating data.",
+        "aiAuthored": true,
+        "ownerSupplied": false,
+        "siteSupplied": false,
+        "physicalValidationPerformed": false
+      }
+    },
+    {
+      "packageId": "BW-019",
+      "fleetId": "BF-008",
+      "electricEnergy_kWh": 22.0,
+      "basis": "Illustrative sensor/controls fit-out and checkout allowance linked to the future safety-perception role; no physical capability is claimed.",
+      "provenance": {
+        "sourceType": "SYNTHETIC_AGENT_AUTHORED",
+        "statement": "Agent-authored illustrative BW-019/BF-008 duty assumption; no measured equipment, route, site, supplier or operating data.",
+        "aiAuthored": true,
+        "ownerSupplied": false,
+        "siteSupplied": false,
+        "physicalValidationPerformed": false
+      }
+    },
+    {
+      "packageId": "BW-020",
+      "fleetId": "BF-008",
+      "electricEnergy_kWh": 6.0,
+      "basis": "Illustrative monitoring support during synthetic commissioning review; the zero-duration human gate remains unresolved and unperformed.",
+      "provenance": {
+        "sourceType": "SYNTHETIC_AGENT_AUTHORED",
+        "statement": "Agent-authored illustrative BW-020/BF-008 duty assumption; no measured equipment, route, site, supplier or operating data.",
+        "aiAuthored": true,
+        "ownerSupplied": false,
+        "siteSupplied": false,
+        "physicalValidationPerformed": false
+      }
+    }
+  ]
+}

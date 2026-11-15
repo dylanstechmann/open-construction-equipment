@@ -17,6 +17,10 @@ External resources are references for future qualified review, not evidence that
 - Apache Software Foundation, **Apache License, Version 2.0**, <https://www.apache.org/licenses/LICENSE-2.0>.
 - Creative Commons, **Attribution-ShareAlike 4.0 International**, <https://creativecommons.org/licenses/by-sa/4.0/>.
 
+## BUNKER-01 built-environment references
+
+The civilian non-habitable utility-enclosure concept has a separate [official reference starting-point register](../projects/bunker01/references.md) for excavation, lifting, construction electrical, assessed confined-space, concrete, electrical/fire and future safe-room evaluation paths. Those pointers are not evidence of current-edition review, applicability, compliance, occupancy approval, or protective performance. BUNKER-01 is not a safe room or storm shelter.
+
 ## Supplier and standards evidence policy
 
 Final component specifications must cite dated manufacturer datasheets/manuals by exact revision, including safety manuals where relevant. Any openly reused geometry, media, dataset, or software needs its source, author, version, and license recorded here. No supplier part number, attachment standard compatibility, engineering result, or certification is inferred from marketing material. No editorial reference to a standard licenses its reproduction.

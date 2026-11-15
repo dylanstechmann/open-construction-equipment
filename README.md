@@ -7,6 +7,8 @@ OCE publishes lifecycle information and host-only learning tools for the **OCE-C
 
 **Software boundary:** every executable is **SIMULATION/CALCULATION-ONLY and host-testable**. There is no real actuation, hardware I/O, controller flashing, deployment mechanism or bypass of the independent protective chain. The Python supervisor and C++ gate are ordinary non-certified reference logic, not safety functions.
 
+**Second reference concept:** [BUNKER-01](projects/bunker01/README.md) is a civilian, non-habitable cut-and-cover utility-enclosure documentation/design baseline. It is not a habitable bunker, storm safe room, protective structure, excavation plan, or construction release. No occupancy, blast/ballistic/CBRN protection, site safety, physical autonomous construction, or code compliance is claimed.
+
 ## Reference design targets — not released specifications
 
 The numeric targets below were **initially authored by an AI implementation prompt; owner review is pending**. They were not supplied as owner-approved requirements.
@@ -36,6 +38,7 @@ oce --help
 oce validate
 oce simulate
 oce analyze
+oce bunker
 oce maintenance
 oce bom
 make check
@@ -48,6 +51,7 @@ An installation-free alternative is:
 ```sh
 PYTHONPATH=src python3 -m open_construction_equipment simulate
 PYTHONPATH=src python3 -m open_construction_equipment analyze
+PYTHONPATH=src python3 -m open_construction_equipment bunker
 PYTHONPATH=src python3 -m unittest discover -s tests -v
 python3 tools/check_all.py
 ```
@@ -64,17 +68,20 @@ The JSON contains structured termination/event data, paths and metrics; the SVG 
 
 `oce analyze` additionally runs AN-LC-001A, an unreviewed static longitudinal load-moment calculation on explicitly synthetic inputs. It writes deterministic `builds/analysis/lc001/result.json`; the sample total mass is 2020 kg and resultant x is 0.144059405940594 m. Acceptance remains `NOT_ASSESSED`: this is neither a stability rating nor a capacity result. See [engineering calculations](docs/engineering-calculations.md).
 
+`oce bunker` runs blocked BUNKER-01 synthetic quantity/dependency/energy arithmetic and writes deterministic `builds/bunker01/result.json` plus `schedule.svg`. The default geometric excavation is 109.5 m³, gross concrete is 17.6625 m³, relative duration is 472 h, and the eight-assumption energy subtotal is 246 kWh. These are not order quantities, total project energy, an excavation/structural design, or an executable construction schedule. All 15 human gates remain unresolved. See [BUNKER-01 planning](docs/bunker-planning.md).
+
 ## Repository guide
 
-- [`src/open_construction_equipment/`](src/open_construction_equipment/) — strict config loaders, geometry, A*, pure pursuit, supervisor, kinematic simulator, mission, maintenance, BOM, deterministic engineering calculations, validation and CLI.
+- [`src/open_construction_equipment/`](src/open_construction_equipment/) — strict config loaders, geometry, A*, pure pursuit, supervisor, kinematic simulator, mission, maintenance, BOM, deterministic engineering and BUNKER-01 synthetic planning calculations, validation and CLI.
 - [`configs/`](configs/ctl01.simulation.json) and [`schemas/`](schemas/) — explicit simulation assumptions and interchange schemas; internal runtime validation needs no schema package.
-- [`examples/`](examples/README.md) — synthetic yard, analysis, service history and record envelopes only.
+- [`examples/`](examples/README.md) — synthetic yard, analysis, BUNKER-01 planning, service history and record envelopes only.
 - [`firmware/ctl01/`](firmware/ctl01/) — portable non-safety-rated C++17 command-gate reference and host tests.
 - [`tests/`](tests/) and [`tools/check_all.py`](tools/check_all.py) — offline unit/integration/CLI tests and unified verification.
 - [`docs/`](docs/engineering-status.md) — status, architecture, safety case, algorithms, engineering calculations, maintenance tooling, standards and decisions.
 - [`hardware/ctl01/`](hardware/ctl01/README.md) — concept breakdown, interfaces, BOM, hazards and visualization-only OpenSCAD.
 - [`manufacturing/ctl01/`](manufacturing/ctl01/README.md) — **unreleased controlled templates**, not permission to fabricate.
 - [`maintenance/ctl01/`](maintenance/ctl01/README.md) — **proposed** service planning and procedures, not an OEM manual.
+- [`projects/bunker01/`](projects/bunker01/README.md) — **BUNKER-01 concept-only** civilian non-habitable utility enclosure requirements, null site-input register, safety/architecture, human gates, fleet gaps, conceptual BOM and synthetic visualization CAD; host-only synthetic quantity/schedule software is available through `oce bunker`; no construction or entry is authorized.
 
 ## Lifecycle map
 
