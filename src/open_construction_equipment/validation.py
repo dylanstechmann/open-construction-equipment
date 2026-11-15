@@ -11,6 +11,7 @@ from typing import Any
 
 from .bom import read_bom
 from .config import ConfigError, load_json, load_mission_config, load_simulation_config
+from .engineering import LongitudinalAnalysisInput, load_analysis_input
 from .maintenance import load_service_history, load_service_plan
 from .resources import default_data_root, is_source_repository
 
@@ -32,6 +33,36 @@ def _service_ids(root: Path) -> set[str]:
     path = root / "maintenance/ctl01/service-schedule.csv"
     with path.open(newline="", encoding="utf-8") as handle:
         return {row["service_id"] for row in csv.DictReader(handle, strict=True)}
+
+
+def validate_analysis_source_traces(root: Path, model: LongitudinalAnalysisInput) -> None:
+    """Resolve every AN-LC-001A trace ID to the checked-out source registers."""
+
+    def csv_ids(relative: str, column: str) -> set[str]:
+        with (root / relative).open(newline="", encoding="utf-8") as handle:
+            return {row[column] for row in csv.DictReader(handle, strict=True)}
+
+    design_inputs = load_json(root / "hardware/ctl01/design-inputs.json")
+    design_ids = {item["id"] for item in design_inputs["parameters"]}
+    interface_text = (root / "hardware/ctl01/interface-control.md").read_text(encoding="utf-8")
+    interface_ids = set(re.findall(r"\|\s*(IF-[A-Z]+-\d{3})\s*\|", interface_text))
+    available = (
+        csv_ids("hardware/ctl01/mechanical/load-case-register.csv", "load_case_id")
+        | design_ids
+        | csv_ids("hardware/ctl01/safety/safety-requirements.csv", "requirement_id")
+        | csv_ids("hardware/ctl01/safety/hazard-register.csv", "hazard_id")
+        | interface_ids
+    )
+    missing = set(model.trace_ids) - available
+    if missing:
+        raise ConfigError(f"analysis trace IDs missing from source registers: {', '.join(sorted(missing))}")
+    with (root / "hardware/ctl01/mechanical/load-case-register.csv").open(newline="", encoding="utf-8") as handle:
+        load_cases = {row["load_case_id"]: row for row in csv.DictReader(handle, strict=True)}
+    lc001 = load_cases["LC-001"]
+    if model.analysis_id not in lc001["evidence_reference"] or "partial unreviewed" not in lc001["evidence_reference"]:
+        raise ConfigError("LC-001 must reference AN-LC-001A only as partial unreviewed analysis")
+    if lc001["status"] != "TBD":
+        raise ConfigError("LC-001 overall status must remain TBD")
 
 
 def _validate_design_inputs(value: dict[str, Any]) -> None:
@@ -117,6 +148,16 @@ def validate_repository(root: str | Path | None = None) -> dict[str, Any]:
         load_mission_config(root / "examples/missions/synthetic-yard.json")
     except ConfigError as exc:
         errors.append(f"simulation inputs: {exc}")
+    analysis_model = None
+    try:
+        analysis_model = load_analysis_input(root / "examples/analysis/synthetic-lc001.json")
+    except (ConfigError, OSError) as exc:
+        errors.append(f"analysis input: {exc}")
+    if full_repository and analysis_model is not None:
+        try:
+            validate_analysis_source_traces(root, analysis_model)
+        except (ConfigError, OSError, csv.Error, KeyError) as exc:
+            errors.append(f"analysis source traces: {exc}")
     try:
         read_bom(root / "hardware/ctl01/bom/ctl01-bom.csv")
     except ConfigError as exc:
@@ -143,6 +184,8 @@ def validate_repository(root: str | Path | None = None) -> dict[str, Any]:
         "jsonFilesChecked": len(json_files),
         "csvFilesChecked": len(csv_files),
         "serviceIdsChecked": 20,
+        "analysisInputsChecked": 1 if analysis_model is not None else 0,
+        "analysisTraceIdsChecked": len(analysis_model.trace_ids) if analysis_model is not None else 0,
         "errors": errors,
         "physicalValidationPerformed": False,
     }

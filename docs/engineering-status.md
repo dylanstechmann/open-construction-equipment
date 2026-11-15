@@ -10,8 +10,8 @@
 | Area | Available now | Not established |
 |---|---|---|
 | Mission | Learning reference for open, maintainable electric compact track loader development | Production requirements, legal operating domain, user acceptance |
-| Performance | Approximate numeric targets in `hardware/ctl01/design-inputs.json` | Capacity, stability, gradeability, endurance, braking distance, speed control, lifting performance |
-| Mechanical | System decomposition, conceptual interfaces, non-fabrication envelope model | Detailed geometry, stress/fatigue life, section sizes, material/weld releases, ROPS/FOPS performance |
+| Performance | Approximate numeric targets in `hardware/ctl01/design-inputs.json`; AN-LC-001A provides partial unreviewed synthetic static arithmetic | Capacity, stability, gradeability, endurance, braking distance, speed control, lifting performance |
+| Mechanical | System decomposition, conceptual interfaces, non-fabrication envelope model, AN-LC-001A static longitudinal arithmetic | Detailed geometry, stress/fatigue life, section sizes, material/weld releases, ROPS/FOPS performance |
 | Electrical | 96 V nominal LFP target, dual-drive/pump concept, independent protective-chain intent | Complete schematics, fault analysis, battery safety evidence, EMC, insulation coordination, charger integration |
 | Hydraulic | Electro-hydraulic lift/tilt target and preliminary function/hose registers | Pressure/flow, component sizing, load holding, hose specification, thermal balance, validated flushing criteria |
 | Controls/safety | Manual supervisory concept, independent safety-chain intent, seed I/O/hazards, non-certified Python/C++ host gate references | Safety requirements specification, PL/SIL allocation, circuit design, independent diagnostics, validated physical stopping and reset behavior |
@@ -46,6 +46,6 @@ No error found by later review should be hidden; update the affected target, haz
 
 ## Phase 2 host software evidence
 
-The `oce` host CLI supports `validate`, `simulate`, `maintenance`, and `bom`. The default synthetic yard produces deterministic JSON/SVG under ignored `builds/`; unit, integration, CLI and C++ host tests run through `python3 tools/check_all.py`. These are agent-run software consistency results, not physical validation or signed owner review. The simulator is a documented kinematic approximation, and the service intervals remain proposed non-OEM values.
+The `oce` host CLI supports `validate`, `simulate`, `analyze`, `maintenance`, and `bom`. The default synthetic yard produces deterministic JSON/SVG under ignored `builds/`; unit, integration, CLI and C++ host tests run through `python3 tools/check_all.py`. AN-LC-001A adds byte-identical deterministic analysis JSON with acceptance `NOT_ASSESSED` and review `UNREVIEWED`; it is not a stability rating or ROC calculation. These are agent-run software consistency results, not physical validation or signed owner review. The simulator is a documented kinematic approximation, and the service intervals remain proposed non-OEM values.
 
-See `simulation.md`, `autonomy.md`, `maintenance-tooling.md`, `firmware.md`, and `repository-validation.md` for exact boundaries and commands. No ROS 2, hardware I/O, target image, controller flashing or deployment integration is present.
+See `simulation.md`, `autonomy.md`, `engineering-calculations.md`, `maintenance-tooling.md`, `firmware.md`, and `repository-validation.md` for exact boundaries and commands. No ROS 2, hardware I/O, target image, controller flashing or deployment integration is present.

@@ -39,9 +39,14 @@ def _keys(data: dict[str, Any], required: set[str], optional: set[str], name: st
 def _number(data: dict[str, Any], key: str, name: str, low: float | None = None, high: float | None = None,
             strict_low: bool = False) -> float:
     value = data.get(key)
-    if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise ConfigError(f"{name}.{key} must be a finite number")
-    result = float(value)
+    try:
+        result = float(value)
+    except (OverflowError, TypeError, ValueError) as exc:
+        raise ConfigError(f"{name}.{key} must be a finite number") from exc
+    if not math.isfinite(result):
+        raise ConfigError(f"{name}.{key} must be a finite number")
     if low is not None and (result <= low if strict_low else result < low):
         relation = ">" if strict_low else ">="
         raise ConfigError(f"{name}.{key} must be {relation} {low}")

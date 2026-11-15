@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "open-construction-equipment"
-version = "0.2.0"
+version = "0.3.0"
 description = "Simulation-only host reference tools for the OCE-CTL-01 concept"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -28,6 +28,7 @@ include = ["open_construction_equipment*"]
 "share/open-construction-equipment/configs" = ["configs/ctl01.simulation.json"]
 "share/open-construction-equipment/examples/missions" = ["examples/missions/synthetic-yard.json"]
 "share/open-construction-equipment/examples/maintenance" = ["examples/maintenance/synthetic-service-history.json"]
+"share/open-construction-equipment/examples/analysis" = ["examples/analysis/synthetic-lc001.json"]
 "share/open-construction-equipment/maintenance/ctl01" = [
   "maintenance/ctl01/service-intervals.json",
   "maintenance/ctl01/service-schedule.csv",

@@ -5,7 +5,7 @@
 
 OCE publishes lifecycle information and host-only learning tools for the **OCE-CTL-01** reference concept: a battery-electric compact track loader with dual electric traction drives, electro-hydraulic lift/tilt, a universal-*style* quick attach interface, manual controls, an independent safety-chain intent, and an autonomy-ready sensing/control boundary. “Style” denotes an interface concept only; attachment interchangeability is unvalidated.
 
-**Software boundary:** every executable is **SIMULATION-ONLY and host-testable**. There is no real actuation, hardware I/O, controller flashing, deployment mechanism or bypass of the independent protective chain. The Python supervisor and C++ gate are ordinary non-certified reference logic, not safety functions.
+**Software boundary:** every executable is **SIMULATION/CALCULATION-ONLY and host-testable**. There is no real actuation, hardware I/O, controller flashing, deployment mechanism or bypass of the independent protective chain. The Python supervisor and C++ gate are ordinary non-certified reference logic, not safety functions.
 
 ## Reference design targets — not released specifications
 
@@ -24,7 +24,7 @@ The numeric targets below were **initially authored by an AI implementation prom
 
 No manufacturing dimensions, weld sizes, fastener torques, hydraulic pressure settings, structural thicknesses, or ROPS/FOPS compliance claims are released. Those values are **TBD pending calculations, supplier data, applicable standards, risk assessment, and signed responsible engineering review**.
 
-## Quickstart — host simulation only
+## Quickstart — host tools only
 
 Requirements: Python 3.11 or newer; a C++17 compiler for firmware host tests. Python runtime and tests use only the standard library.
 
@@ -35,6 +35,7 @@ python -m pip install -e .
 oce --help
 oce validate
 oce simulate
+oce analyze
 oce maintenance
 oce bom
 make check
@@ -46,6 +47,7 @@ An installation-free alternative is:
 
 ```sh
 PYTHONPATH=src python3 -m open_construction_equipment simulate
+PYTHONPATH=src python3 -m open_construction_equipment analyze
 PYTHONPATH=src python3 -m unittest discover -s tests -v
 python3 tools/check_all.py
 ```
@@ -60,14 +62,16 @@ Reports: .../builds/demo/result.json and .../builds/demo/trajectory.svg
 
 The JSON contains structured termination/event data, paths and metrics; the SVG is self-contained. Reports go under ignored `builds/`. See [examples](examples/README.md), [simulation](docs/simulation.md) and [autonomy](docs/autonomy.md).
 
+`oce analyze` additionally runs AN-LC-001A, an unreviewed static longitudinal load-moment calculation on explicitly synthetic inputs. It writes deterministic `builds/analysis/lc001/result.json`; the sample total mass is 2020 kg and resultant x is 0.144059405940594 m. Acceptance remains `NOT_ASSESSED`: this is neither a stability rating nor a capacity result. See [engineering calculations](docs/engineering-calculations.md).
+
 ## Repository guide
 
-- [`src/open_construction_equipment/`](src/open_construction_equipment/) — strict config loaders, geometry, A*, pure pursuit, supervisor, kinematic simulator, mission, maintenance, BOM, validation and CLI.
+- [`src/open_construction_equipment/`](src/open_construction_equipment/) — strict config loaders, geometry, A*, pure pursuit, supervisor, kinematic simulator, mission, maintenance, BOM, deterministic engineering calculations, validation and CLI.
 - [`configs/`](configs/ctl01.simulation.json) and [`schemas/`](schemas/) — explicit simulation assumptions and interchange schemas; internal runtime validation needs no schema package.
-- [`examples/`](examples/README.md) — synthetic yard, service history and record envelopes only.
+- [`examples/`](examples/README.md) — synthetic yard, analysis, service history and record envelopes only.
 - [`firmware/ctl01/`](firmware/ctl01/) — portable non-safety-rated C++17 command-gate reference and host tests.
 - [`tests/`](tests/) and [`tools/check_all.py`](tools/check_all.py) — offline unit/integration/CLI tests and unified verification.
-- [`docs/`](docs/engineering-status.md) — status, architecture, safety case, algorithms, maintenance tooling, standards and decisions.
+- [`docs/`](docs/engineering-status.md) — status, architecture, safety case, algorithms, engineering calculations, maintenance tooling, standards and decisions.
 - [`hardware/ctl01/`](hardware/ctl01/README.md) — concept breakdown, interfaces, BOM, hazards and visualization-only OpenSCAD.
 - [`manufacturing/ctl01/`](manufacturing/ctl01/README.md) — **unreleased controlled templates**, not permission to fabricate.
 - [`maintenance/ctl01/`](maintenance/ctl01/README.md) — **proposed** service planning and procedures, not an OEM manual.

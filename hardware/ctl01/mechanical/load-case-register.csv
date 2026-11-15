@@ -1,5 +1,5 @@
 load_case_id,subsystem,scenario,required_inputs,acceptance_basis,analysis_method,status,evidence_reference
-LC-001,Whole machine,Static target attachment load at critical lift geometry,Mass CG track footprint load center attachment inertia slope,Applicable capacity stability structural criteria TBD,Rigid body then multibody structural analysis,TBD,NONE
+LC-001,Whole machine,Static target attachment load at critical lift geometry,Mass CG track footprint load center attachment inertia slope,Applicable capacity stability structural criteria TBD,Rigid body then multibody structural analysis,TBD,AN-LC-001A partial unreviewed synthetic static longitudinal only
 LC-002,Whole machine,Forward braking with target load at target speed,Mass distribution deceleration adhesion load geometry,No instability excessive stop structural exceedance TBD,Dynamic analysis then instrumented tests,TBD,NONE
 LC-003,Whole machine,Turning and one-side traction fault on slope,Slope friction fault payload CG steering dynamics,Controlled stop stability and protective response TBD,Fault dynamics simulation and physical validation,TBD,NONE
 LC-004,Chassis lift arms,Hydraulic stall at critical arm position,Pressure limit TBD cylinder geometry target payload tolerance,Strength fatigue deflection limits TBD,Free body FEA and test correlation,TBD,NONE

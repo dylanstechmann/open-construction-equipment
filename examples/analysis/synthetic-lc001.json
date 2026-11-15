@@ -1,0 +1,151 @@
+{
+  "spdxLicenseIdentifier": "CERN-OHL-S-2.0",
+  "schemaVersion": "1.0.0",
+  "platform": "OCE-CTL-01",
+  "analysisId": "AN-LC-001A",
+  "analysisType": "STATIC_LONGITUDINAL_LOAD_MOMENT",
+  "analysisStatus": "AGENT_AUTHORED_UNREVIEWED",
+  "acceptanceStatus": "NOT_ASSESSED",
+  "reviewStatus": "UNREVIEWED",
+  "physicalValidationPerformed": false,
+  "syntheticNotice": "Every numeric engineering input is hypothetical and agent-authored for software demonstration; values are not extracted from OpenSCAD, not measured, not owner-supplied, and not released.",
+  "unitSystem": "SI",
+  "coordinateConvention": "x_forward_m_front_x_greater_than_rear_x",
+  "traceIds": [
+    "LC-001",
+    "DI-MASS-001",
+    "DI-ROC-001",
+    "SR-006",
+    "HZ-005",
+    "IF-MEC-001",
+    "IF-MEC-002",
+    "IF-MEC-003",
+    "IF-MEC-004"
+  ],
+  "inputs": {
+    "machine": {
+      "mass_kg": {
+        "value": 1600,
+        "unit": "kg",
+        "provenance": {
+          "sourceType": "SYNTHETIC_AGENT_AUTHORED",
+          "statement": "Hypothetical agent-authored bare-machine mass for arithmetic demonstration only; not extracted from OpenSCAD and not owner-supplied.",
+          "cadDerived": false,
+          "ownerSupplied": false,
+          "traceIds": [
+            "LC-001",
+            "DI-MASS-001"
+          ]
+        }
+      },
+      "cgX_m": {
+        "value": -0.15,
+        "unit": "m",
+        "provenance": {
+          "sourceType": "SYNTHETIC_AGENT_AUTHORED",
+          "statement": "Hypothetical agent-authored bare-machine longitudinal CG for arithmetic demonstration only; not extracted from OpenSCAD and not owner-supplied.",
+          "cadDerived": false,
+          "ownerSupplied": false,
+          "traceIds": [
+            "LC-001",
+            "IF-MEC-002"
+          ]
+        }
+      }
+    },
+    "attachment": {
+      "mass_kg": {
+        "value": 240,
+        "unit": "kg",
+        "provenance": {
+          "sourceType": "SYNTHETIC_AGENT_AUTHORED",
+          "statement": "Hypothetical agent-authored attachment mass for arithmetic demonstration only; not extracted from OpenSCAD and not owner-supplied.",
+          "cadDerived": false,
+          "ownerSupplied": false,
+          "traceIds": [
+            "LC-001",
+            "IF-MEC-004"
+          ]
+        }
+      },
+      "cgX_m": {
+        "value": 1.05,
+        "unit": "m",
+        "provenance": {
+          "sourceType": "SYNTHETIC_AGENT_AUTHORED",
+          "statement": "Hypothetical agent-authored attachment longitudinal CG for arithmetic demonstration only; not extracted from OpenSCAD and not owner-supplied.",
+          "cadDerived": false,
+          "ownerSupplied": false,
+          "traceIds": [
+            "LC-001",
+            "IF-MEC-003",
+            "IF-MEC-004"
+          ]
+        }
+      }
+    },
+    "payload": {
+      "mass_kg": {
+        "value": 180,
+        "unit": "kg",
+        "provenance": {
+          "sourceType": "SYNTHETIC_AGENT_AUTHORED",
+          "statement": "Hypothetical agent-authored payload mass for arithmetic demonstration only; not extracted from OpenSCAD and not owner-supplied.",
+          "cadDerived": false,
+          "ownerSupplied": false,
+          "traceIds": [
+            "LC-001",
+            "DI-ROC-001",
+            "SR-006",
+            "HZ-005"
+          ]
+        }
+      },
+      "cgX_m": {
+        "value": 1.55,
+        "unit": "m",
+        "provenance": {
+          "sourceType": "SYNTHETIC_AGENT_AUTHORED",
+          "statement": "Hypothetical agent-authored payload load center for arithmetic demonstration only; not extracted from OpenSCAD and not owner-supplied.",
+          "cadDerived": false,
+          "ownerSupplied": false,
+          "traceIds": [
+            "LC-001",
+            "DI-ROC-001",
+            "SR-006"
+          ]
+        }
+      }
+    },
+    "supports": {
+      "rearX_m": {
+        "value": -0.9,
+        "unit": "m",
+        "provenance": {
+          "sourceType": "SYNTHETIC_AGENT_AUTHORED",
+          "statement": "Hypothetical agent-authored rear ideal support coordinate for arithmetic demonstration only; not extracted from OpenSCAD and not owner-supplied.",
+          "cadDerived": false,
+          "ownerSupplied": false,
+          "traceIds": [
+            "LC-001",
+            "IF-MEC-001"
+          ]
+        }
+      },
+      "frontX_m": {
+        "value": 0.8,
+        "unit": "m",
+        "provenance": {
+          "sourceType": "SYNTHETIC_AGENT_AUTHORED",
+          "statement": "Hypothetical agent-authored front ideal support coordinate for arithmetic demonstration only; not extracted from OpenSCAD and not owner-supplied.",
+          "cadDerived": false,
+          "ownerSupplied": false,
+          "traceIds": [
+            "LC-001",
+            "IF-MEC-001"
+          ]
+        }
+      }
+    }
+  }
+}

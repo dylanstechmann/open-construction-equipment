@@ -1,0 +1,275 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/oce-ctl-01/engineering-analysis.schema.json",
+  "title": "AN-LC-001A synthetic static longitudinal load-moment input",
+  "description": "Interchange schema for strict synthetic input, not an operational or physical-validity assessment. The standard-library Python loader additionally requires frontX_m greater than rearX_m. A JSON Schema package is optional and is not a runtime dependency.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "spdxLicenseIdentifier",
+    "schemaVersion",
+    "platform",
+    "analysisId",
+    "analysisType",
+    "analysisStatus",
+    "acceptanceStatus",
+    "reviewStatus",
+    "unitSystem",
+    "coordinateConvention",
+    "physicalValidationPerformed",
+    "syntheticNotice",
+    "traceIds",
+    "inputs"
+  ],
+  "properties": {
+    "spdxLicenseIdentifier": {
+      "const": "CERN-OHL-S-2.0"
+    },
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "platform": {
+      "const": "OCE-CTL-01"
+    },
+    "analysisId": {
+      "const": "AN-LC-001A"
+    },
+    "analysisType": {
+      "const": "STATIC_LONGITUDINAL_LOAD_MOMENT"
+    },
+    "analysisStatus": {
+      "const": "AGENT_AUTHORED_UNREVIEWED"
+    },
+    "acceptanceStatus": {
+      "const": "NOT_ASSESSED"
+    },
+    "reviewStatus": {
+      "const": "UNREVIEWED"
+    },
+    "unitSystem": {
+      "const": "SI"
+    },
+    "coordinateConvention": {
+      "const": "x_forward_m_front_x_greater_than_rear_x"
+    },
+    "physicalValidationPerformed": {
+      "const": false
+    },
+    "syntheticNotice": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "traceIds": {
+      "type": "array",
+      "minItems": 9,
+      "maxItems": 9,
+      "uniqueItems": true,
+      "prefixItems": [
+        {
+          "const": "LC-001"
+        },
+        {
+          "const": "DI-MASS-001"
+        },
+        {
+          "const": "DI-ROC-001"
+        },
+        {
+          "const": "SR-006"
+        },
+        {
+          "const": "HZ-005"
+        },
+        {
+          "const": "IF-MEC-001"
+        },
+        {
+          "const": "IF-MEC-002"
+        },
+        {
+          "const": "IF-MEC-003"
+        },
+        {
+          "const": "IF-MEC-004"
+        }
+      ],
+      "items": false
+    },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "machine",
+        "attachment",
+        "payload",
+        "supports"
+      ],
+      "properties": {
+        "machine": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mass_kg",
+            "cgX_m"
+          ],
+          "properties": {
+            "mass_kg": {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/massQuantity"
+                },
+                {
+                  "properties": {
+                    "value": {
+                      "exclusiveMinimum": 0
+                    }
+                  }
+                }
+              ]
+            },
+            "cgX_m": {
+              "$ref": "#/$defs/lengthQuantity"
+            }
+          }
+        },
+        "attachment": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mass_kg",
+            "cgX_m"
+          ],
+          "properties": {
+            "mass_kg": {
+              "$ref": "#/$defs/massQuantity"
+            },
+            "cgX_m": {
+              "$ref": "#/$defs/lengthQuantity"
+            }
+          }
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mass_kg",
+            "cgX_m"
+          ],
+          "properties": {
+            "mass_kg": {
+              "$ref": "#/$defs/massQuantity"
+            },
+            "cgX_m": {
+              "$ref": "#/$defs/lengthQuantity"
+            }
+          }
+        },
+        "supports": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "rearX_m",
+            "frontX_m"
+          ],
+          "properties": {
+            "rearX_m": {
+              "$ref": "#/$defs/lengthQuantity"
+            },
+            "frontX_m": {
+              "$ref": "#/$defs/lengthQuantity"
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceType",
+        "statement",
+        "cadDerived",
+        "ownerSupplied",
+        "traceIds"
+      ],
+      "properties": {
+        "sourceType": {
+          "const": "SYNTHETIC_AGENT_AUTHORED"
+        },
+        "statement": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "cadDerived": {
+          "const": false
+        },
+        "ownerSupplied": {
+          "const": false
+        },
+        "traceIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "LC-001",
+              "DI-MASS-001",
+              "DI-ROC-001",
+              "SR-006",
+              "HZ-005",
+              "IF-MEC-001",
+              "IF-MEC-002",
+              "IF-MEC-003",
+              "IF-MEC-004"
+            ]
+          }
+        }
+      }
+    },
+    "massQuantity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value",
+        "unit",
+        "provenance"
+      ],
+      "properties": {
+        "value": {
+          "type": "number",
+          "minimum": 0
+        },
+        "unit": {
+          "const": "kg"
+        },
+        "provenance": {
+          "$ref": "#/$defs/provenance"
+        }
+      }
+    },
+    "lengthQuantity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value",
+        "unit",
+        "provenance"
+      ],
+      "properties": {
+        "value": {
+          "type": "number"
+        },
+        "unit": {
+          "const": "m"
+        },
+        "provenance": {
+          "$ref": "#/$defs/provenance"
+        }
+      }
+    }
+  }
+}

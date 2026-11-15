@@ -24,6 +24,8 @@ class PackagingTests(unittest.TestCase):
         data_files = project["tool"]["setuptools"]["data-files"]
         self.assertIn("share/open-construction-equipment/configs", data_files)
         self.assertIn("share/open-construction-equipment/hardware/ctl01/bom", data_files)
+        self.assertIn("share/open-construction-equipment/examples/analysis", data_files)
+        self.assertEqual(project["project"]["version"], "0.3.0")
         self.assertEqual(project["build-system"]["requires"], ["setuptools>=77"])
 
     def test_license_references_have_complete_local_targets(self):

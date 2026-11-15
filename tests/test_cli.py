@@ -22,7 +22,7 @@ class CliTests(unittest.TestCase):
     def test_help_names_host_only_commands(self):
         result = self.run_cli("--help")
         self.assertEqual(result.returncode, 0, result.stderr)
-        for command in ("validate", "simulate", "maintenance", "bom"):
+        for command in ("validate", "simulate", "maintenance", "bom", "analyze"):
             self.assertIn(command, result.stdout)
         self.assertIn("SIMULATION-ONLY", result.stdout)
 
@@ -47,6 +47,45 @@ class CliTests(unittest.TestCase):
         bom = self.run_cli("bom", "--json")
         self.assertEqual(bom.returncode, 0, bom.stderr)
         self.assertEqual(json.loads(bom.stdout)["itemCount"], 63)
+
+    def test_analyze_json_and_deterministic_report(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result = self.run_cli("analyze", "--json", "--output-dir", directory)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            report = json.loads(result.stdout)
+            self.assertEqual(report["analysisId"], "AN-LC-001A")
+            self.assertEqual(report["acceptanceStatus"], "NOT_ASSESSED")
+            self.assertEqual(report["reviewStatus"], "UNREVIEWED")
+            self.assertFalse(report["physicalValidationPerformed"])
+            result_path = Path(directory) / "result.json"
+            self.assertTrue(result_path.is_file())
+            self.assertEqual(result_path.read_text(encoding="utf-8"), result.stdout)
+
+    def test_invalid_analysis_returns_controlled_error_without_report(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "bad-analysis.json"
+            path.write_text("{}", encoding="utf-8")
+            output = Path(directory) / "out"
+            result = self.run_cli("analyze", "--input", path, "--output-dir", output, "--json")
+            self.assertEqual(result.returncode, 2)
+            self.assertIn("ERROR:", result.stderr)
+            self.assertIn("missing fields", result.stderr)
+            self.assertNotIn("Traceback", result.stderr)
+            self.assertFalse(output.exists())
+
+    def test_huge_analysis_integer_exits_two_without_traceback(self):
+        with tempfile.TemporaryDirectory() as directory:
+            data = json.loads((ROOT / "examples/analysis/synthetic-lc001.json").read_text(encoding="utf-8"))
+            data["inputs"]["machine"]["mass_kg"]["value"] = 10**400
+            path = Path(directory) / "huge-analysis.json"
+            path.write_text(json.dumps(data), encoding="utf-8")
+            output = Path(directory) / "out"
+            result = self.run_cli("analyze", "--input", path, "--output-dir", output, "--json")
+            self.assertEqual(result.returncode, 2)
+            self.assertIn("finite number", result.stderr)
+            self.assertIn("ERROR:", result.stderr)
+            self.assertNotIn("Traceback", result.stderr)
+            self.assertFalse(output.exists())
 
     def test_malformed_config_returns_nonzero(self):
         with tempfile.TemporaryDirectory() as directory:

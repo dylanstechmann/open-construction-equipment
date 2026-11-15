@@ -120,6 +120,65 @@ class RepositoryValidationTests(unittest.TestCase):
                 self.assertEqual(report["status"], "failed")
                 self.assertTrue(any(relative in error for error in report["errors"]), report["errors"])
 
+    def test_analysis_provenance_and_unknown_trace_fail_semantic_validation(self):
+        for mutation in ("missing_provenance", "unknown_trace"):
+            with self.subTest(mutation=mutation), tempfile.TemporaryDirectory() as directory:
+                root = self.make_copy(directory)
+                path = root / "examples/analysis/synthetic-lc001.json"
+                data = json.loads(path.read_text(encoding="utf-8"))
+                if mutation == "missing_provenance":
+                    del data["inputs"]["supports"]["frontX_m"]["provenance"]
+                else:
+                    data["inputs"]["machine"]["mass_kg"]["provenance"]["traceIds"] = ["DI-NOT-A-TRACE"]
+                path.write_text(json.dumps(data), encoding="utf-8")
+                report = validate_repository(root)
+                self.assertEqual(report["status"], "failed")
+                self.assertTrue(any("analysis input" in error for error in report["errors"]), report["errors"])
+
+    def test_huge_analysis_integer_returns_failed_validation_report(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.make_copy(directory)
+            path = root / "examples/analysis/synthetic-lc001.json"
+            data = json.loads(path.read_text(encoding="utf-8"))
+            data["inputs"]["machine"]["mass_kg"]["value"] = 10**400
+            path.write_text(json.dumps(data), encoding="utf-8")
+            report = validate_repository(root)
+            self.assertEqual(report["status"], "failed")
+            self.assertEqual(report["analysisInputsChecked"], 0)
+            self.assertTrue(
+                any("analysis input" in error and "finite number" in error for error in report["errors"]),
+                report["errors"],
+            )
+
+    def test_analysis_trace_must_exist_in_actual_source_registers(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.make_copy(directory)
+            path = root / "hardware/ctl01/safety/safety-requirements.csv"
+            with path.open(newline="", encoding="utf-8") as handle:
+                rows = list(csv.DictReader(handle, strict=True))
+            for row in rows:
+                if row["requirement_id"] == "SR-006":
+                    row["requirement_id"] = "SR-RENAMED"
+            with path.open("w", newline="", encoding="utf-8") as handle:
+                writer = csv.DictWriter(handle, fieldnames=rows[0].keys())
+                writer.writeheader()
+                writer.writerows(rows)
+            report = validate_repository(root)
+            self.assertEqual(report["status"], "failed")
+            self.assertTrue(any("SR-006" in error and "source registers" in error for error in report["errors"]), report["errors"])
+
+    def test_lc001_reference_remains_partial_unreviewed_and_tbd(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.make_copy(directory)
+            path = root / "hardware/ctl01/mechanical/load-case-register.csv"
+            content = path.read_text(encoding="utf-8").replace(
+                "AN-LC-001A partial unreviewed synthetic static longitudinal only", "AN-LC-001A RELEASED"
+            ).replace("Rigid body then multibody structural analysis,TBD,AN-LC-001A", "Rigid body then multibody structural analysis,CALCULATED,AN-LC-001A")
+            path.write_text(content, encoding="utf-8")
+            report = validate_repository(root)
+            self.assertEqual(report["status"], "failed")
+            self.assertTrue(any("analysis source traces" in error for error in report["errors"]), report["errors"])
+
     def test_malformed_json_fails(self):
         with tempfile.TemporaryDirectory() as directory:
             root = self.make_copy(directory)

@@ -47,6 +47,21 @@ class ConfigTests(unittest.TestCase):
                 with self.assertRaises(ConfigError):
                     load_simulation_config(self.write(data))
 
+    def test_out_of_float_range_json_integers_have_controlled_errors(self):
+        for value in (10**400, -(10**400)):
+            with self.subTest(value_sign="positive" if value > 0 else "negative"):
+                self.simulation["machine"]["width_m"] = value
+                with self.assertRaisesRegex(ConfigError, "finite number"):
+                    load_simulation_config(self.write(self.simulation))
+        self.mission["start"]["x_m"] = 10**400
+        with self.assertRaisesRegex(ConfigError, "finite number"):
+            load_mission_config(self.write(self.mission, mission=True))
+        # A large integer within float range retains the prior accepted behavior.
+        self.simulation = json.loads((ROOT / "configs/ctl01.simulation.json").read_text(encoding="utf-8"))
+        self.simulation["machine"]["mass_kg"] = 10**300
+        config = load_simulation_config(self.write(self.simulation))
+        self.assertEqual(config.machine.mass_kg, float(10**300))
+
     def test_footprint_must_enclose_rectangle(self):
         self.simulation["machine"]["footprint_radius_m"] = 1.0
         with self.assertRaisesRegex(ConfigError, "must enclose"):

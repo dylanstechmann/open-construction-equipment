@@ -17,7 +17,7 @@ All load paths, member sections, plate thicknesses, joint types, materials, weld
 
 ## Stability and structure inputs
 
-No rated-capacity inference may be drawn from 500 kg alone. Required inputs include combined machine CG/inertia; payload/attachment CG; track contact; slope/turning/braking; lift-arm range; hydraulic limits; drive reactions; quick-attach moment; transport; misuse; fatigue cycles; weld stress; corrosion; and applicable stability/protective-structure methods. `load-case-register.csv` contains unquantified seeds.
+No rated-capacity inference may be drawn from 500 kg alone. Required inputs include combined machine CG/inertia; payload/attachment CG; track contact; slope/turning/braking; lift-arm range; hydraulic limits; drive reactions; quick-attach moment; transport; misuse; fatigue cycles; weld stress; corrosion; and applicable stability/protective-structure methods. `load-case-register.csv` contains the unresolved cases. [AN-LC-001A](../analysis/AN-LC-001A-static-longitudinal.md) supplies only partial, agent-authored, unreviewed static longitudinal arithmetic for synthetic inputs; LC-001 remains `TBD` and no capacity or stability rating follows.
 
 ## Mechanical decisions pending
 

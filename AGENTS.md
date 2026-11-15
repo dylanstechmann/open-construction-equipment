@@ -9,8 +9,8 @@ The `/workspace/AGENTS.md` rules apply. This is an independent personal hobby/le
 - `hardware/ctl01/`: conceptual OCE-CTL-01 design inputs, interfaces, registers, BOM, and CERN-OHL-S-2.0 OpenSCAD source.
 - `manufacturing/ctl01/`: unreleased process templates and quality gates, not permission to fabricate.
 - `maintenance/ctl01/`: proposed service planning and machine-readable non-OEM intervals, not an OEM service manual.
-- `src/open_construction_equipment/`: Python 3.11+ standard-library simulation, planning, supervisory, maintenance, BOM and CLI reference code.
-- `configs/`, `schemas/`, `examples/`: strict synthetic simulation inputs, interchange schemas and non-operational examples. Generated reports belong in ignored `builds/`.
+- `src/open_construction_equipment/`: Python 3.11+ standard-library simulation, planning, supervisory, maintenance, BOM, deterministic engineering arithmetic and CLI reference code.
+- `configs/`, `schemas/`, `examples/`: strict synthetic simulation/analysis inputs, interchange schemas and non-operational examples. Generated reports belong in ignored `builds/`.
 - `tests/`, `tools/check_all.py`: offline Python unit/integration/CLI tests and the unified check.
 - `firmware/ctl01/`: non-safety-rated portable C++17 host gate and tests, with no MCU/deployment integration.
 

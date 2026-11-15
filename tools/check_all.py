@@ -59,6 +59,19 @@ def main() -> int:
     if outputs[0] != outputs[1]:
         raise RuntimeError("deterministic demo outputs differ")
     print("Deterministic demo JSON and SVG: byte-identical")
+    analysis_outputs = []
+    for name in ("analysis-a", "analysis-b"):
+        directory = ROOT / "builds/check" / name
+        result = require(run([sys.executable, "-m", "open_construction_equipment", "analyze",
+                              "--output-dir", str(directory), "--json"], capture=True), f"analysis {name}")
+        report = json.loads(result)
+        if (report["analysisId"] != "AN-LC-001A" or report["acceptanceStatus"] != "NOT_ASSESSED"
+                or report["reviewStatus"] != "UNREVIEWED" or report["physicalValidationPerformed"]):
+            raise RuntimeError(f"analysis {name} has an invalid identity/status")
+        analysis_outputs.append((directory / "result.json").read_bytes())
+    if analysis_outputs[0] != analysis_outputs[1]:
+        raise RuntimeError("deterministic analysis outputs differ")
+    print("Deterministic AN-LC-001A result JSON: byte-identical; UNREVIEWED; acceptance NOT_ASSESSED")
     require(run([sys.executable, "firmware/ctl01/run_host_tests.py"]), "firmware host tests")
     require(run([sys.executable, "tools/wheel_smoke.py"]), "offline wheel smoke")
     print(static_openscad_check())

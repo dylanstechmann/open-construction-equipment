@@ -11,6 +11,7 @@ from typing import Any, Sequence
 
 from .bom import summarize_bom
 from .config import ConfigError, load_mission_config, load_simulation_config
+from .engineering import calculate_static_longitudinal, load_analysis_input, write_analysis_result
 from .maintenance import evaluate_maintenance, load_service_history, load_service_plan
 from .mission import run_mission, write_mission_outputs
 from .resources import default_data_root
@@ -24,7 +25,7 @@ def _emit(data: Any, as_json: bool) -> None:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="oce", description="OCE-CTL-01 SIMULATION-ONLY host tools; never hardware control.")
-    parser.add_argument("--version", action="version", version="oce 0.2.0 (simulation-only)")
+    parser.add_argument("--version", action="version", version="oce 0.3.0 (simulation/calculation-only)")
     subcommands = parser.add_subparsers(dest="command", required=True)
     data_root = default_data_root()
     validate = subcommands.add_parser("validate", help="validate source repository or installed runtime data")
@@ -42,6 +43,10 @@ def build_parser() -> argparse.ArgumentParser:
     bom = subcommands.add_parser("bom", help="summarize the concept BOM by subsystem and safety criticality")
     bom.add_argument("--bom", type=Path, default=data_root / "hardware/ctl01/bom/ctl01-bom.csv")
     bom.add_argument("--json", action="store_true", help="emit the full BOM summary as JSON")
+    analyze = subcommands.add_parser("analyze", help="run unreviewed synthetic AN-LC-001A static arithmetic")
+    analyze.add_argument("--input", type=Path, default=data_root / "examples/analysis/synthetic-lc001.json")
+    analyze.add_argument("--output-dir", type=Path, default=Path.cwd() / "builds/analysis/lc001")
+    analyze.add_argument("--json", action="store_true", help="emit the complete analysis result JSON to stdout")
     return parser
 
 
@@ -78,6 +83,18 @@ def main(argv: Sequence[str] | None = None) -> int:
                     if item["status"] != "current":
                         print(f"{item['serviceId']}: {item['status']} — {', '.join(item['reasons'])}")
                 print("Intervals are proposed, not an OEM schedule; no service completion was invented.")
+            return 0
+        if args.command == "analyze":
+            analysis_input = load_analysis_input(args.input)
+            result = calculate_static_longitudinal(analysis_input)
+            result_path = write_analysis_result(result, args.output_dir)
+            _emit(result, args.json)
+            if not args.json:
+                values = result["results"]
+                print(f"Analysis {result['analysisId']}: total mass {values['totalMass_kg']:.3f} kg; resultant x {values['resultantX_m']:.6f} m")
+                print(f"Minimum signed static moment margin: {values['staticMomentMargins_Nm']['minimum']:.3f} N*m")
+                print(f"Result: {result_path}")
+                print("UNREVIEWED synthetic arithmetic only; acceptance NOT_ASSESSED; no physical validation or operational verdict.")
             return 0
         if args.command == "bom":
             report = summarize_bom(args.bom)

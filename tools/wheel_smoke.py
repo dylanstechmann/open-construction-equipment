@@ -89,6 +89,9 @@ def main(argv: list[str] | None = None) -> int:
             if not any(name.endswith(".data/data/share/open-construction-equipment/configs/ctl01.simulation.json")
                        for name in names):
                 raise RuntimeError("wheel lacks installed shared simulation data")
+            if not any(name.endswith(".data/data/share/open-construction-equipment/examples/analysis/synthetic-lc001.json")
+                       for name in names):
+                raise RuntimeError("wheel lacks installed synthetic analysis input")
         target = work / "venv"
         venv.EnvBuilder(with_pip=False, clear=True, symlinks=True).create(target)
         python = target / "bin/python"
@@ -108,6 +111,13 @@ def main(argv: list[str] | None = None) -> int:
             raise RuntimeError(f"installed default simulation failed: {simulation['finalReasons']}")
         if not (run_dir / "builds/demo/result.json").is_file() or not (run_dir / "builds/demo/trajectory.svg").is_file():
             raise RuntimeError("installed simulation did not write default reports in the clean working directory")
+        analysis = json.loads(_run([str(oce), "analyze", "--json"], cwd=run_dir, env=installed_env))
+        if (analysis["analysisId"] != "AN-LC-001A" or analysis["acceptanceStatus"] != "NOT_ASSESSED"
+                or analysis["reviewStatus"] != "UNREVIEWED" or analysis["physicalValidationPerformed"]):
+            raise RuntimeError(f"installed analysis has wrong identity/status: {analysis}")
+        analysis_path = run_dir / "builds/analysis/lc001/result.json"
+        if not analysis_path.is_file() or json.loads(analysis_path.read_text(encoding="utf-8")) != analysis:
+            raise RuntimeError("installed analysis did not write matching default deterministic output")
         maintenance = json.loads(_run([str(oce), "maintenance", "--json"], cwd=run_dir, env=installed_env))
         if maintenance["summary"]["total"] != 20:
             raise RuntimeError("installed maintenance data is incomplete")
@@ -119,6 +129,8 @@ def main(argv: list[str] | None = None) -> int:
               f"{validation['jsonFilesChecked']} JSON, {validation['csvFilesChecked']} CSV)")
         print(f"Installed demo: {simulation['status']}; duration {simulation['metrics']['duration_s']:.3f} s; "
               f"goal error {simulation['metrics']['finalGoalError_m']:.3f} m")
+        print(f"Installed analysis: {analysis['analysisId']}; resultant x {analysis['results']['resultantX_m']:.6f} m; "
+              f"acceptance {analysis['acceptanceStatus']}")
         print(f"Installed maintenance/BOM: {maintenance['summary']['total']} service items; {bom['itemCount']} BOM items")
         print("Wheel licenses/NOTICE: complete and byte-identical to source")
         print("WHEEL SMOKE PASSED — clean non-editable install, offline commands, simulation only.")
