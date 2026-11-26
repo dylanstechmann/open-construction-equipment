@@ -129,6 +129,17 @@ class PrivacyTests(unittest.TestCase):
                     reject_private_location_data(value)
         reject_private_location_data("Generic parcel screening prose and block foundations remain synthetic.")
 
+    def test_canonical_typed_anonymous_local_geometry_is_accepted(self):
+        parcels = parse_geohazard_input(copy.deepcopy(self.data))
+        candidate = parcels[0]
+        reject_private_location_data(candidate, "candidate")
+        reject_private_location_data(LocalPoint)  # Dataclass classes are not instances.
+        self.assertEqual(len(assess_risks(candidate.factors)), 16)
+        result = screen_candidate_parcels((candidate,))
+        document = json.loads(geohazard_result_json(result))
+        self.assertEqual(document["parcels"][0]["anonymousLabel"], "CANDIDATE-A")
+        self.assertFalse(document["locationDataRetained"])
+
     def test_document_loader_validates_and_preserves_envelope(self):
         document = load_geohazard_document(SCREEN_PATH)
         self.assertEqual(document["mode"], "screen")
@@ -312,6 +323,28 @@ class ScreeningTests(unittest.TestCase):
         self.assertFalse(self.result.purchase_recommendation_made)
         self.assertFalse(self.result.location_data_retained)
         self.assertFalse(self.result.physical_validation_performed)
+
+    def test_serializer_rescans_risk_reason_gate_evidence_and_decision_text(self):
+        for attack in ("risk reason", "gate evidence", "decision text"):
+            with self.subTest(attack=attack):
+                parcel = self.result.parcels[0]
+                gates = self.result.human_gates
+                if attack == "risk reason":
+                    risk = replace(parcel.risks[0], reason="123 Main Street")
+                    parcel = replace(parcel, risks=(risk,) + parcel.risks[1:])
+                    expected = r"result\.parcels\[0\]\.risks\[0\]\.reason"
+                elif attack == "gate evidence":
+                    gate = replace(gates[0], required_evidence="Review APN 123-456-789")
+                    gates = (gate,) + gates[1:]
+                    expected = r"result\.human_gates\[0\]\.required_evidence"
+                else:
+                    parcel = replace(parcel, decision="123 Main Street")
+                    expected = r"result\.parcels\[0\]\.decision"
+                result = replace(
+                    self.result, parcels=(parcel,) + self.result.parcels[1:], human_gates=gates,
+                )
+                with self.assertRaisesRegex(ConfigError, expected):
+                    geohazard_result_json(result)
 
     def test_repeat_calls_and_facade_are_byte_identical(self):
         first = geohazard_result_json(self.result)
@@ -507,6 +540,33 @@ class AdaptationTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             path = write_geohazard_result(self.result, temp)
             self.assertEqual(path.read_bytes(), first.encode("utf-8"))
+
+    def test_direct_typed_adaptation_basis_is_rejected_without_output(self):
+        assumption = replace(
+            self.site.adaptation_assumptions[0], basis="Synthetic assumption for parcel ID 98765",
+        )
+        site = replace(
+            self.site, adaptation_assumptions=(assumption,) + self.site.adaptation_assumptions[1:],
+        )
+        with tempfile.TemporaryDirectory() as temp:
+            output = Path(temp) / "output"
+            with self.assertRaisesRegex(ConfigError, r"site\.adaptation_assumptions\[0\]\.basis"):
+                write_geohazard_result(adapt_to_existing_site(site), output)
+            self.assertFalse(output.exists())
+
+    def test_serializer_rescans_adapted_basis_without_output(self):
+        delta = replace(
+            self.result.adaptations[0].delta, basis="Synthetic assumption for APN 123-456-789",
+        )
+        adaptation = replace(self.result.adaptations[0], delta=delta)
+        result = replace(
+            self.result, adaptations=(adaptation,) + self.result.adaptations[1:],
+        )
+        with tempfile.TemporaryDirectory() as temp:
+            output = Path(temp) / "output"
+            with self.assertRaisesRegex(ConfigError, r"result\.adaptations\[0\]\.delta\.basis"):
+                write_geohazard_result(result, output)
+            self.assertFalse(output.exists())
 
     def test_nonfinite_result_is_rejected_before_output(self):
         bad = replace(self.result.adaptations[0].delta, cost_delta=math.nan)

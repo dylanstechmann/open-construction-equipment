@@ -851,6 +851,35 @@ def calculate_energy(model: BunkerPlanInput, registers: BunkerRegisters) -> dict
     }
 
 
+def _evidence_handoff(registers: BunkerRegisters) -> dict[str, Any]:
+    """Reference canonical IDs without turning synthetic evidence into acceptance."""
+    return {
+        "schemaVersion": "1.0.0",
+        "exportType": "SYNTHETIC_EVIDENCE_HANDOFF",
+        "status": "SYNTHETIC_UNREVIEWED",
+        "constructionAuthorized": False,
+        "physicalValidationPerformed": False,
+        "humanAcceptancePerformed": False,
+        "canonicalRegisters": {
+            "workBreakdown": "projects/bunker01/construction/work-breakdown.csv",
+            "qualityGates": "projects/bunker01/construction/quality-gates.csv",
+        },
+        "workPackages": [
+            {
+                "packageId": package.package_id,
+                "requiredGateIds": list(package.required_gate_ids),
+                "evidenceStatus": package.evidence_status,
+            }
+            for package in registers.packages
+        ],
+        "qualityGates": [
+            {"gateId": gate.gate_id, "status": gate.status}
+            for gate in registers.gates
+        ],
+        "notice": "Canonical CSV registers remain authoritative. Synthetic evidence references are separate from human acceptance; no evidence completion or gate acceptance is asserted.",
+    }
+
+
 def plan_bunker(model: BunkerPlanInput, registers: BunkerRegisters, site: SiteStatus) -> dict[str, Any]:
     """Return a blocked synthetic plan regardless of any input authorization flag."""
     if site.site_known or site.construction_authorized or site.physical_validation_performed:
@@ -876,6 +905,7 @@ def plan_bunker(model: BunkerPlanInput, registers: BunkerRegisters, site: SiteSt
         "planningNotice": "Schedule and energy are synthetic planning only. No construction, excavation, entry, occupancy, procurement, physical autonomy, or real-machine control is authorized.",
         "syntheticNotice": model.synthetic_notice,
         "provenance": _provenance_json(model.provenance),
+        "evidenceHandoff": _evidence_handoff(registers),
         "quantityConventions": {
             "units": "SI: metres, square metres, cubic metres, hours and kWh",
             "concrete": "Gross geometric volumes only; no entrance, vent or other opening deductions and no reinforcement estimate. Waste-adjusted concrete is theoretical, never an order quantity.",

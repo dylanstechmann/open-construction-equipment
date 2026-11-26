@@ -360,7 +360,10 @@ def _normalized_key(key: str) -> str:
 def reject_private_location_data(value: Any, path: str = "site") -> None:
     """Fail closed on raw location identifiers, coordinates, and postal text."""
 
-    if isinstance(value, dict):
+    if is_dataclass(value) and not isinstance(value, type):
+        for field in fields(value):
+            reject_private_location_data(getattr(value, field.name), f"{path}.{field.name}")
+    elif isinstance(value, dict):
         for key, item in value.items():
             if not isinstance(key, str):
                 raise ConfigError(f"{path} contains a non-string object key")
@@ -958,6 +961,7 @@ def assess_risks(factors: SiteFactors) -> tuple[RiskAssessment, ...]:
     """Independently evaluate all declared risk domains without averaging them."""
 
     _validate_factors(factors)
+    reject_private_location_data(factors, "factors")
     karst = factors.karst
     water = factors.water
     slope = factors.slope
@@ -1194,8 +1198,9 @@ def screen_candidate_parcels(parcels: Sequence[CandidateParcel]) -> ScreeningRes
         raise ConfigError("parcels must be a non-empty sequence")
     assessments = []
     labels = []
-    for parcel in parcels:
+    for index, parcel in enumerate(parcels):
         _validate_candidate(parcel)
+        reject_private_location_data(parcel, f"parcels[{index}]")
         labels.append(parcel.anonymous_label)
         risks = assess_risks(parcel.factors)
         permits = assess_permits(parcel.factors.permits)
@@ -1241,6 +1246,7 @@ def adapt_to_existing_site(site: ExistingSite) -> AdaptationResult:
     """Accumulate concept adaptations for an existing anonymous site."""
 
     _validate_existing(site)
+    reject_private_location_data(site, "site")
     factors = site.factors
     risks = assess_risks(factors)
     by_domain = {risk.domain: risk for risk in risks}
@@ -1484,6 +1490,7 @@ def geohazard_result_json(result: ScreeningResult | AdaptationResult) -> str:
     """Serialize anonymous derived results with sorted keys and finite numbers."""
 
     _validate_result(result)
+    reject_private_location_data(result, "result")
     compatible = _json_value(result)
     _check_json_value(compatible)
     try:

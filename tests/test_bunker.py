@@ -370,6 +370,30 @@ class BunkerTests(unittest.TestCase):
         self.assertEqual(result["unresolvedGateIds"], [f"BG-{index:03d}" for index in range(1, 16)])
         self.assertIn("synthetic planning only", result["planningNotice"])
 
+    def test_evidence_handoff_is_versioned_reference_only_and_not_acceptance(self):
+        handoff = self.result()["evidenceHandoff"]
+        self.assertEqual(handoff["schemaVersion"], "1.0.0")
+        self.assertEqual(handoff["exportType"], "SYNTHETIC_EVIDENCE_HANDOFF")
+        self.assertEqual(handoff["status"], "SYNTHETIC_UNREVIEWED")
+        self.assertFalse(handoff["constructionAuthorized"])
+        self.assertFalse(handoff["physicalValidationPerformed"])
+        self.assertFalse(handoff["humanAcceptancePerformed"])
+        self.assertEqual(
+            [row["packageId"] for row in handoff["workPackages"]],
+            [package.package_id for package in self.registers.packages],
+        )
+        self.assertEqual(
+            [row["gateId"] for row in handoff["qualityGates"]],
+            [gate.gate_id for gate in self.registers.gates],
+        )
+        for row in handoff["workPackages"]:
+            self.assertEqual(set(row), {"packageId", "requiredGateIds", "evidenceStatus"})
+        for row in handoff["qualityGates"]:
+            self.assertEqual(set(row), {"gateId", "status"})
+            self.assertEqual(row["status"], "UNRESOLVED")
+        self.assertIn("separate from human acceptance", handoff["notice"])
+        self.assertIn("remain authoritative", handoff["notice"])
+
     def test_svg_has_blocking_label_ids_durations_and_autonomy(self):
         svg = schedule_svg(self.result())
         self.assertIn("SYNTHETIC PLAN — CONSTRUCTION BLOCKED", svg)

@@ -128,6 +128,8 @@ After installation, use `oce bunker` with the same options and no checkout paths
 
 Outputs are ignored `builds/bunker01/result.json` and self-contained `builds/bunker01/schedule.svg`. The SVG shows package IDs, relative durations, autonomy classes, ordinary and dashed hypothetical gate-evidence connectors, zero-duration gates, and prominent blocking language. Deterministic measured label columns, wrapped names, variable row heights, compact hour formatting, a dynamic banner, and a bounded critical-path footer prevent fixed-column overlaps. Both artifacts are deterministic and contain no actual dates or locations.
 
+The result's versioned `evidenceHandoff` is a synthetic reference manifest, not an evidence store or acceptance record. It carries canonical BW/BG IDs, package evidence statuses and gate statuses while naming the CSV registers as authoritative; it does not copy gate requirements or acceptance authority. `constructionAuthorized`, `physicalValidationPerformed`, and `humanAcceptancePerformed` remain `false`. Synthetic evidence references are separate from human acceptance and assert neither evidence completion nor gate acceptance.
+
 Default result excerpt:
 
 ```json
