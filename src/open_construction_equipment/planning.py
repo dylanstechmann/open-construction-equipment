@@ -111,9 +111,9 @@ def plan_path(geofence: tuple[Point, ...], obstacles: tuple[Circle, ...], start:
         return grid.segment_free(endpoint, grid.cell_center(cell))
 
     start_cells = [cell for cell in free_cells if connector_free(start, cell)]
-    goal_cells = {cell for cell in free_cells if connector_free(goal, cell)}
     if not start_cells:
         raise NoPathError("no_path", "start has no collision-free connector to a free grid-cell center")
+    goal_cells = {cell for cell in free_cells if connector_free(goal, cell)}
     if not goal_cells:
         raise NoPathError("no_path", "goal has no collision-free connector from a free grid-cell center")
 
