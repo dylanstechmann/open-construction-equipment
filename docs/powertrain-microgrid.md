@@ -282,3 +282,5 @@ and all costs remain synthetic and unquoted.
 ### Battery stock across a task
 
 For paths with an LFP battery, each task row includes `batteryStorage` with opening and closing kWh, charging input, and combined charge/discharge losses. Opening stock plus charging input equals closing stock plus delivered battery discharge plus battery conversion loss. The generator comparators use `null` for this field. Each representative task starts from its configured opening stock.
+
+Each path reports `solarCollected_kWh` after the declared DC collection efficiency. This total reconciles with direct solar delivery, battery charging input, hydrogen production input, and curtailed solar. Initial stored energy and generator output are external to that total.

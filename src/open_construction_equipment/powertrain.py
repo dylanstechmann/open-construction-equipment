@@ -216,6 +216,7 @@ class TaskPathResult:
     findings: tuple[EnergyFinding, ...]
     generator_output_kwh: float = 0.0
     battery_storage: BatteryStorageBalance | None = None
+    solar_collected_kwh: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -768,11 +769,13 @@ def simulate_battery_path(
     stored = battery.initial_stored_energy_kwh
     charge_inputs = []
     discharge_power_limits = []
+    collected_values = []
     direct_values, discharge_values, curtailed_values, loss_values = [], [], [], []
     for interval in task.solar_profile:
         load = _interval_load(required, interval, duration, "interval electric load")
         collected = _product(interval.available_dc_energy_kwh, pv.dc_collection_efficiency,
                              name="collected solar energy")
+        collected_values.append(collected)
         direct = min(load, collected)
         deficit = _sum((load, -direct), "interval electric deficit")
         surplus = _sum((collected, -direct), "interval solar surplus")
@@ -810,6 +813,7 @@ def simulate_battery_path(
         _electric_noise(task, battery), battery_loss,
         0.0, 0.0, 0.0, costs.currency,
         _findings(unserved, task.peak_electric_power_kw > min(discharge_power_limits)),
+        solar_collected_kwh=_sum(collected_values, "collected solar energy"),
         battery_storage=BatteryStorageBalance(battery.initial_stored_energy_kwh,
             _sum(charge_inputs, "battery charging input"), battery_loss, stored),
     )
@@ -837,6 +841,7 @@ def simulate_hydrogen_path(
     ), hydrogen.compression_energy_kwh_kg), "hydrogen specific solar input")
     ac_per_kg = _product(HYDROGEN_LHV_KWH_PER_KG, converter_efficiency, pv.ac_inverter_efficiency,
                          name="hydrogen AC output per kilogram")
+    collected_values = []
     direct_values, battery_values, hydrogen_values, solar_h2_values = [], [], [], []
     produced_values, consumed_values, curtailed_values, loss_values, heat_values = [], [], [], [], []
     for interval in task.solar_profile:
@@ -844,6 +849,7 @@ def simulate_hydrogen_path(
         heat_demand = _interval_load(task.recoverable_heat_demand_kwh, interval, duration, "interval heat demand")
         collected = _product(interval.available_dc_energy_kwh, pv.dc_collection_efficiency,
                              name="collected solar energy")
+        collected_values.append(collected)
         direct = min(load, collected)
         deficit = _sum((load, -direct), "interval electric deficit")
         surplus = _sum((collected, -direct), "interval solar surplus")
@@ -923,6 +929,7 @@ def simulate_hydrogen_path(
         _electric_noise(task, battery), _sum(loss_values, "conversion_loss_heat_kwh"),
         0.0, 0.0, 0.0, costs.currency,
         _findings(unserved, task.peak_electric_power_kw > hydrogen.maximum_reconversion_power_kw, hydrogen=True),
+        solar_collected_kwh=_sum(collected_values, "collected solar energy"),
         battery_storage=BatteryStorageBalance(battery.initial_stored_energy_kwh,
             _sum(charge_inputs, "battery charging input"), _sum(battery_losses, "battery conversion loss"), stored_kwh),
     )
@@ -944,11 +951,13 @@ def simulate_fuel_path(
         raise ConfigError("fuel kind must match the requested generator path")
     required = _required_electrical_energy(task)
     duration = _task_duration(task)
+    collected_values = []
     direct_values, generated_values, fuel_values, curtailed_values, loss_values = [], [], [], [], []
     for interval in task.solar_profile:
         load = _interval_load(required, interval, duration, "interval electric load")
         collected = _product(interval.available_dc_energy_kwh, pv.dc_collection_efficiency,
                              name="collected solar energy")
+        collected_values.append(collected)
         direct = min(load, collected)
         deficit = _sum((load, -direct), "interval electric deficit")
         generated = min(deficit, _product(fuel.maximum_electrical_power_kw, interval.duration_h,
@@ -979,6 +988,7 @@ def simulate_fuel_path(
         _findings(unserved, task.peak_electric_power_kw > fuel.maximum_electrical_power_kw,
                   confined_exhaust=task.confined_excavation),
         generator_output_kwh=generated_total,
+        solar_collected_kwh=_sum(collected_values, "collected solar energy"),
     )
 
 
@@ -1199,6 +1209,14 @@ def _validate_result(result: PowertrainResult) -> None:
             scale = max(stock.opening_kwh, stock.closing_kwh, stock.charging_input_kwh, item.battery_discharge_kwh)
             if abs(residual) > max(1e-9, 1e-12 * scale):
                 raise ConfigError(f"task {item.task_id} path {item.path} violates battery storage balance")
+        collected = _at_least(item.solar_collected_kwh, 0, "collected solar energy")
+        # Subtracting allocated energy can leave roundoff-sized residual curtailment.
+        solar_uses = (item.solar_direct_kwh, item.hydrogen_solar_input_kwh, item.solar_curtailed_kwh,
+                      item.battery_storage.charging_input_kwh if item.battery_storage is not None else 0.0)
+        tolerance = max(1e-9, 1e-12 * collected)
+        residual = _sum((*solar_uses, -collected), "solar allocation residual")
+        if any(flow < -tolerance for flow in solar_uses) or abs(residual) > tolerance:
+            raise ConfigError(f"task {item.task_id} path {item.path} violates solar allocation balance")
         _finite(item.conversion_loss_heat_kwh, "conversion_loss_heat_kwh")
         _finite(item.refill_delivery_km, "refill_delivery_km")
         _finite(item.allocated_capex, "allocated_capex")

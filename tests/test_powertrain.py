@@ -127,6 +127,21 @@ class PowertrainTests(unittest.TestCase):
         with self.assertRaisesRegex(ConfigError, "battery storage balance"):
             powertrain_result_json(replace(result, task_results=(broken, *result.task_results[1:])))
 
+    def test_collected_solar_is_accounted_for_across_all_paths(self):
+        work = task(shaft=8, auxiliary=0, efficiency=1, solar_profile=profile((1, 8, 20), (1, 40, 20)))
+        model = replace(self.model, tasks=(work,), pv=replace(self.pv, dc_collection_efficiency=0.5))
+        result = compare_powertrains(model)
+        for row in json.loads(powertrain_result_json(result))["taskResults"]:
+            with self.subTest(path=row["path"]):
+                self.assertEqual(row["solarCollected_kWh"], 24)
+                charging = (row["batteryStorage"] or {}).get("chargingInput_kWh", 0)
+                self.assertAlmostEqual(row["solarDirect_kWh"] + charging + row["hydrogenSolarInput_kWh"]
+                                       + row["solarCurtailed_kWh"], 24)
+        first = result.task_results[0]
+        broken = replace(first, solar_curtailed_kwh=first.solar_curtailed_kwh + 1)
+        with self.assertRaisesRegex(ConfigError, "solar allocation balance"):
+            powertrain_result_json(replace(result, task_results=(broken,)))
+
     def test_duration_proportional_interval_load_and_direct_pv_first(self):
         work = task(solar_profile=profile((1.0, 3.0, 20.0), (3.0, 0.0, 20.0)))
         result = simulate_battery_path(work, self.pv, self.battery(), self.model.costs)
