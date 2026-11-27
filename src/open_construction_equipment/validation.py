@@ -11,7 +11,10 @@ from typing import Any
 import xml.etree.ElementTree as ET
 
 from .bom import read_bom
-from .bunker import BunkerPlanInput, load_bunker_input, load_bunker_registers, load_bunker_site, plan_bunker
+from .bunker import (
+    BunkerPlanInput, construction_energy_json, load_bunker_input, load_bunker_registers,
+    load_bunker_site, plan_bunker,
+)
 from .cad_blender import (
     export_wavefront,
     generate_blender_python,
@@ -286,6 +289,14 @@ def validate_repository(root: str | Path | None = None) -> dict[str, Any]:
                     f"BG-{number:03d}" for number in range(1, 16)
                 ]):
             raise ConfigError("BUNKER-01 unresolved-gate/no-authorization invariant failed")
+        construction_energy_json(bunker_result["constructionEnergy"])
+        if full_repository:
+            schema = load_json(root / "schemas/bunker-construction-energy.schema.json")
+            export = bunker_result["constructionEnergy"]
+            if (schema.get("additionalProperties") is not False
+                    or set(schema.get("required", ())) != set(export)
+                    or set(schema.get("properties", ())) != set(export)):
+                raise ConfigError("BUNKER-01 construction-energy schema does not match the strict export envelope")
     except (ConfigError, OSError, ValueError, csv.Error, KeyError) as exc:
         errors.append(f"BUNKER-01 planning inputs/references: {exc}")
     if full_repository and bunker_model is not None:

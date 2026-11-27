@@ -25,8 +25,18 @@ schema is not a substitute for the parser.
 The privacy boundary assumes that accidentally supplied real-world identifiers
 could reveal a person, household, property, work site, or neighboring receiver.
 It therefore fails closed **before typed parsing, calculation, or report
-creation**. `reject_private_location_data` recursively scans object keys, array
-items, and every raw string.
+creation**. `reject_private_location_data` recursively scans object keys, list/
+tuple items, dataclass-instance field values, and every encountered string. It
+uses `dataclasses.fields` for dataclass instances and excludes dataclass class
+objects. Field/index paths in errors identify the rejected value.
+
+After structural validation, `assess_risks`, every candidate in
+`screen_candidate_parcels`, and `adapt_to_existing_site` apply this same scanner
+to typed inputs. `geohazard_result_json` applies it again to the complete result
+before conversion to JSON, so private text introduced into a typed result cannot
+bypass the input boundary. `write_geohazard_result` calls that serializer before
+creating its output directory. No second scanner, pattern family, result schema,
+or serializer is involved.
 
 Forbidden key tokens include latitude/longitude, `lat`/`lon`, GPS/GNSS,
 geohashes, plus codes, street or postal fields, APN/assessor/deed references,
@@ -41,7 +51,11 @@ values, geolocation URL queries, coordinate pairs, plus codes, and common postal
 street forms. This is deliberately conservative rather than a promise that all
 possible private information can be detected. A caller must remove or protect
 private source material before invoking the module; generated anonymity is not
-anonymization of a real dataset.
+anonymization of a real dataset. The recursive heuristic does not inspect
+arbitrary non-dataclass object attributes, prove that free text is anonymous, or
+recognize every possible encoding, address, identifier, or indirect disclosure.
+Its successful return is only a check against the implemented key/text patterns,
+not a privacy certification.
 
 Accepted location-adjacent vocabulary is limited in purpose:
 
@@ -223,3 +237,34 @@ construction authorization remains false where that field applies.
 Results are deterministic frozen-dataclass transformations with canonical,
 sorted, finite JSON. Successful software completion never closes a human gate
 or converts a modeled finding into evidence of safety.
+
+## Agent-run verification — 2026-11-16
+
+Using `/home/vscode/.local/bin/python3.12` (Python 3.12.16), the typed/result
+privacy increment produced these observed software results:
+
+- `PYTHONPATH=src python3.12 -m unittest tests.test_geohazard_rural -v` ran 49
+  tests with `OK (skipped=2)`; the two skips are optional `jsonschema` tests.
+- `PYTHONPATH=src python3.12 -m unittest discover -s tests -v` ran 388 tests
+  with `OK (skipped=9)`; skips cover unavailable optional schema/physics tooling.
+- `PYTHONPATH=src python3.12 -m open_construction_equipment validate --json`
+  returned `status: passed`, `errors: []`, 30 JSON and 19 CSV files checked, and
+  one input checked for each site mode.
+- Two fresh CLI runs of each site mode produced byte-identical output, with
+  stdout exactly matching `result.json`. Screening produced 21,056 bytes
+  (SHA-256 `734d8456cd7bed3f16c0d45fb6a0757960ad44fb0a2ff986700f2b0df60d8ca3`);
+  adaptation produced 7,089 bytes
+  (SHA-256 `993850d33f00a69775bc1ef7625999ad11aca89f64cfad683c83a3eec8f508cb`).
+  Both also matched their pre-existing generated reference bytes. All nine site
+  gates remained `UNRESOLVED`; purchase recommendation, location retention,
+  physical validation, construction authorization, and site-engineering
+  completion flags remained false where applicable.
+- `python3.12 tools/check_all.py` completed with `ALL CHECKS PASSED`, including
+  deterministic commands and 45 C++17 host checks. Its wheel smoke was
+  explicitly skipped because preinstalled setuptools 77+ was unavailable;
+  optional external CAD/physics applications and OpenSCAD rendering were not
+  executed.
+
+These are deterministic host-software checks only. They do not establish
+physical validation, site suitability, construction readiness, procurement
+authority, or resolution of any human gate.

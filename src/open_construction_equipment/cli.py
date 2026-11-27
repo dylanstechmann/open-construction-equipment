@@ -155,7 +155,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 print(f"Excavation {quantities['geometry']['excavationVolume_m3']:g} m^3; gross concrete "
                       f"{quantities['concrete']['grossVolume_m3']:g} m^3; modeled-only energy "
                       f"{result['energy']['modeledOnlyElectricEnergy_kWh']:g} kWh")
-                print(f"Reports: {result_path} and {svg_path}")
+                print(f"Reports: {result_path}, {svg_path}, and {result_path.with_name('construction-energy.json')}")
                 print("SYNTHETIC PLAN — CONSTRUCTION BLOCKED; all human gates unresolved; no physical validation or authorization.")
             return 0
         if args.command == "physics":

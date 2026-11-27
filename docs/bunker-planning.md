@@ -115,6 +115,8 @@ Only eight explicitly listed package/fleet pairs carry synthetic electric-energy
 
 Every package appears in `energy.byPackage`; an unmodeled package has `null`, **not zero**. `modeledPackageIds`, `unmodeledPackageIds`, `modeledFleetIds`, and `unmodeledFleetIds` make coverage explicit. The 246 kWh sum is not total project energy. No unmodeled task/fleet energy, peak power, charger size, charging schedule, cost, tariff, date, or autonomous-readiness percentage is inferred.
 
+The versioned `constructionEnergy` object is also written standalone as `construction-energy.json`. Its eight assumptions retain their package/fleet IDs, values, basis and synthetic provenance. All 22 work packages and all eight fleet entries have `estimateStatus`; the 14 unmodeled packages and BF-006 have `electricEnergy_kWh:null`, never zero. Stable source IDs link each row to a source record with a SHA-256 revision fingerprint of canonical parsed content. These fingerprints provide change provenance, not Git revisions, releases or reviews. `energyScope:ONE_TIME_CONSTRUCTION_ONLY` and `habitatDailyOperatingDemandIncluded:false` keep the 246 kWh modeled-only subtotal out of habitat daily operating demand. The strict output envelope is `schemas/bunker-construction-energy.schema.json`; runtime serialization also rejects zeroed unknowns, inconsistent totals/coverage and malformed provenance.
+
 ## Commands and deterministic outputs
 
 From a source checkout:
@@ -126,7 +128,9 @@ PYTHONPATH=src python3 -m open_construction_equipment bunker   --input examples/
 
 After installation, use `oce bunker` with the same options and no checkout paths. Defaults resolve canonical installed resources. Controlled input/register failures print `ERROR: ...` and exit 2 without a traceback.
 
-Outputs are ignored `builds/bunker01/result.json` and self-contained `builds/bunker01/schedule.svg`. The SVG shows package IDs, relative durations, autonomy classes, ordinary and dashed hypothetical gate-evidence connectors, zero-duration gates, and prominent blocking language. Deterministic measured label columns, wrapped names, variable row heights, compact hour formatting, a dynamic banner, and a bounded critical-path footer prevent fixed-column overlaps. Both artifacts are deterministic and contain no actual dates or locations.
+Outputs are ignored `builds/bunker01/result.json`, `builds/bunker01/construction-energy.json` and self-contained `builds/bunker01/schedule.svg`. The SVG shows package IDs, relative durations, autonomy classes, ordinary and dashed hypothetical gate-evidence connectors, zero-duration gates, and prominent blocking language. Deterministic measured label columns, wrapped names, variable row heights, compact hour formatting, a dynamic banner, and a bounded critical-path footer prevent fixed-column overlaps. All three artifacts are deterministic and contain no actual dates or locations.
+
+The result's versioned `evidenceHandoff` is a synthetic reference manifest, not an evidence store or acceptance record. It carries canonical BW/BG IDs, package evidence statuses and gate statuses while naming the CSV registers as authoritative; it does not copy gate requirements or acceptance authority. `constructionAuthorized`, `physicalValidationPerformed`, and `humanAcceptancePerformed` remain `false`. Synthetic evidence references are separate from human acceptance and assert neither evidence completion nor gate acceptance.
 
 Default result excerpt:
 
@@ -139,7 +143,14 @@ Default result excerpt:
     "syntheticDurationHours": 472.0,
     "criticalPathPackageIds": ["BW-001", "BW-002", "BW-003", "BW-005", "BW-006", "BW-007", "BW-008", "BW-010", "BW-011", "BW-012", "BW-013", "BW-014", "BW-015", "BW-016", "BW-018", "BW-019", "BW-020", "BW-021", "BW-022"]
   },
-  "energy": {"modeledOnlyElectricEnergy_kWh": 246.0}
+  "energy": {"modeledOnlyElectricEnergy_kWh": 246.0},
+  "constructionEnergy": {
+    "energyScope": "ONE_TIME_CONSTRUCTION_ONLY",
+    "modeledOnlySubtotal_kWh": 246.0,
+    "unknownWorkPackageCount": 14,
+    "unknownFleetIds": ["BF-006"],
+    "habitatDailyOperatingDemandIncluded": false
+  }
 }
 ```
 

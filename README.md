@@ -80,7 +80,7 @@ The JSON contains structured termination/event data, paths and metrics; the SVG 
 
 `oce analyze` additionally runs AN-LC-001A, an unreviewed static longitudinal load-moment calculation on explicitly synthetic inputs. It writes deterministic `builds/analysis/lc001/result.json`; the sample total mass is 2020 kg and resultant x is 0.144059405940594 m. Acceptance remains `NOT_ASSESSED`: this is neither a stability rating nor a capacity result. See [engineering calculations](docs/engineering-calculations.md).
 
-`oce bunker` runs blocked BUNKER-01 synthetic quantity/dependency/energy arithmetic and writes deterministic `builds/bunker01/result.json` plus `schedule.svg`. The default geometric excavation is 109.5 m³, gross concrete is 17.6625 m³, relative duration is 472 h, and the eight-assumption energy subtotal is 246 kWh. These are not order quantities, total project energy, an excavation/structural design, or an executable construction schedule. All 15 human gates remain unresolved. See [BUNKER-01 planning](docs/bunker-planning.md).
+`oce bunker` runs blocked BUNKER-01 synthetic quantity/dependency/energy arithmetic and writes deterministic `builds/bunker01/result.json`, `construction-energy.json` plus `schedule.svg`. The default geometric excavation is 109.5 m³, gross concrete is 17.6625 m³, relative duration is 472 h, and the eight-assumption energy subtotal is 246 kWh. These are not order quantities, total project energy, an excavation/structural design, or an executable construction schedule. All 15 human gates remain unresolved. See [BUNKER-01 planning](docs/bunker-planning.md).
 
 ## v0.5.0 deterministic trade studies and interchange
 

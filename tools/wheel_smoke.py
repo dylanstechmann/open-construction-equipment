@@ -201,6 +201,17 @@ def main(argv: list[str] | None = None) -> int:
             raise RuntimeError("installed bunker planner did not write matching deterministic JSON")
         if not bunker_svg.is_file() or "SYNTHETIC PLAN — CONSTRUCTION BLOCKED" not in bunker_svg.read_text(encoding="utf-8"):
             raise RuntimeError("installed bunker planner did not write blocked schedule SVG")
+        bunker_energy_path = run_dir / "builds/bunker01/construction-energy.json"
+        if not bunker_energy_path.is_file():
+            raise RuntimeError("installed bunker planner did not write construction-energy JSON")
+        bunker_energy = json.loads(bunker_energy_path.read_text(encoding="utf-8"))
+        unknown_packages = [row for row in bunker_energy["workPackages"] if row["estimateStatus"] == "UNKNOWN"]
+        unknown_fleet = [row for row in bunker_energy["fleet"] if row["estimateStatus"] == "UNKNOWN"]
+        if (bunker_energy != bunker["constructionEnergy"] or bunker_energy["modeledOnlySubtotal_kWh"] != 246
+                or len(unknown_packages) != 14 or len(unknown_fleet) != 1
+                or any(row["electricEnergy_kWh"] is not None for row in unknown_packages + unknown_fleet)
+                or bunker_energy["habitatDailyOperatingDemandIncluded"]):
+            raise RuntimeError("installed bunker construction-energy export has invalid coverage or scope")
         maintenance = json.loads(_run([str(oce), "maintenance", "--json"], cwd=run_dir, env=installed_env))
         if maintenance["summary"]["total"] != 20:
             raise RuntimeError("installed maintenance data is incomplete")

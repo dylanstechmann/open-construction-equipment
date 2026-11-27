@@ -74,11 +74,6 @@ class OccupancyGrid:
         return self.in_bounds(cell) and cell not in self.blocked
 
 
-def _heuristic(a: tuple[int, int], b: tuple[int, int]) -> float:
-    dx, dy = abs(a[0] - b[0]), abs(a[1] - b[1])
-    return max(dx, dy) + (math.sqrt(2.0) - 1.0) * min(dx, dy)
-
-
 def _result_path(grid: OccupancyGrid, points: list[Point], visited: int) -> GridPlan:
     distinct: list[Point] = []
     for point in points:
@@ -116,16 +111,16 @@ def plan_path(geofence: tuple[Point, ...], obstacles: tuple[Circle, ...], start:
         return grid.segment_free(endpoint, grid.cell_center(cell))
 
     start_cells = [cell for cell in free_cells if connector_free(start, cell)]
-    goal_cells = [cell for cell in free_cells if connector_free(goal, cell)]
+    goal_cells = {cell for cell in free_cells if connector_free(goal, cell)}
     if not start_cells:
         raise NoPathError("no_path", "start has no collision-free connector to a free grid-cell center")
     if not goal_cells:
         raise NoPathError("no_path", "goal has no collision-free connector from a free grid-cell center")
-    goal_set = set(goal_cells)
 
     def heuristic(cell: tuple[int, int]) -> float:
-        return min(_heuristic(cell, candidate) + grid.cell_center(candidate).distance(goal) / resolution
-                   for candidate in goal_cells)
+        # Straight-line distance bounds every detour and equals the remaining
+        # connector cost at a goal-visible cell, where the search terminates.
+        return grid.cell_center(cell).distance(goal) / resolution
 
     # Cardinal moves precede diagonals; heap fields provide stable deterministic ties.
     neighbors = ((1, 0), (0, 1), (-1, 0), (0, -1), (1, 1), (-1, 1), (-1, -1), (1, -1))
@@ -144,7 +139,7 @@ def plan_path(geofence: tuple[Point, ...], obstacles: tuple[Circle, ...], start:
         if current in closed:
             continue
         closed.add(current)
-        if current in goal_set:
+        if current in goal_cells:
             cells = [current]
             while current in parents:
                 current = parents[current]

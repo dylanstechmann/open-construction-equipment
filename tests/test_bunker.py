@@ -19,6 +19,8 @@ from open_construction_equipment.bunker import (
     WorkPackage,
     QualityGate,
     bunker_result_json,
+    construction_energy_export,
+    construction_energy_json,
     calculate_energy,
     calculate_quantities,
     calculate_schedule,
@@ -39,6 +41,7 @@ ROOT = repository_root()
 INPUT = ROOT / "examples/bunker/synthetic-bunker01.json"
 CONSTRUCTION = ROOT / "projects/bunker01/construction"
 SCHEMA = ROOT / "schemas/bunker-plan.schema.json"
+ENERGY_SCHEMA = ROOT / "schemas/bunker-construction-energy.schema.json"
 
 
 class BunkerTests(unittest.TestCase):
@@ -364,11 +367,137 @@ class BunkerTests(unittest.TestCase):
         self.assertIsNone(schedule["BW-001"]["modeledElectricEnergy_kWh"])
         self.assertIn("not zero energy", energy["coverageNotice"])
 
+    def test_construction_energy_export_acceptance_and_provenance(self):
+        export = construction_energy_export(self.model, self.registers)
+        self.assertEqual(export["modeledOnlySubtotal_kWh"], 246)
+        self.assertEqual(export["modeledAssumptionCount"], 8)
+        self.assertEqual(len(export["assumptions"]), 8)
+        unknown_packages = [row for row in export["workPackages"] if row["estimateStatus"] == "UNKNOWN"]
+        self.assertEqual(len(export["workPackages"]), 22)
+        self.assertEqual(len(unknown_packages), 14)
+        self.assertEqual(export["unknownWorkPackageCount"], 14)
+        self.assertEqual([row["packageId"] for row in unknown_packages], export["unknownWorkPackageIds"])
+        self.assertTrue(all(row["electricEnergy_kWh"] is None for row in unknown_packages))
+        unknown_fleet = [row for row in export["fleet"] if row["estimateStatus"] == "UNKNOWN"]
+        self.assertEqual(len(export["fleet"]), 8)
+        self.assertEqual([(row["fleetId"], row["electricEnergy_kWh"]) for row in unknown_fleet], [("BF-006", None)])
+        self.assertEqual(export["unknownFleetIds"], ["BF-006"])
+        self.assertEqual(export["unknownFleetCount"], 1)
+        modeled = {row["packageId"]: row["electricEnergy_kWh"] for row in export["workPackages"]}
+        self.assertEqual(modeled["BW-008"], 80)
+        self.assertEqual(modeled["BW-020"], 6)
+        self.assertEqual(export["energyScope"], "ONE_TIME_CONSTRUCTION_ONLY")
+        self.assertFalse(export["habitatDailyOperatingDemandIncluded"])
+        self.assertFalse(export["projectEnergyEstimateAvailable"])
+        self.assertFalse(export["constructionAuthorized"])
+        self.assertFalse(export["physicalValidationPerformed"])
+        sources = {row["sourceId"]: row for row in export["sources"]}
+        self.assertEqual(set(sources), {
+            "BUNKER-01-SYNTHETIC-PLAN", "BUNKER-01-WORK-BREAKDOWN", "BUNKER-01-FLEET-REGISTER",
+        })
+        for source in sources.values():
+            self.assertRegex(source["revision"], r"^sha256:[0-9a-f]{64}$")
+        self.assertTrue(all(row["sourceId"] == "BUNKER-01-SYNTHETIC-PLAN" for row in export["assumptions"]))
+        self.assertTrue(export["provenance"]["aiAuthored"])
+        self.assertFalse(export["provenance"]["ownerSupplied"])
+        self.assertFalse(export["provenance"]["siteSupplied"])
+        self.assertIn("not zero", export["notice"])
+        self.assertIn("daily operating demand", export["notice"])
+
+    def test_construction_energy_source_revision_tracks_parsed_content(self):
+        first = construction_energy_export(self.model, self.registers)
+        second = construction_energy_export(self.model, self.registers)
+        self.assertEqual(construction_energy_json(first), construction_energy_json(second))
+        self.data["energyAssumptions"][0]["electricEnergy_kWh"] = 13
+        changed = construction_energy_export(parse_bunker_input(self.data), self.registers)
+        first_sources = {row["sourceId"]: row["revision"] for row in first["sources"]}
+        changed_sources = {row["sourceId"]: row["revision"] for row in changed["sources"]}
+        self.assertNotEqual(
+            first_sources["BUNKER-01-SYNTHETIC-PLAN"], changed_sources["BUNKER-01-SYNTHETIC-PLAN"],
+        )
+        self.assertEqual(
+            first_sources["BUNKER-01-WORK-BREAKDOWN"], changed_sources["BUNKER-01-WORK-BREAKDOWN"],
+        )
+        self.assertEqual(first_sources["BUNKER-01-FLEET-REGISTER"], changed_sources["BUNKER-01-FLEET-REGISTER"])
+
+    def test_construction_energy_validation_rejects_zeroed_unknowns_and_bad_provenance(self):
+        for attack in ("zeroed_unknown", "subtotal", "revision", "extra_field", "daily_demand"):
+            with self.subTest(attack=attack):
+                export = construction_energy_export(self.model, self.registers)
+                if attack == "zeroed_unknown":
+                    row = next(row for row in export["workPackages"] if row["packageId"] == "BW-001")
+                    row["electricEnergy_kWh"] = 0
+                    expected = "unknown energy must be null"
+                elif attack == "subtotal":
+                    export["modeledOnlySubtotal_kWh"] = 245
+                    expected = "modeled subtotal"
+                elif attack == "revision":
+                    export["sources"][0]["revision"] = "unreviewed"
+                    expected = "revision"
+                elif attack == "extra_field":
+                    export["dailyOperatingDemand_kWh"] = 246
+                    expected = "unknown fields"
+                else:
+                    export["habitatDailyOperatingDemandIncluded"] = True
+                    expected = "must be false"
+                with self.assertRaisesRegex(ConfigError, expected):
+                    construction_energy_json(export)
+
+    def test_construction_energy_schema_and_runtime_strictness_agree(self):
+        schema = json.loads(ENERGY_SCHEMA.read_text(encoding="utf-8"))
+        export = construction_energy_export(self.model, self.registers)
+        self.assertFalse(schema["additionalProperties"])
+        self.assertEqual(set(schema["required"]), set(export))
+        self.assertEqual(set(schema["properties"]), set(export))
+        for definition in ("source", "assumption", "workPackage", "fleetEntry", "provenance"):
+            self.assertFalse(schema["$defs"][definition]["additionalProperties"])
+        export["unexpected"] = True
+        with self.assertRaisesRegex(ConfigError, "unknown fields"):
+            construction_energy_json(export)
+
+    @unittest.skipUnless(importlib.util.find_spec("jsonschema"), "optional jsonschema package unavailable")
+    def test_optional_construction_energy_jsonschema_validation(self):
+        import jsonschema
+        schema = json.loads(ENERGY_SCHEMA.read_text(encoding="utf-8"))
+        export = construction_energy_export(self.model, self.registers)
+        jsonschema.Draft202012Validator.check_schema(schema)
+        jsonschema.Draft202012Validator(schema).validate(export)
+        row = next(row for row in export["workPackages"] if row["packageId"] == "BW-001")
+        row["electricEnergy_kWh"] = 0
+        with self.assertRaises(jsonschema.ValidationError):
+            jsonschema.Draft202012Validator(schema).validate(export)
+        with self.assertRaises(ConfigError):
+            construction_energy_json(export)
+
     def test_all_fifteen_gates_block_every_result(self):
         result = self.result()
         self.assertEqual(result["readinessStatus"], "BLOCKED_UNRESOLVED_HUMAN_GATES")
         self.assertEqual(result["unresolvedGateIds"], [f"BG-{index:03d}" for index in range(1, 16)])
         self.assertIn("synthetic planning only", result["planningNotice"])
+
+    def test_evidence_handoff_is_versioned_reference_only_and_not_acceptance(self):
+        handoff = self.result()["evidenceHandoff"]
+        self.assertEqual(handoff["schemaVersion"], "1.0.0")
+        self.assertEqual(handoff["exportType"], "SYNTHETIC_EVIDENCE_HANDOFF")
+        self.assertEqual(handoff["status"], "SYNTHETIC_UNREVIEWED")
+        self.assertFalse(handoff["constructionAuthorized"])
+        self.assertFalse(handoff["physicalValidationPerformed"])
+        self.assertFalse(handoff["humanAcceptancePerformed"])
+        self.assertEqual(
+            [row["packageId"] for row in handoff["workPackages"]],
+            [package.package_id for package in self.registers.packages],
+        )
+        self.assertEqual(
+            [row["gateId"] for row in handoff["qualityGates"]],
+            [gate.gate_id for gate in self.registers.gates],
+        )
+        for row in handoff["workPackages"]:
+            self.assertEqual(set(row), {"packageId", "requiredGateIds", "evidenceStatus"})
+        for row in handoff["qualityGates"]:
+            self.assertEqual(set(row), {"gateId", "status"})
+            self.assertEqual(row["status"], "UNRESOLVED")
+        self.assertIn("separate from human acceptance", handoff["notice"])
+        self.assertIn("remain authoritative", handoff["notice"])
 
     def test_svg_has_blocking_label_ids_durations_and_autonomy(self):
         svg = schedule_svg(self.result())
@@ -395,6 +524,8 @@ class BunkerTests(unittest.TestCase):
         first = self.result()
         second = self.result()
         self.assertEqual(bunker_result_json(first), bunker_result_json(second))
+        self.assertEqual(construction_energy_json(first["constructionEnergy"]),
+                         construction_energy_json(second["constructionEnergy"]))
         self.assertEqual(schedule_svg(first), schedule_svg(second))
         output_a = self.temp_path / "a"
         output_b = self.temp_path / "b"
@@ -402,6 +533,10 @@ class BunkerTests(unittest.TestCase):
         write_bunker_outputs(second, output_b)
         self.assertEqual((output_a / "result.json").read_bytes(), (output_b / "result.json").read_bytes())
         self.assertEqual((output_a / "schedule.svg").read_bytes(), (output_b / "schedule.svg").read_bytes())
+        self.assertEqual((output_a / "construction-energy.json").read_bytes(),
+                         (output_b / "construction-energy.json").read_bytes())
+        self.assertEqual(json.loads((output_a / "construction-energy.json").read_text(encoding="utf-8")),
+                         first["constructionEnergy"])
 
     def test_wrong_csv_row_width_is_controlled(self):
         path = self.temp_path / "wide-work.csv"
@@ -654,6 +789,14 @@ class BunkerTests(unittest.TestCase):
         self.assertEqual(report["schedule"]["syntheticDurationHours"], 472)
         self.assertEqual((output / "result.json").read_text(encoding="utf-8"), completed.stdout)
         self.assertTrue((output / "schedule.svg").is_file())
+        energy_path = output / "construction-energy.json"
+        self.assertTrue(energy_path.is_file())
+        energy = json.loads(energy_path.read_text(encoding="utf-8"))
+        self.assertEqual(energy, report["constructionEnergy"])
+        self.assertEqual(energy["modeledOnlySubtotal_kWh"], 246)
+        self.assertEqual(energy["unknownWorkPackageCount"], 14)
+        self.assertEqual(energy["unknownFleetIds"], ["BF-006"])
+        self.assertFalse(energy["habitatDailyOperatingDemandIncluded"])
 
     def test_cli_invalid_input_and_missing_register_are_controlled(self):
         bad = self.write_input({}, "bad.json")

@@ -9,7 +9,8 @@ This is deterministic host-side arithmetic for a civilian non-habitable utility
 from __future__ import annotations
 
 import csv
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
+import hashlib
 import heapq
 import html
 import json
@@ -46,6 +47,16 @@ _ID_PATTERNS = {
     "quality gate": re.compile(r"BG-\d{3}\Z"),
     "fleet": re.compile(r"BF-\d{3}\Z"),
 }
+_CONSTRUCTION_ENERGY_SOURCE_IDS = {
+    "plan": "BUNKER-01-SYNTHETIC-PLAN",
+    "work": "BUNKER-01-WORK-BREAKDOWN",
+    "fleet": "BUNKER-01-FLEET-REGISTER",
+}
+_SOURCE_REVISION_METHOD = (
+    "SHA-256 over UTF-8 canonical JSON (sorted keys, compact separators) of parsed source content; "
+    "an integrity fingerprint, not a release or review status"
+)
+_SOURCE_REVISION_PATTERN = re.compile(r"sha256:[0-9a-f]{64}\Z")
 
 
 @dataclass(frozen=True)
@@ -851,6 +862,294 @@ def calculate_energy(model: BunkerPlanInput, registers: BunkerRegisters) -> dict
     }
 
 
+def _source_revision(value: Any) -> str:
+    """Fingerprint parsed source content without depending on checkout paths or Git."""
+    try:
+        encoded = json.dumps(
+            value, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False,
+        ).encode("utf-8")
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise ConfigError(f"cannot fingerprint construction-energy source: {exc}") from exc
+    return f"sha256:{hashlib.sha256(encoded).hexdigest()}"
+
+
+def _construction_energy_export(
+    model: BunkerPlanInput, registers: BunkerRegisters, energy: dict[str, Any],
+) -> dict[str, Any]:
+    source_revisions = {
+        "plan": _source_revision(asdict(model)),
+        "work": _source_revision([asdict(package) for package in registers.packages]),
+        "fleet": _source_revision([asdict(entry) for entry in registers.fleet]),
+    }
+    canonical_paths = {
+        "plan": ("examples/bunker/synthetic-bunker01.json", "ENERGY_ASSUMPTIONS"),
+        "work": ("projects/bunker01/construction/work-breakdown.csv", "WORK_PACKAGE_REGISTER"),
+        "fleet": ("projects/bunker01/construction/fleet-register.csv", "FLEET_REGISTER"),
+    }
+    sources = [
+        {
+            "sourceId": _CONSTRUCTION_ENERGY_SOURCE_IDS[key],
+            "canonicalPath": canonical_paths[key][0],
+            "role": canonical_paths[key][1],
+            "revision": source_revisions[key],
+        }
+        for key in ("plan", "work", "fleet")
+    ]
+    package_energy = {row["packageId"]: row["electricEnergy_kWh"] for row in energy["byPackage"]}
+    fleet_energy = {row["fleetId"]: row["electricEnergy_kWh"] for row in energy["byFleet"]}
+    work_packages = [
+        {
+            "sourceId": _CONSTRUCTION_ENERGY_SOURCE_IDS["work"],
+            "packageId": package.package_id,
+            "estimateStatus": "MODELED_SYNTHETIC" if package_energy[package.package_id] is not None else "UNKNOWN",
+            "electricEnergy_kWh": package_energy[package.package_id],
+        }
+        for package in sorted(registers.packages, key=lambda item: item.package_id)
+    ]
+    fleet = [
+        {
+            "sourceId": _CONSTRUCTION_ENERGY_SOURCE_IDS["fleet"],
+            "fleetId": entry.fleet_id,
+            "estimateStatus": "MODELED_SYNTHETIC" if entry.fleet_id in fleet_energy else "UNKNOWN",
+            "electricEnergy_kWh": fleet_energy.get(entry.fleet_id),
+        }
+        for entry in sorted(registers.fleet, key=lambda item: item.fleet_id)
+    ]
+    result = {
+        "schemaVersion": "1.0.0",
+        "exportId": "BUNKER-01-CONSTRUCTION-ENERGY",
+        "exportType": "SYNTHETIC_CONSTRUCTION_ENERGY_EXPORT",
+        "projectId": PROJECT_ID,
+        "status": "SYNTHETIC_UNREVIEWED",
+        "unitSystem": "SI",
+        "energyUnit": "kWh",
+        "energyScope": "ONE_TIME_CONSTRUCTION_ONLY",
+        "constructionAuthorized": False,
+        "physicalValidationPerformed": False,
+        "habitatDailyOperatingDemandIncluded": False,
+        "provenance": _provenance_json(model.provenance),
+        "sourceRevisionMethod": _SOURCE_REVISION_METHOD,
+        "sources": sources,
+        "assumptions": [
+            {"sourceId": _CONSTRUCTION_ENERGY_SOURCE_IDS["plan"], **assumption}
+            for assumption in energy["assumptions"]
+        ],
+        "modeledOnlySubtotal_kWh": energy["modeledOnlyElectricEnergy_kWh"],
+        "modeledAssumptionCount": len(energy["assumptions"]),
+        "workPackages": work_packages,
+        "fleet": fleet,
+        "modeledWorkPackageIds": energy["modeledPackageIds"],
+        "unknownWorkPackageIds": energy["unmodeledPackageIds"],
+        "unknownWorkPackageCount": len(energy["unmodeledPackageIds"]),
+        "modeledFleetIds": energy["modeledFleetIds"],
+        "unknownFleetIds": energy["unmodeledFleetIds"],
+        "unknownFleetCount": len(energy["unmodeledFleetIds"]),
+        "projectEnergyEstimateAvailable": False,
+        "notice": (
+            "One-time synthetic construction energy only. Null marks unknown energy, not zero. "
+            "The modeled subtotal is not total project energy and includes no habitat daily operating demand."
+        ),
+    }
+    validate_construction_energy_export(result)
+    return result
+
+
+def construction_energy_export(model: BunkerPlanInput, registers: BunkerRegisters) -> dict[str, Any]:
+    """Export modeled one-time construction energy and every explicit unknown."""
+    return _construction_energy_export(model, registers, calculate_energy(model, registers))
+
+
+def _export_id_list(value: Any, kind: str, name: str) -> list[str]:
+    if not isinstance(value, list):
+        raise ConfigError(f"{name} must be an array")
+    result = [_identifier({"value": item}, "value", kind, name) for item in value]
+    if len(set(result)) != len(result):
+        raise ConfigError(f"{name} contains duplicate IDs")
+    return result
+
+
+def validate_construction_energy_export(export: dict[str, Any]) -> None:
+    """Fail closed on malformed coverage, provenance, totals or zeroed unknowns."""
+    data = _mapping(export, "construction energy export")
+    required = {
+        "schemaVersion", "exportId", "exportType", "projectId", "status", "unitSystem", "energyUnit",
+        "energyScope", "constructionAuthorized", "physicalValidationPerformed",
+        "habitatDailyOperatingDemandIncluded", "provenance", "sourceRevisionMethod", "sources",
+        "assumptions", "modeledOnlySubtotal_kWh", "modeledAssumptionCount", "workPackages", "fleet",
+        "modeledWorkPackageIds", "unknownWorkPackageIds", "unknownWorkPackageCount", "modeledFleetIds",
+        "unknownFleetIds", "unknownFleetCount", "projectEnergyEstimateAvailable", "notice",
+    }
+    _keys(data, required, set(), "construction energy export")
+    constants = {
+        "schemaVersion": "1.0.0",
+        "exportId": "BUNKER-01-CONSTRUCTION-ENERGY",
+        "exportType": "SYNTHETIC_CONSTRUCTION_ENERGY_EXPORT",
+        "projectId": PROJECT_ID,
+        "status": "SYNTHETIC_UNREVIEWED",
+        "unitSystem": "SI",
+        "energyUnit": "kWh",
+        "energyScope": "ONE_TIME_CONSTRUCTION_ONLY",
+        "sourceRevisionMethod": _SOURCE_REVISION_METHOD,
+    }
+    for key, expected in constants.items():
+        if data[key] != expected:
+            raise ConfigError(f"construction energy export.{key} must be {expected}")
+    for key in (
+        "constructionAuthorized", "physicalValidationPerformed", "habitatDailyOperatingDemandIncluded",
+        "projectEnergyEstimateAvailable",
+    ):
+        if data[key] is not False:
+            raise ConfigError(f"construction energy export.{key} must be false")
+    _provenance(data["provenance"], "construction energy export.provenance")
+    notice = _xml_string(data["notice"], "construction energy export.notice")
+    if "not zero" not in notice or "daily operating demand" not in notice:
+        raise ConfigError("construction energy export notice must retain unknown and operating-demand boundaries")
+
+    sources = data["sources"]
+    if not isinstance(sources, list) or len(sources) != 3:
+        raise ConfigError("construction energy export.sources must contain three source records")
+    for index, key in enumerate(("plan", "work", "fleet")):
+        name = f"construction energy export.sources[{index}]"
+        source = _mapping(sources[index], name)
+        _keys(source, {"sourceId", "canonicalPath", "role", "revision"}, set(), name)
+        expected_paths = {
+            "plan": ("examples/bunker/synthetic-bunker01.json", "ENERGY_ASSUMPTIONS"),
+            "work": ("projects/bunker01/construction/work-breakdown.csv", "WORK_PACKAGE_REGISTER"),
+            "fleet": ("projects/bunker01/construction/fleet-register.csv", "FLEET_REGISTER"),
+        }
+        expected_path, expected_role = expected_paths[key]
+        if (source["sourceId"] != _CONSTRUCTION_ENERGY_SOURCE_IDS[key]
+                or source["canonicalPath"] != expected_path or source["role"] != expected_role):
+            raise ConfigError(f"{name} does not match its stable source identity")
+        revision = _string(source, "revision", name)
+        if not _SOURCE_REVISION_PATTERN.fullmatch(revision):
+            raise ConfigError(f"{name}.revision must be a SHA-256 content fingerprint")
+
+    assumptions = data["assumptions"]
+    if not isinstance(assumptions, list):
+        raise ConfigError("construction energy export.assumptions must be an array")
+    package_totals: dict[str, float] = {}
+    fleet_totals: dict[str, float] = {}
+    pairs: set[tuple[str, str]] = set()
+    for index, item in enumerate(assumptions):
+        name = f"construction energy export.assumptions[{index}]"
+        row = _mapping(item, name)
+        _keys(row, {"sourceId", "packageId", "fleetId", "electricEnergy_kWh", "basis", "provenance"}, set(), name)
+        if row["sourceId"] != _CONSTRUCTION_ENERGY_SOURCE_IDS["plan"]:
+            raise ConfigError(f"{name}.sourceId must reference the synthetic plan")
+        package_id = _identifier(row, "packageId", "work package", name)
+        fleet_id = _identifier(row, "fleetId", "fleet", name)
+        if (package_id, fleet_id) in pairs:
+            raise ConfigError(f"duplicate construction energy assumption for {package_id}/{fleet_id}")
+        pairs.add((package_id, fleet_id))
+        value = _number(row, "electricEnergy_kWh", name, 0, strict_low=True)
+        _xml_string(row["basis"], f"{name}.basis")
+        _provenance(row["provenance"], f"{name}.provenance")
+        package_totals[package_id] = _sum(
+            (package_totals.get(package_id, 0.0), value), f"{package_id} export modeled energy",
+        )
+        fleet_totals[fleet_id] = _sum(
+            (fleet_totals.get(fleet_id, 0.0), value), f"{fleet_id} export modeled energy",
+        )
+
+    def rows_by_id(field: str, id_key: str, kind: str, source_key: str) -> dict[str, dict[str, Any]]:
+        rows = data[field]
+        if not isinstance(rows, list):
+            raise ConfigError(f"construction energy export.{field} must be an array")
+        result: dict[str, dict[str, Any]] = {}
+        for index, item in enumerate(rows):
+            name = f"construction energy export.{field}[{index}]"
+            row = _mapping(item, name)
+            _keys(row, {"sourceId", id_key, "estimateStatus", "electricEnergy_kWh"}, set(), name)
+            if row["sourceId"] != _CONSTRUCTION_ENERGY_SOURCE_IDS[source_key]:
+                raise ConfigError(f"{name}.sourceId does not match its register")
+            row_id = _identifier(row, id_key, kind, name)
+            if row_id in result:
+                raise ConfigError(f"duplicate construction energy {kind} ID {row_id}")
+            status = row["estimateStatus"]
+            if not isinstance(status, str) or status not in {"MODELED_SYNTHETIC", "UNKNOWN"}:
+                raise ConfigError(f"{name}.estimateStatus is unsupported")
+            if status == "UNKNOWN":
+                if row["electricEnergy_kWh"] is not None:
+                    raise ConfigError(f"{name} unknown energy must be null, not zero or a modeled value")
+            else:
+                _number(row, "electricEnergy_kWh", name, 0, strict_low=True)
+            result[row_id] = row
+        return result
+
+    package_rows = rows_by_id("workPackages", "packageId", "work package", "work")
+    fleet_rows = rows_by_id("fleet", "fleetId", "fleet", "fleet")
+    modeled_packages = sorted(row_id for row_id, row in package_rows.items() if row["estimateStatus"] == "MODELED_SYNTHETIC")
+    unknown_packages = sorted(row_id for row_id, row in package_rows.items() if row["estimateStatus"] == "UNKNOWN")
+    modeled_fleet = sorted(row_id for row_id, row in fleet_rows.items() if row["estimateStatus"] == "MODELED_SYNTHETIC")
+    unknown_fleet = sorted(row_id for row_id, row in fleet_rows.items() if row["estimateStatus"] == "UNKNOWN")
+    if modeled_packages != sorted(package_totals) or modeled_fleet != sorted(fleet_totals):
+        raise ConfigError("construction energy modeled rows do not match assumption coverage")
+    for row_id, total in package_totals.items():
+        if package_rows[row_id]["electricEnergy_kWh"] != total:
+            raise ConfigError(f"construction energy package subtotal mismatch for {row_id}")
+    for row_id, total in fleet_totals.items():
+        if fleet_rows[row_id]["electricEnergy_kWh"] != total:
+            raise ConfigError(f"construction energy fleet subtotal mismatch for {row_id}")
+    subtotal = _number(data, "modeledOnlySubtotal_kWh", "construction energy export", 0)
+    expected_subtotal = _sum(package_totals.values(), "construction energy export modeled subtotal")
+    fleet_subtotal = _sum(fleet_totals.values(), "construction energy export fleet subtotal")
+    if subtotal != expected_subtotal or subtotal != fleet_subtotal:
+        raise ConfigError("construction energy modeled subtotal does not match assumptions")
+
+    expected_lists = {
+        "modeledWorkPackageIds": (modeled_packages, "work package"),
+        "unknownWorkPackageIds": (unknown_packages, "work package"),
+        "modeledFleetIds": (modeled_fleet, "fleet"),
+        "unknownFleetIds": (unknown_fleet, "fleet"),
+    }
+    for key, (expected, kind) in expected_lists.items():
+        actual = _export_id_list(data[key], kind, f"construction energy export.{key}")
+        if actual != expected:
+            raise ConfigError(f"construction energy export.{key} does not match row coverage")
+    for key, expected in (
+        ("modeledAssumptionCount", len(assumptions)),
+        ("unknownWorkPackageCount", len(unknown_packages)),
+        ("unknownFleetCount", len(unknown_fleet)),
+    ):
+        if type(data[key]) is not int or data[key] != expected:
+            raise ConfigError(f"construction energy export.{key} does not match row coverage")
+
+
+def construction_energy_json(export: dict[str, Any]) -> str:
+    validate_construction_energy_export(export)
+    return json.dumps(export, indent=2, sort_keys=True, ensure_ascii=False, allow_nan=False) + "\n"
+
+
+def _evidence_handoff(registers: BunkerRegisters) -> dict[str, Any]:
+    """Reference canonical IDs without turning synthetic evidence into acceptance."""
+    return {
+        "schemaVersion": "1.0.0",
+        "exportType": "SYNTHETIC_EVIDENCE_HANDOFF",
+        "status": "SYNTHETIC_UNREVIEWED",
+        "constructionAuthorized": False,
+        "physicalValidationPerformed": False,
+        "humanAcceptancePerformed": False,
+        "canonicalRegisters": {
+            "workBreakdown": "projects/bunker01/construction/work-breakdown.csv",
+            "qualityGates": "projects/bunker01/construction/quality-gates.csv",
+        },
+        "workPackages": [
+            {
+                "packageId": package.package_id,
+                "requiredGateIds": list(package.required_gate_ids),
+                "evidenceStatus": package.evidence_status,
+            }
+            for package in registers.packages
+        ],
+        "qualityGates": [
+            {"gateId": gate.gate_id, "status": gate.status}
+            for gate in registers.gates
+        ],
+        "notice": "Canonical CSV registers remain authoritative. Synthetic evidence references are separate from human acceptance; no evidence completion or gate acceptance is asserted.",
+    }
+
+
 def plan_bunker(model: BunkerPlanInput, registers: BunkerRegisters, site: SiteStatus) -> dict[str, Any]:
     """Return a blocked synthetic plan regardless of any input authorization flag."""
     if site.site_known or site.construction_authorized or site.physical_validation_performed:
@@ -860,6 +1159,7 @@ def plan_bunker(model: BunkerPlanInput, registers: BunkerRegisters, site: SiteSt
         raise ConfigError("every BUNKER-01 human gate must remain unresolved")
     schedule = calculate_schedule(registers)
     energy = calculate_energy(model, registers)
+    construction_energy = _construction_energy_export(model, registers, energy)
     package_energy = {row["packageId"]: row["electricEnergy_kWh"] for row in energy["byPackage"]}
     for package in schedule["packages"]:
         package["modeledElectricEnergy_kWh"] = package_energy[package["packageId"]]
@@ -876,6 +1176,7 @@ def plan_bunker(model: BunkerPlanInput, registers: BunkerRegisters, site: SiteSt
         "planningNotice": "Schedule and energy are synthetic planning only. No construction, excavation, entry, occupancy, procurement, physical autonomy, or real-machine control is authorized.",
         "syntheticNotice": model.synthetic_notice,
         "provenance": _provenance_json(model.provenance),
+        "evidenceHandoff": _evidence_handoff(registers),
         "quantityConventions": {
             "units": "SI: metres, square metres, cubic metres, hours and kWh",
             "concrete": "Gross geometric volumes only; no entrance, vent or other opening deductions and no reinforcement estimate. Waste-adjusted concrete is theoretical, never an order quantity.",
@@ -886,6 +1187,7 @@ def plan_bunker(model: BunkerPlanInput, registers: BunkerRegisters, site: SiteSt
         "quantities": calculate_quantities(model),
         "schedule": schedule,
         "energy": energy,
+        "constructionEnergy": construction_energy,
         "exclusions": [
             "structural or reinforcement design", "excavation protective-system or work plan", "safe shelter or occupancy approval",
             "procurement or order quantities", "permit package", "real site data or prices", "supplier selection",
@@ -895,6 +1197,8 @@ def plan_bunker(model: BunkerPlanInput, registers: BunkerRegisters, site: SiteSt
 
 
 def bunker_result_json(result: dict[str, Any]) -> str:
+    if "constructionEnergy" in result:
+        validate_construction_energy_export(result["constructionEnergy"])
     return json.dumps(result, indent=2, sort_keys=True, ensure_ascii=False, allow_nan=False) + "\n"
 
 
@@ -1034,11 +1338,14 @@ def schedule_svg(result: dict[str, Any]) -> str:
 
 def write_bunker_outputs(result: dict[str, Any], output_dir: str | Path) -> tuple[Path, Path]:
     destination = Path(output_dir)
-    destination.mkdir(parents=True, exist_ok=True)
     result_path = destination / "result.json"
     svg_path = destination / "schedule.svg"
+    energy_path = destination / "construction-energy.json"
     result_text = bunker_result_json(result)
+    energy_text = construction_energy_json(result["constructionEnergy"])
     svg_text = schedule_svg(result)
+    destination.mkdir(parents=True, exist_ok=True)
     result_path.write_text(result_text, encoding="utf-8", newline="\n")
     svg_path.write_text(svg_text, encoding="utf-8", newline="\n")
+    energy_path.write_text(energy_text, encoding="utf-8", newline="\n")
     return result_path, svg_path

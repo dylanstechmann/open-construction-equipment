@@ -1,7 +1,8 @@
 # SPDX-License-Identifier: Apache-2.0
 import unittest
+from unittest.mock import patch
 
-from open_construction_equipment.geometry import Circle, Point, obstacle_clearance, segment_is_clear
+from open_construction_equipment.geometry import Circle, Point, obstacle_clearance, path_length, segment_is_clear
 from open_construction_equipment.planning import NoPathError, OccupancyGrid, plan_path
 
 
@@ -23,6 +24,27 @@ class PlanningTests(unittest.TestCase):
             self.assertGreaterEqual(obstacle_clearance(waypoint, 0.5, (obstacle,)), -1e-9)
         for start, end in zip(result.path, result.path[1:]):
             self.assertTrue(segment_is_clear(start, end, 0.5, self.fence, (obstacle,)))
+
+    def test_open_grid_with_off_center_endpoints(self):
+        fence = (Point(0, 0), Point(3, 0), Point(3, 2), Point(0, 2))
+        start, goal = Point(0.35, 0.55), Point(2.45, 1.6)
+        distance = Point.distance
+        goal_distances = 0
+
+        def count_distance(point, other):
+            nonlocal goal_distances
+            if other is goal:
+                goal_distances += 1
+            return distance(point, other)
+
+        with patch.object(Point, "distance", count_distance):
+            plan = plan_path(fence, (), start, goal, resolution=0.5, inflation=0.1)
+
+        # Several cell centers lie on the straight line between the exact endpoints.
+        self.assertEqual((plan.path[0], plan.path[-1]), (start, goal))
+        self.assertAlmostEqual(path_length(plan.path), start.distance(goal))
+        # All 24 centers see the goal. A pairwise scan would take 24² distances.
+        self.assertLessEqual(goal_distances, 2 * 24)
 
     def test_coarse_plan_checks_every_segment_and_exact_connectors(self):
         fence = (Point(0, 0), Point(12, 0), Point(12, 12), Point(0, 12))

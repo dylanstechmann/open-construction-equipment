@@ -1,0 +1,379 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/open-construction-equipment/bunker-construction-energy.schema.json",
+  "title": "BUNKER-01 synthetic one-time construction-energy export",
+  "description": "Modeled synthetic construction assumptions and explicit unknowns only. Null means unknown, not zero. This is not total project energy or habitat daily operating demand and authorizes no physical work.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "exportId",
+    "exportType",
+    "projectId",
+    "status",
+    "unitSystem",
+    "energyUnit",
+    "energyScope",
+    "constructionAuthorized",
+    "physicalValidationPerformed",
+    "habitatDailyOperatingDemandIncluded",
+    "provenance",
+    "sourceRevisionMethod",
+    "sources",
+    "assumptions",
+    "modeledOnlySubtotal_kWh",
+    "modeledAssumptionCount",
+    "workPackages",
+    "fleet",
+    "modeledWorkPackageIds",
+    "unknownWorkPackageIds",
+    "unknownWorkPackageCount",
+    "modeledFleetIds",
+    "unknownFleetIds",
+    "unknownFleetCount",
+    "projectEnergyEstimateAvailable",
+    "notice"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "exportId": {
+      "const": "BUNKER-01-CONSTRUCTION-ENERGY"
+    },
+    "exportType": {
+      "const": "SYNTHETIC_CONSTRUCTION_ENERGY_EXPORT"
+    },
+    "projectId": {
+      "const": "BUNKER-01"
+    },
+    "status": {
+      "const": "SYNTHETIC_UNREVIEWED"
+    },
+    "unitSystem": {
+      "const": "SI"
+    },
+    "energyUnit": {
+      "const": "kWh"
+    },
+    "energyScope": {
+      "const": "ONE_TIME_CONSTRUCTION_ONLY"
+    },
+    "constructionAuthorized": {
+      "const": false
+    },
+    "physicalValidationPerformed": {
+      "const": false
+    },
+    "habitatDailyOperatingDemandIncluded": {
+      "const": false
+    },
+    "provenance": {
+      "$ref": "#/$defs/provenance"
+    },
+    "sourceRevisionMethod": {
+      "$ref": "#/$defs/nonEmptyString"
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "$ref": "#/$defs/source"
+      }
+    },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/assumption"
+      }
+    },
+    "modeledOnlySubtotal_kWh": {
+      "$ref": "#/$defs/nonnegativeNumber"
+    },
+    "modeledAssumptionCount": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "workPackages": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/workPackage"
+      }
+    },
+    "fleet": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/fleetEntry"
+      }
+    },
+    "modeledWorkPackageIds": {
+      "$ref": "#/$defs/workPackageIds"
+    },
+    "unknownWorkPackageIds": {
+      "$ref": "#/$defs/workPackageIds"
+    },
+    "unknownWorkPackageCount": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "modeledFleetIds": {
+      "$ref": "#/$defs/fleetIds"
+    },
+    "unknownFleetIds": {
+      "$ref": "#/$defs/fleetIds"
+    },
+    "unknownFleetCount": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "projectEnergyEstimateAvailable": {
+      "const": false
+    },
+    "notice": {
+      "$ref": "#/$defs/nonEmptyString"
+    }
+  },
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "positiveNumber": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "nonnegativeNumber": {
+      "type": "number",
+      "minimum": 0
+    },
+    "workPackageIds": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^BW-[0-9]{3}$"
+      }
+    },
+    "fleetIds": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^BF-[0-9]{3}$"
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceType",
+        "statement",
+        "aiAuthored",
+        "ownerSupplied",
+        "siteSupplied",
+        "physicalValidationPerformed"
+      ],
+      "properties": {
+        "sourceType": {
+          "const": "SYNTHETIC_AGENT_AUTHORED"
+        },
+        "statement": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "aiAuthored": {
+          "const": true
+        },
+        "ownerSupplied": {
+          "const": false
+        },
+        "siteSupplied": {
+          "const": false
+        },
+        "physicalValidationPerformed": {
+          "const": false
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceId",
+        "canonicalPath",
+        "role",
+        "revision"
+      ],
+      "properties": {
+        "sourceId": {
+          "type": "string",
+          "enum": [
+            "BUNKER-01-SYNTHETIC-PLAN",
+            "BUNKER-01-WORK-BREAKDOWN",
+            "BUNKER-01-FLEET-REGISTER"
+          ]
+        },
+        "canonicalPath": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "ENERGY_ASSUMPTIONS",
+            "WORK_PACKAGE_REGISTER",
+            "FLEET_REGISTER"
+          ]
+        },
+        "revision": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      }
+    },
+    "assumption": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceId",
+        "packageId",
+        "fleetId",
+        "electricEnergy_kWh",
+        "basis",
+        "provenance"
+      ],
+      "properties": {
+        "sourceId": {
+          "const": "BUNKER-01-SYNTHETIC-PLAN"
+        },
+        "packageId": {
+          "type": "string",
+          "pattern": "^BW-[0-9]{3}$"
+        },
+        "fleetId": {
+          "type": "string",
+          "pattern": "^BF-[0-9]{3}$"
+        },
+        "electricEnergy_kWh": {
+          "$ref": "#/$defs/positiveNumber"
+        },
+        "basis": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "provenance": {
+          "$ref": "#/$defs/provenance"
+        }
+      }
+    },
+    "workPackage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceId",
+        "packageId",
+        "estimateStatus",
+        "electricEnergy_kWh"
+      ],
+      "properties": {
+        "sourceId": {
+          "const": "BUNKER-01-WORK-BREAKDOWN"
+        },
+        "packageId": {
+          "type": "string",
+          "pattern": "^BW-[0-9]{3}$"
+        },
+        "estimateStatus": {
+          "type": "string",
+          "enum": [
+            "MODELED_SYNTHETIC",
+            "UNKNOWN"
+          ]
+        },
+        "electricEnergy_kWh": {}
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "estimateStatus": {
+                "const": "UNKNOWN"
+              }
+            },
+            "required": [
+              "estimateStatus"
+            ]
+          },
+          "then": {
+            "properties": {
+              "electricEnergy_kWh": {
+                "type": "null"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "electricEnergy_kWh": {
+                "$ref": "#/$defs/positiveNumber"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "fleetEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceId",
+        "fleetId",
+        "estimateStatus",
+        "electricEnergy_kWh"
+      ],
+      "properties": {
+        "sourceId": {
+          "const": "BUNKER-01-FLEET-REGISTER"
+        },
+        "fleetId": {
+          "type": "string",
+          "pattern": "^BF-[0-9]{3}$"
+        },
+        "estimateStatus": {
+          "type": "string",
+          "enum": [
+            "MODELED_SYNTHETIC",
+            "UNKNOWN"
+          ]
+        },
+        "electricEnergy_kWh": {}
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "estimateStatus": {
+                "const": "UNKNOWN"
+              }
+            },
+            "required": [
+              "estimateStatus"
+            ]
+          },
+          "then": {
+            "properties": {
+              "electricEnergy_kWh": {
+                "type": "null"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "electricEnergy_kWh": {
+                "$ref": "#/$defs/positiveNumber"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -161,10 +161,27 @@ def main() -> int:
                 or report["readinessStatus"] != "BLOCKED_UNRESOLVED_HUMAN_GATES"
                 or len(report["unresolvedGateIds"]) != 15):
             raise RuntimeError(f"bunker {name} has an invalid identity/status")
-        bunker_outputs.append(((directory / "result.json").read_bytes(), (directory / "schedule.svg").read_bytes()))
+        energy_path = directory / "construction-energy.json"
+        if not energy_path.is_file():
+            raise RuntimeError(f"bunker {name} did not write construction-energy.json")
+        energy_report = json.loads(energy_path.read_text(encoding="utf-8"))
+        unknown_packages = [row for row in energy_report["workPackages"] if row["estimateStatus"] == "UNKNOWN"]
+        unknown_fleet = [row for row in energy_report["fleet"] if row["estimateStatus"] == "UNKNOWN"]
+        if (energy_report != report["constructionEnergy"]
+                or energy_report["modeledOnlySubtotal_kWh"] != 246
+                or len(energy_report["assumptions"]) != 8 or len(unknown_packages) != 14
+                or len(unknown_fleet) != 1 or unknown_fleet[0]["fleetId"] != "BF-006"
+                or any(row["electricEnergy_kWh"] is not None for row in unknown_packages + unknown_fleet)
+                or energy_report["habitatDailyOperatingDemandIncluded"]):
+            raise RuntimeError(f"bunker {name} has invalid construction-energy coverage or scope")
+        bunker_outputs.append((
+            (directory / "result.json").read_bytes(), (directory / "schedule.svg").read_bytes(),
+            energy_path.read_bytes(),
+        ))
     if bunker_outputs[0] != bunker_outputs[1]:
-        raise RuntimeError("deterministic bunker JSON or SVG outputs differ")
-    print("Deterministic BUNKER-01 result JSON and schedule SVG: byte-identical; construction BLOCKED")
+        raise RuntimeError("deterministic bunker JSON, SVG or construction-energy outputs differ")
+    print("Deterministic BUNKER-01 result JSON, schedule SVG and construction-energy JSON: byte-identical; "
+          "246 kWh modeled subtotal; 14 package and one fleet unknowns; construction BLOCKED")
     physics_payloads = run_twice_and_compare(
         [sys.executable, "-m", "open_construction_equipment", "physics", "--output-dir", "{output}", "--json"],
         ("result.json",), "physics",
