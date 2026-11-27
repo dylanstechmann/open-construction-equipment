@@ -109,6 +109,39 @@ class PowertrainTests(unittest.TestCase):
         self.assertAlmostEqual(result.conversion_loss_heat_kwh, 7 / 0.9 - 7)
         self.assertEqual(result.solar_curtailed_kwh, 0)
 
+    def test_reported_battery_storage_closes_across_surplus_and_deficit(self):
+        battery = self.battery(initial_stored_energy_kwh=10, charge_efficiency=0.5, discharge_efficiency=0.8)
+        work = task(shaft=8, auxiliary=0, efficiency=1, solar_profile=profile((1, 8, 20), (1, 0, 20)))
+        result = compare_powertrains(replace(self.model, tasks=(work,), pv=self.pv, battery=battery))
+        for path in result.task_results:
+            with self.subTest(path=path.path):
+                if path.path in (PowertrainKind.BATTERY_LFP, PowertrainKind.SOLAR_H2_PEMFC, PowertrainKind.SOLAR_H2_ICE):
+                    self.assertEqual(path.battery_storage.opening_kwh, 10)
+                    self.assertEqual(path.battery_storage.charging_input_kwh, 4)
+                    self.assertEqual(path.battery_storage.conversion_loss_kwh, 3)
+                    self.assertEqual(path.battery_storage.closing_kwh, 7)
+                else:
+                    self.assertIsNone(path.battery_storage)
+        first = result.task_results[0]
+        broken = replace(first, battery_storage=replace(first.battery_storage, closing_kwh=8))
+        with self.assertRaisesRegex(ConfigError, "battery storage balance"):
+            powertrain_result_json(replace(result, task_results=(broken, *result.task_results[1:])))
+
+    def test_collected_solar_is_accounted_for_across_all_paths(self):
+        work = task(shaft=8, auxiliary=0, efficiency=1, solar_profile=profile((1, 8, 20), (1, 40, 20)))
+        model = replace(self.model, tasks=(work,), pv=replace(self.pv, dc_collection_efficiency=0.5))
+        result = compare_powertrains(model)
+        for row in json.loads(powertrain_result_json(result))["taskResults"]:
+            with self.subTest(path=row["path"]):
+                self.assertEqual(row["solarCollected_kWh"], 24)
+                charging = (row["batteryStorage"] or {}).get("chargingInput_kWh", 0)
+                self.assertAlmostEqual(row["solarDirect_kWh"] + charging + row["hydrogenSolarInput_kWh"]
+                                       + row["solarCurtailed_kWh"], 24)
+        first = result.task_results[0]
+        broken = replace(first, solar_curtailed_kwh=first.solar_curtailed_kwh + 1)
+        with self.assertRaisesRegex(ConfigError, "solar allocation balance"):
+            powertrain_result_json(replace(result, task_results=(broken,)))
+
     def test_duration_proportional_interval_load_and_direct_pv_first(self):
         work = task(solar_profile=profile((1.0, 3.0, 20.0), (3.0, 0.0, 20.0)))
         result = simulate_battery_path(work, self.pv, self.battery(), self.model.costs)
@@ -325,6 +358,7 @@ class PowertrainTests(unittest.TestCase):
         result = simulate_fuel_path(work, self.pv, self.diesel(maximum_electrical_power_kw=40),
                                     PowertrainKind.DIESEL_ICE, self.model.costs)
         self.assertEqual(result.served_energy_kwh, 40)
+        self.assertEqual(result.generator_output_kwh, 40)
         self.assertEqual(result.unserved_energy_kwh, 60)
         self.assertIn(EnergyFinding.PEAK_POWER_EXCEEDED, result.findings)
         with self.assertRaises(ConfigError):
@@ -503,6 +537,19 @@ class PowertrainTests(unittest.TestCase):
         with self.assertRaises(ConfigError):
             write_powertrain_result(broken, destination)
         self.assertFalse(destination.exists())
+
+    def test_report_preserves_served_source_balance_for_all_paths(self):
+        result = compare_powertrains(self.model)
+        for row in json.loads(powertrain_result_json(result))["taskResults"]:
+            generator = row["generatorOutput_kWh"]
+            sources = (row["solarDirect_kWh"] + row["batteryDischarge_kWh"]
+                       + row["hydrogenElectricalOutput_kWh"] + generator)
+            self.assertAlmostEqual(row["servedEnergy_kWh"], sources, delta=1e-9)
+            if row["path"] not in (PowertrainKind.DIESEL_ICE, PowertrainKind.GASOLINE_ICE):
+                self.assertEqual(generator, 0)
+        broken = replace(result.task_results[0], generator_output_kwh=1.0)
+        with self.assertRaisesRegex(ConfigError, "source balance"):
+            powertrain_result_json(replace(result, task_results=(broken,)))
 
     def test_result_serializer_rejects_status_release_and_gate_mutations(self):
         result = compare_powertrains(self.model)

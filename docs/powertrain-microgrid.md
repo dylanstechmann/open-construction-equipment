@@ -81,8 +81,10 @@ unserved = required - served
 served + unserved = required                 (within 1e-9 kWh)
 ```
 
-Generator output is embedded in `served_energy_kwh`; there is no separate
-result field for it. `solar_curtailed_kwh` is collected energy left after direct
+Each task result records `generatorOutput_kWh` at the electrical bus. Battery
+and hydrogen paths report zero for this field. Before writing a result, the
+serializer checks that the four electrical sources sum to served energy
+within 1e-9 kWh. `solar_curtailed_kwh` is collected energy left after direct
 use and all eligible storage production. No deficit is erased when a rated
 power or storage limit is reached.
 
@@ -276,3 +278,9 @@ and unallocated one-time system CAPEX are separate labels; adding both as though
 they were independent purchases would double count capital. Operating cost does
 not secretly include allocated CAPEX. All paths use the same currency label,
 and all costs remain synthetic and unquoted.
+
+### Battery stock across a task
+
+For paths with an LFP battery, each task row includes `batteryStorage` with opening and closing kWh, charging input, and combined charge/discharge losses. Opening stock plus charging input equals closing stock plus delivered battery discharge plus battery conversion loss. The generator comparators use `null` for this field. Each representative task starts from its configured opening stock.
+
+Each path reports `solarCollected_kWh` after the declared DC collection efficiency. This total reconciles with direct solar delivery, battery charging input, hydrogen production input, and curtailed solar. Initial stored energy and generator output are external to that total.
