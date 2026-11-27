@@ -206,6 +206,7 @@ class TaskPathResult:
     operating_cost: float
     currency: str
     findings: tuple[EnergyFinding, ...]
+    generator_output_kwh: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -958,6 +959,7 @@ def simulate_fuel_path(
         _sum(loss_values, "conversion_loss_heat_kwh"), delivery_km, 0.0, 0.0, costs.currency,
         _findings(unserved, task.peak_electric_power_kw > fuel.maximum_electrical_power_kw,
                   confined_exhaust=task.confined_excavation),
+        generator_output_kwh=generated_total,
     )
 
 
@@ -1160,6 +1162,15 @@ def _validate_result(result: PowertrainResult) -> None:
         closure = abs(_sum((served, unserved, -required), "energy closure residual"))
         if closure > 1e-9:
             raise ConfigError(f"task {item.task_id} path {item.path} violates 1e-9 kWh energy closure")
+        source_flows = (
+            item.solar_direct_kwh, item.battery_discharge_kwh,
+            item.hydrogen_electrical_output_kwh, item.generator_output_kwh,
+        )
+        for flow in source_flows:
+            _at_least(flow, 0, "electrical source delivery")
+        total_delivery = _sum(source_flows, "electrical source delivery")
+        if abs(total_delivery - served) > 1e-9:
+            raise ConfigError(f"task {item.task_id} path {item.path} violates 1e-9 kWh source balance")
         _finite(item.conversion_loss_heat_kwh, "conversion_loss_heat_kwh")
         _finite(item.refill_delivery_km, "refill_delivery_km")
         _finite(item.allocated_capex, "allocated_capex")

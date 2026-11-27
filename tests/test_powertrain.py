@@ -325,6 +325,7 @@ class PowertrainTests(unittest.TestCase):
         result = simulate_fuel_path(work, self.pv, self.diesel(maximum_electrical_power_kw=40),
                                     PowertrainKind.DIESEL_ICE, self.model.costs)
         self.assertEqual(result.served_energy_kwh, 40)
+        self.assertEqual(result.generator_output_kwh, 40)
         self.assertEqual(result.unserved_energy_kwh, 60)
         self.assertIn(EnergyFinding.PEAK_POWER_EXCEEDED, result.findings)
         with self.assertRaises(ConfigError):
@@ -503,6 +504,19 @@ class PowertrainTests(unittest.TestCase):
         with self.assertRaises(ConfigError):
             write_powertrain_result(broken, destination)
         self.assertFalse(destination.exists())
+
+    def test_report_preserves_served_source_balance_for_all_paths(self):
+        result = compare_powertrains(self.model)
+        for row in json.loads(powertrain_result_json(result))["taskResults"]:
+            generator = row["generatorOutput_kWh"]
+            sources = (row["solarDirect_kWh"] + row["batteryDischarge_kWh"]
+                       + row["hydrogenElectricalOutput_kWh"] + generator)
+            self.assertAlmostEqual(row["servedEnergy_kWh"], sources, delta=1e-9)
+            if row["path"] not in (PowertrainKind.DIESEL_ICE, PowertrainKind.GASOLINE_ICE):
+                self.assertEqual(generator, 0)
+        broken = replace(result.task_results[0], generator_output_kwh=1.0)
+        with self.assertRaisesRegex(ConfigError, "source balance"):
+            powertrain_result_json(replace(result, task_results=(broken,)))
 
     def test_result_serializer_rejects_status_release_and_gate_mutations(self):
         result = compare_powertrains(self.model)
