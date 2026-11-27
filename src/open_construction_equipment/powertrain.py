@@ -180,6 +180,14 @@ class NoiseEstimate:
 
 
 @dataclass(frozen=True)
+class BatteryStorageBalance:
+    opening_kwh: float
+    charging_input_kwh: float
+    conversion_loss_kwh: float
+    closing_kwh: float
+
+
+@dataclass(frozen=True)
 class TaskPathResult:
     task_id: str
     path: PowertrainKind
@@ -207,6 +215,7 @@ class TaskPathResult:
     currency: str
     findings: tuple[EnergyFinding, ...]
     generator_output_kwh: float = 0.0
+    battery_storage: BatteryStorageBalance | None = None
 
 
 @dataclass(frozen=True)
@@ -689,7 +698,7 @@ def _interval_load(total: float, interval: SolarInterval, duration_h: float, nam
 def _charge_battery(
     stored_kwh: float, surplus_kwh: float, duration_h: float, temperature_factor: float,
     battery: LfpBatterySystem,
-) -> tuple[float, float, float]:
+) -> tuple[float, float, float, float]:
     room = _product(max(0.0, _sum((battery.maximum_stored_energy_kwh, -stored_kwh),
                                   "battery charge room")), temperature_factor, name="derated battery charge room")
     power_limit = _product(battery.maximum_charge_power_kw, temperature_factor, duration_h,
@@ -699,7 +708,7 @@ def _charge_battery(
     stored_gain = _product(charge_input, battery.charge_efficiency, name="battery stored charge")
     new_stored = _sum((stored_kwh, stored_gain), "battery stored energy")
     loss = _sum((charge_input, -stored_gain), "battery charge loss")
-    return new_stored, _sum((surplus_kwh, -charge_input), "remaining solar surplus"), loss
+    return new_stored, _sum((surplus_kwh, -charge_input), "remaining solar surplus"), loss, charge_input
 
 
 def _discharge_battery(
@@ -757,6 +766,7 @@ def simulate_battery_path(
     required = _required_electrical_energy(task)
     duration = _task_duration(task)
     stored = battery.initial_stored_energy_kwh
+    charge_inputs = []
     discharge_power_limits = []
     direct_values, discharge_values, curtailed_values, loss_values = [], [], [], []
     for interval in task.solar_profile:
@@ -771,7 +781,8 @@ def simulate_battery_path(
             battery.maximum_discharge_power_kw, factor, name="temperature-derated battery discharge power",
         ))
         if surplus > 0:
-            stored, surplus, charge_loss = _charge_battery(stored, surplus, interval.duration_h, factor, battery)
+            stored, surplus, charge_loss, charge_input = _charge_battery(stored, surplus, interval.duration_h, factor, battery)
+            charge_inputs.append(charge_input)
         else:
             charge_loss = 0.0
         if deficit > 0:
@@ -788,6 +799,7 @@ def simulate_battery_path(
     battery_discharge = _sum(discharge_values, "battery_discharge_kwh")
     served = _sum((solar_direct, battery_discharge), "served_energy_kwh")
     unserved = max(0.0, _sum((required, -served), "unserved_energy_kwh"))
+    battery_loss = _sum(loss_values, "battery conversion loss")
     return TaskPathResult(
         task.task_id, PowertrainKind.BATTERY_LFP, required, served, unserved, solar_direct,
         battery_discharge, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -795,9 +807,11 @@ def simulate_battery_path(
         task.recoverable_heat_demand_kwh,
         _product(battery.charge_efficiency, battery.discharge_efficiency, pv.ac_inverter_efficiency,
                  name="battery electrical round-trip efficiency"),
-        _electric_noise(task, battery), _sum(loss_values, "conversion_loss_heat_kwh"),
+        _electric_noise(task, battery), battery_loss,
         0.0, 0.0, 0.0, costs.currency,
         _findings(unserved, task.peak_electric_power_kw > min(discharge_power_limits)),
+        battery_storage=BatteryStorageBalance(battery.initial_stored_energy_kwh,
+            _sum(charge_inputs, "battery charging input"), battery_loss, stored),
     )
 
 
@@ -817,6 +831,7 @@ def simulate_hydrogen_path(
     duration = _task_duration(task)
     stored_kwh = battery.initial_stored_energy_kwh
     stored_kg = hydrogen.initial_stored_kg
+    charge_inputs, battery_losses = [], []
     specific_solar_input = _sum((checked_divide(
         HYDROGEN_LHV_KWH_PER_KG, hydrogen.electrolyzer_lhv_efficiency, "electrolyzer specific energy",
     ), hydrogen.compression_energy_kwh_kg), "hydrogen specific solar input")
@@ -836,9 +851,10 @@ def simulate_hydrogen_path(
         charge_loss = discharge_loss = 0.0
         battery_output = hydrogen_output = produced = consumed = solar_for_h2 = recovered = 0.0
         if surplus > 0:
-            stored_kwh, surplus, charge_loss = _charge_battery(
+            stored_kwh, surplus, charge_loss, charge_input = _charge_battery(
                 stored_kwh, surplus, interval.duration_h, factor, battery,
             )
+            charge_inputs.append(charge_input)
             storage_room = max(0.0, _sum((hydrogen.storage_capacity_kg, -stored_kg), "hydrogen storage room"))
             mass_by_surplus = checked_divide(surplus, specific_solar_input, "hydrogen mass from solar surplus")
             electrolyzer_energy_limit = _product(hydrogen.maximum_electrolyzer_power_kw, interval.duration_h,
@@ -888,6 +904,7 @@ def simulate_hydrogen_path(
         curtailed_values.append(surplus)
         heat_values.append(recovered)
         loss_values.extend((charge_loss, discharge_loss))
+        battery_losses.extend((charge_loss, discharge_loss))
     solar_direct = _sum(direct_values, "solar_direct_kwh")
     battery_discharge = _sum(battery_values, "battery_discharge_kwh")
     hydrogen_output = _sum(hydrogen_values, "hydrogen_electrical_output_kwh")
@@ -906,6 +923,8 @@ def simulate_hydrogen_path(
         _electric_noise(task, battery), _sum(loss_values, "conversion_loss_heat_kwh"),
         0.0, 0.0, 0.0, costs.currency,
         _findings(unserved, task.peak_electric_power_kw > hydrogen.maximum_reconversion_power_kw, hydrogen=True),
+        battery_storage=BatteryStorageBalance(battery.initial_stored_energy_kwh,
+            _sum(charge_inputs, "battery charging input"), _sum(battery_losses, "battery conversion loss"), stored_kwh),
     )
 
 
@@ -1171,6 +1190,15 @@ def _validate_result(result: PowertrainResult) -> None:
         total_delivery = _sum(source_flows, "electrical source delivery")
         if abs(total_delivery - served) > 1e-9:
             raise ConfigError(f"task {item.task_id} path {item.path} violates 1e-9 kWh source balance")
+        if item.battery_storage is not None:
+            stock = item.battery_storage
+            for quantity in (stock.opening_kwh, stock.charging_input_kwh, stock.conversion_loss_kwh, stock.closing_kwh):
+                _at_least(quantity, 0, "battery storage energy")
+            residual = _sum((stock.opening_kwh, stock.charging_input_kwh, -item.battery_discharge_kwh,
+                             -stock.conversion_loss_kwh, -stock.closing_kwh), "battery storage residual")
+            scale = max(stock.opening_kwh, stock.closing_kwh, stock.charging_input_kwh, item.battery_discharge_kwh)
+            if abs(residual) > max(1e-9, 1e-12 * scale):
+                raise ConfigError(f"task {item.task_id} path {item.path} violates battery storage balance")
         _finite(item.conversion_loss_heat_kwh, "conversion_loss_heat_kwh")
         _finite(item.refill_delivery_km, "refill_delivery_km")
         _finite(item.allocated_capex, "allocated_capex")

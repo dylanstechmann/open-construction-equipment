@@ -278,3 +278,7 @@ and unallocated one-time system CAPEX are separate labels; adding both as though
 they were independent purchases would double count capital. Operating cost does
 not secretly include allocated CAPEX. All paths use the same currency label,
 and all costs remain synthetic and unquoted.
+
+### Battery stock across a task
+
+For paths with an LFP battery, each task row includes `batteryStorage` with opening and closing kWh, charging input, and combined charge/discharge losses. Opening stock plus charging input equals closing stock plus delivered battery discharge plus battery conversion loss. The generator comparators use `null` for this field. Each representative task starts from its configured opening stock.

@@ -109,6 +109,24 @@ class PowertrainTests(unittest.TestCase):
         self.assertAlmostEqual(result.conversion_loss_heat_kwh, 7 / 0.9 - 7)
         self.assertEqual(result.solar_curtailed_kwh, 0)
 
+    def test_reported_battery_storage_closes_across_surplus_and_deficit(self):
+        battery = self.battery(initial_stored_energy_kwh=10, charge_efficiency=0.5, discharge_efficiency=0.8)
+        work = task(shaft=8, auxiliary=0, efficiency=1, solar_profile=profile((1, 8, 20), (1, 0, 20)))
+        result = compare_powertrains(replace(self.model, tasks=(work,), pv=self.pv, battery=battery))
+        for path in result.task_results:
+            with self.subTest(path=path.path):
+                if path.path in (PowertrainKind.BATTERY_LFP, PowertrainKind.SOLAR_H2_PEMFC, PowertrainKind.SOLAR_H2_ICE):
+                    self.assertEqual(path.battery_storage.opening_kwh, 10)
+                    self.assertEqual(path.battery_storage.charging_input_kwh, 4)
+                    self.assertEqual(path.battery_storage.conversion_loss_kwh, 3)
+                    self.assertEqual(path.battery_storage.closing_kwh, 7)
+                else:
+                    self.assertIsNone(path.battery_storage)
+        first = result.task_results[0]
+        broken = replace(first, battery_storage=replace(first.battery_storage, closing_kwh=8))
+        with self.assertRaisesRegex(ConfigError, "battery storage balance"):
+            powertrain_result_json(replace(result, task_results=(broken, *result.task_results[1:])))
+
     def test_duration_proportional_interval_load_and_direct_pv_first(self):
         work = task(solar_profile=profile((1.0, 3.0, 20.0), (3.0, 0.0, 20.0)))
         result = simulate_battery_path(work, self.pv, self.battery(), self.model.costs)
