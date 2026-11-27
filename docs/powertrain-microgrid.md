@@ -81,8 +81,10 @@ unserved = required - served
 served + unserved = required                 (within 1e-9 kWh)
 ```
 
-Generator output is embedded in `served_energy_kwh`; there is no separate
-result field for it. `solar_curtailed_kwh` is collected energy left after direct
+Each task result records `generatorOutput_kWh` at the electrical bus. Battery
+and hydrogen paths report zero for this field. Before writing a result, the
+serializer checks that the four electrical sources sum to served energy
+within 1e-9 kWh. `solar_curtailed_kwh` is collected energy left after direct
 use and all eligible storage production. No deficit is erased when a rated
 power or storage limit is reached.
 
